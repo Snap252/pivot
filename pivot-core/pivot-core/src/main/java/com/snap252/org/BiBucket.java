@@ -15,22 +15,22 @@ public final class BiBucket<V> {
 
 	private final RootBucket<V> rowBucket;
 	private final RootBucket<V> colBucket;
-	private final List<RowBucketWrapper> rows;
+	private final List<RowBucketWrapper<V>> rows;
 
 	public BiBucket(List<V> values, Pair<Function<V, Object>[]> rowColsFnkt) {
 		rowBucket = new RootBucket<>(values, rowColsFnkt.first);
 		colBucket = new RootBucket<>(values, rowColsFnkt.second);
 
-		this.rows = rowBucket.stream().map(RowBucketWrapper::new).collect(toList());
+		this.rows = rowBucket.stream().map(t -> new RowBucketWrapper<V>(t, colBucket)).collect(toList());
 	}
 
-	public final class RowBucketWrapper {
+	public static class RowBucketWrapper<V> {
 		public final Bucket<V> rb;
-		public final List<Bucket<V>> cells;
+		public final Bucket<V> cells;
 
-		public RowBucketWrapper(Bucket<V> rb) {
+		public RowBucketWrapper(Bucket<V> rb, final RootBucket<V> colBucket) {
 			this.rb = rb;
-			this.cells = colBucket.createBucketWithNewValues(rb.values).stream().collect(toList());
+			this.cells = colBucket.createBucketWithNewValues(rb.values);
 		}
 
 		public Stream<Bucket<V>> getCells() {

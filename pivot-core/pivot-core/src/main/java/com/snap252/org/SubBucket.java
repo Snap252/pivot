@@ -19,10 +19,10 @@ public class SubBucket<V> extends Bucket<V> {
 		assert !partitionCriterionsAndSubCriterions.isEmpty();
 		this.depth = partitionCriterionsAndSubCriterions.size();
 
-		Function<V, Object> ownCriterion = partitionCriterionsAndSubCriterions.get(0);
-		Map<Object, List<V>> collect = values.stream().filter(this).collect(Collectors.groupingBy(ownCriterion::apply));
+		final Function<V, Object> ownCriterion = partitionCriterionsAndSubCriterions.get(0);
+		final Map<Object, List<V>> collect = values.stream().filter(this).collect(Collectors.groupingBy(ownCriterion::apply));
 
-		List<Function<V, Object>> childCriterions = partitionCriterionsAndSubCriterions.subList(1,
+		final List<Function<V, Object>> childCriterions = partitionCriterionsAndSubCriterions.subList(1,
 				partitionCriterionsAndSubCriterions.size());
 
 		assert childCriterions.size() == partitionCriterionsAndSubCriterions.size() - 1;
@@ -41,9 +41,10 @@ public class SubBucket<V> extends Bucket<V> {
 						+ "=> own: " + new HashSet<V>(values);
 	}
 
+	@Override
 	protected StringBuilder addString(String linePrefix, StringBuilder sb) {
 		super.addString(linePrefix, sb);
-		for (Bucket<V> child : children) {
+		for (final Bucket<V> child : children) {
 			child.addString(linePrefix + "\t", sb);
 		}
 		return sb;

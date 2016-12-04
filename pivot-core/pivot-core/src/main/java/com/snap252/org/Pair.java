@@ -1,8 +1,6 @@
 package com.snap252.org;
 
 import java.io.Serializable;
-import java.util.List;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -22,6 +20,7 @@ public final class Pair<T> implements Serializable {
 		this(pair.first, pair.second);
 	}
 
+	@Override
 	public String toString() {
 		return "(" + this.first + ", " + this.second + ")";
 	}
@@ -37,7 +36,7 @@ public final class Pair<T> implements Serializable {
 		if (!(o instanceof Pair))
 			return false;
 
-		Pair<?> p = (Pair<?>) o;
+		final Pair<?> p = (Pair<?>) o;
 		return this.first.equals(p.first) && this.second.equals(p.second);
 
 	}

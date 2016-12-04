@@ -17,7 +17,7 @@ public class CopyBucket<V> extends Bucket<V> {
 		super(origBucket.bucketValue, null, null, origBucket.filter(valuesBase), origBucket.getLevel());
 		this.origBucket = origBucket;
 
-		Collection<Bucket<V>> origChildren = origBucket.getChilren();
+		final Collection<Bucket<V>> origChildren = origBucket.getChilren();
 		if (origChildren == null || origChildren.isEmpty()) {
 			return;
 		}

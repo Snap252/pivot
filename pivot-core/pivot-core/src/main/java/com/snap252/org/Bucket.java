@@ -12,13 +12,13 @@ public abstract class Bucket<V> implements Predicate<V> {
 
 	protected final Object bucketValue;
 
-	private Function<V, Object> extractor;
+	private final Function<V, Object> extractor;
 
-	private Bucket<V> parent;
+	private final Bucket<V> parent;
 
 	protected final List<V> values;
 
-	private int level;
+	private final int level;
 
 	public Bucket(Object bucketValue, Bucket<V> parent, Function<V, Object> extractor, List<V> values, int level) {
 		this.bucketValue = bucketValue;
@@ -70,7 +70,7 @@ public abstract class Bucket<V> implements Predicate<V> {
 			prefix = "<unknown>";
 		}
 
-		String v = prefix + ":" + getBucketValue();
+		final String v = prefix + ":" + getBucketValue();
 		if (parent == null) {
 			return v;
 		}
@@ -81,7 +81,7 @@ public abstract class Bucket<V> implements Predicate<V> {
 	public boolean test(V v) {
 		assert parent != null;
 		assert extractor != null;
-		Object extractedValue = extractor.apply(v);
+		final Object extractedValue = extractor.apply(v);
 		return /* parent.test(v) && */bucketValue.equals(extractedValue);
 	}
 

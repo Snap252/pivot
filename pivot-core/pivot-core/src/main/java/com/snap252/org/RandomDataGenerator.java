@@ -2,8 +2,6 @@ package com.snap252.org;
 
 import static java.util.stream.Collectors.joining;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -16,8 +14,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-
-import com.snap252.org.RandomDataGenerator.Person;
 
 public class RandomDataGenerator {
 	private static final Random random = new Random();
@@ -40,7 +36,7 @@ public class RandomDataGenerator {
 		// String[] vorname = new String[] { "Hanne", "Herbert", "Karmen",
 		// "Klaus", "Helga", "Susanne", "Stefan", "Anne",
 		// "Arne" };
-		String[] vorname = new String[] { "Mia", "Emma", "Hannah", "Hanna", "Sofia", "Sophia", "Anna", "Lea", "Leah",
+		final String[] vorname = new String[] { "Mia", "Emma", "Hannah", "Hanna", "Sofia", "Sophia", "Anna", "Lea", "Leah",
 				"Emilia", "Marie", "Lena", "Leonie", "Emily", "Emilie", "Lina", "Amelie", "Sophie", "Sofie", "Lilly",
 				"Lilli", "Luisa", "Louisa", "Johanna", "Laura", "Nele", "Neele", "Lara", "Maja", "Maya", "Charlotte",
 				"Clara", "Klara", "Leni", "Sarah", "Sara", "Pia", "Mila", "Alina", "Lisa", "Lotta", "Ida", "Julia",
@@ -101,7 +97,7 @@ public class RandomDataGenerator {
 		// String[] nachname = new String[] { "Gustavson", "Häger", "Berner",
 		// "Klaus", "Sommermann", "Chand", "Stenzel",
 		// "Ovan", "Kotzsack" };
-		String[] nachname = new String[] { "Müller", "Schmidt", "Schneider", "Fischer", "Weber", "Meyer", "Wagner",
+		final String[] nachname = new String[] { "Müller", "Schmidt", "Schneider", "Fischer", "Weber", "Meyer", "Wagner",
 				"Becker", "Schulz", "Hoffmann", "Schäfer", "Bauer", "Koch", "Richter", "Klein", "Wolf", "Schröder",
 				"Neumann", "Schwarz", "Braun", "Hofmann", "Zimmermann", "Schmitt", "Hartmann", "Krüger", "Schmid",
 				"Werner", "Lange", "Schmitz", "Meier", "Krause", "Maier", "Lehmann", "Huber", "Mayer", "Herrmann",
@@ -336,9 +332,9 @@ public class RandomDataGenerator {
 				"Reinsch", "Plötz", "Wilk", "Wenger", "Kutscher", "Kappel", "Mund", "Mandel", "Wehr", "Menges",
 				"Zoller", "Schewe", "Zeiler", "Wehrmann", "Kutz", "Häuser", "Faulhaber", "Schunk", "Bast",
 				"Sternberg" };
-		String[] geschlecht = new String[] { "männlich", "weiblich", "unbekannt" };
+		final String[] geschlecht = new String[] { "männlich", "weiblich", "unbekannt" };
 
-		List<Person> personen = getAsStream(100000,
+		final List<Person> personen = getAsStream(100000,
 				r -> new Person(random(vorname), random(nachname), random.nextInt(60) + 10, random(Geschl.values())))
 						.collect(Collectors.toList());
 
@@ -346,14 +342,14 @@ public class RandomDataGenerator {
 		// System.err.println(d);
 		// }
 
-		RootBucket<Person> colBucket = printTimer("rowBucket", 10,
+		final RootBucket<Person> colBucket = printTimer("rowBucket", 10,
 				() -> new RootBucket<Person>(personen,
 //						p -> p.vorname.charAt(0),
 						p -> p.geschlecht
 						, p -> p.alter / 10
 						));
 
-		RootBucket<Person> rowBucket = printTimer("colBucket", () -> new RootBucket<Person>(personen,
+		final RootBucket<Person> rowBucket = printTimer("colBucket", () -> new RootBucket<Person>(personen,
 				p -> Character.toUpperCase(p.nachname.charAt(0))
 //				,p -> p.nachname.charAt(1)
 //				p -> p.vorname
@@ -396,17 +392,17 @@ public class RandomDataGenerator {
 		{
 			try (FileOutputStream fos = new FileOutputStream("C:\\Users\\Snap252\\Documents\\1.html")) {
 
-				BiBucket2<Person> biBucket2 = new BiBucket2<Person>(personen, new Pair<Function<Person, Object>[]>(
+				final BiBucket2<Person> biBucket2 = new BiBucket2<Person>(personen, new Pair<Function<Person, Object>[]>(
 						rowBucket.partitionCriterionsAndSubCriterions, colBucket.partitionCriterionsAndSubCriterions));
 				try (OutputStreamWriter writer = new OutputStreamWriter(fos)) {
 					biBucket2.writeHtml(writer, t -> {
 //						String tt = t.stream().map(Object::toString).collect(joining("\n"));
-						String tt = t.stream().map(Object::toString).limit(5).collect(joining("\n"));
+						final String tt = t.stream().map(Object::toString).limit(5).collect(joining("\n"));
 
 						return MessageFormat.format("<div title=''{0}''>{1}</div>", tt, t.size() == 0 ? "" : t.size());
 					});
 				}
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -449,7 +445,7 @@ public class RandomDataGenerator {
 	}
 
 	static long timer(Runnable r) {
-		long l = System.nanoTime();
+		final long l = System.nanoTime();
 		r.run();
 		return (System.nanoTime() - l) / 1000000L;
 	}
@@ -460,23 +456,11 @@ public class RandomDataGenerator {
 
 	static <R> R printTimer(String name, int cnt, Supplier<R> r) {
 		assert cnt > 0;
-		long l = System.nanoTime();
+		final long l = System.nanoTime();
 		R ret = null;
 		for (int i = 0; i < cnt; i++)
 			ret = r.get();
 		System.err.println(MessageFormat.format("{0}: {1}ms", name, (System.nanoTime() - l) / 1000000L));
 		return ret;
 	}
-
-	protected static void doWithSubBuckets(SubBucket<Person> rowBucket, SubBucket<Person> colBucket) {
-		BiBucket.getStream(rowBucket, colBucket).forEach(b -> {
-			long cnt = b.computeValues().stream().collect(Collectors.counting());
-			if (cnt > 0 && cnt < 10) {
-				// String s = b.getParentString() + "=>" + cnt;
-				String s = b.getParentString() + " => Werte" + Arrays.deepToString(b.computeValues().toArray());
-				// System.err.println(s);
-			}
-		});
-	}
-
 }

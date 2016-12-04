@@ -43,19 +43,19 @@ public final class BiBucket2<V> {
 
 	public void printRow(Writer w, List<Bucket<V>> rows, int depth, int spacerColumns, int level) throws IOException {
 
-		List<Bucket<V>> children = new ArrayList<Bucket<V>>();
+		final List<Bucket<V>> children = new ArrayList<Bucket<V>>();
 		w.write("<tr>");
 		if (level == 0)
 			w.write(MessageFormat.format("<th colspan=''{0}'' rowspan=''{1}''>---columns---</th>", spacerColumns,
 					depth + 1));
-		for (Bucket<V> row : rows) {
+		for (final Bucket<V> row : rows) {
 			// render "self" - cell
 			if (row == null) {
 				w.write(MessageFormat.format("<th rowspan=''{0}''>-</th>", depth + 1));
 				continue;
 			}
 
-			int colSpan = row.getSize(1);
+			final int colSpan = row.getSize(1);
 			if (colSpan == 1)
 				w.write("<th>");
 			else
@@ -108,12 +108,12 @@ public final class BiBucket2<V> {
 							w.write("<td>");
 							w.write(cellHandler.apply(cell.values).toString());
 							w.write("</td>");
-						} catch (IOException e) {
+						} catch (final IOException e) {
 							throw new AssertionError(e);
 						}
 					});
 					w.write("</tr>");
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					throw new AssertionError(e);
 				}
 			});

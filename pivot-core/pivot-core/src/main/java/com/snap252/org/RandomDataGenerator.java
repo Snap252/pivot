@@ -392,7 +392,7 @@ public class RandomDataGenerator {
 		{
 			try (FileOutputStream fos = new FileOutputStream("C:\\Users\\Snap252\\Documents\\1.html")) {
 
-				final BiBucket2<Person> biBucket2 = new BiBucket2<Person>(personen, new Pair<Function<Person, Object>[]>(
+				final BiBucket<Person> biBucket2 = new BiBucket<Person>(personen, new Pair<Function<Person, Object>[]>(
 						rowBucket.partitionCriterionsAndSubCriterions, colBucket.partitionCriterionsAndSubCriterions));
 				try (OutputStreamWriter writer = new OutputStreamWriter(fos)) {
 					biBucket2.writeHtml(writer, t -> {

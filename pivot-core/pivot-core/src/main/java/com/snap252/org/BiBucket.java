@@ -1,5 +1,7 @@
 package com.snap252.org;
 
+import static java.util.stream.Collectors.toList;
+
 import java.io.IOException;
 import java.io.Writer;
 import java.text.MessageFormat;
@@ -9,36 +11,35 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-public final class BiBucket2<V> {
+public final class BiBucket<V> {
 
 	private final RootBucket<V> rowBucket;
 	private final RootBucket<V> colBucket;
+	private final List<RowBucketWrapper> rows;
 
-	public BiBucket2(List<V> values, Pair<Function<V, Object>[]> rowColsFnkt) {
+	public BiBucket(List<V> values, Pair<Function<V, Object>[]> rowColsFnkt) {
 		rowBucket = new RootBucket<>(values, rowColsFnkt.first);
 		colBucket = new RootBucket<>(values, rowColsFnkt.second);
+
+		this.rows = rowBucket.stream().map(RowBucketWrapper::new).collect(toList());
 	}
 
 	public final class RowBucketWrapper {
-		private final Bucket<V> rb;
+		public final Bucket<V> rb;
+		public final List<Bucket<V>> cells;
 
 		public RowBucketWrapper(Bucket<V> rb) {
 			this.rb = rb;
+			this.cells = colBucket.createBucketWithNewValues(rb.values).stream().collect(toList());
 		}
 
 		public Stream<Bucket<V>> getCells() {
-			return colBucket.createBucketWithNewValues(rb.values).stream();// .map(b
-																			// ->
-																			// b.values);
+			return cells.stream();
 		}
 	}
 
-	public Stream<RowBucketWrapper> getRows() {
-		return rowBucket.stream().map(RowBucketWrapper::new);
-	}
-
 	public Stream<Bucket<V>> getCells() {
-		return getRows().flatMap(r -> r.getCells());
+		return rows.stream().flatMap(RowBucketWrapper::getCells);
 	}
 
 	public void printRow(Writer w, List<Bucket<V>> rows, int depth, int spacerColumns, int level) throws IOException {
@@ -95,7 +96,7 @@ public final class BiBucket2<V> {
 		{
 			w.write("<tbody>");
 
-			getRows().forEach(r -> {
+			rows.forEach(r -> {
 				try {
 					w.write("<tr>");
 

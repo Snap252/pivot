@@ -2,7 +2,6 @@ package com.snap252.org;
 
 import static java.util.stream.Collectors.toSet;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -11,12 +10,14 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class SubBucket<V> extends Bucket<V> {
-	public final Collection<Bucket<V>> children;
+	public final List<Bucket<V>> children;
+	public final int depth;
 
 	public SubBucket(Object bucketValue, List<Function<V, Object>> partitionCriterionsAndSubCriterions,
-			SubBucket<V> parent, Function<V, Object> extractor, List<V> values) {
-		super(bucketValue, parent, extractor, values);
+			SubBucket<V> parent, Function<V, Object> extractor, List<V> values, int level) {
+		super(bucketValue, parent, extractor, values, level);
 		assert !partitionCriterionsAndSubCriterions.isEmpty();
+		this.depth = partitionCriterionsAndSubCriterions.size();
 
 		Function<V, Object> ownCriterion = partitionCriterionsAndSubCriterions.get(0);
 		Map<Object, List<V>> collect = values.stream().filter(this).collect(Collectors.groupingBy(ownCriterion::apply));
@@ -27,8 +28,9 @@ public class SubBucket<V> extends Bucket<V> {
 		assert childCriterions.size() == partitionCriterionsAndSubCriterions.size() - 1;
 
 		this.children = collect.entrySet().stream().map(e -> {
-			return childCriterions.isEmpty() ? new LeafBucket<V>(e.getKey(), this, ownCriterion, e.getValue())
-					: new SubBucket<V>(e.getKey(), childCriterions, this, ownCriterion, e.getValue());
+			return childCriterions.isEmpty()
+					? new LeafBucket<V>(e.getKey(), this, ownCriterion, e.getValue(), level + 1)
+					: new SubBucket<V>(e.getKey(), childCriterions, this, ownCriterion, e.getValue(), level + 1);
 		}).collect(Collectors.toList());
 
 		assert children.stream().flatMap(c -> c.values.stream()).collect(toSet()).equals(new HashSet<V>(
@@ -48,8 +50,8 @@ public class SubBucket<V> extends Bucket<V> {
 	}
 
 	@Override
-	protected int getSize() {
-		return children.stream().mapToInt(Bucket::getSize).sum();
+	protected int getSize(int forSelf) {
+		return children.stream().mapToInt(b -> b.getSize(forSelf)).sum() + forSelf;
 	}
 
 	@Override
@@ -63,8 +65,12 @@ public class SubBucket<V> extends Bucket<V> {
 	}
 
 	@Override
-	public Collection<Bucket<V>> getChilren() {
+	public List<Bucket<V>> getChilren() {
 		return children;
 	}
 
+	@Override
+	public int getDepth() {
+		return depth + 1;
+	}
 }

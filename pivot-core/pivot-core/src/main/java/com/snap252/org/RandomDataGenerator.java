@@ -2,6 +2,11 @@ package com.snap252.org;
 
 import static java.util.stream.Collectors.joining;
 
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
@@ -11,6 +16,8 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
+import com.snap252.org.RandomDataGenerator.Person;
 
 public class RandomDataGenerator {
 	private static final Random random = new Random();
@@ -28,7 +35,7 @@ public class RandomDataGenerator {
 		return t[random.nextInt(t.length)];
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 
 		// String[] vorname = new String[] { "Hanne", "Herbert", "Karmen",
 		// "Klaus", "Helga", "Susanne", "Stefan", "Anne",
@@ -331,7 +338,7 @@ public class RandomDataGenerator {
 				"Sternberg" };
 		String[] geschlecht = new String[] { "männlich", "weiblich", "unbekannt" };
 
-		List<Person> personen = getAsStream(100,
+		List<Person> personen = getAsStream(100000,
 				r -> new Person(random(vorname), random(nachname), random.nextInt(60) + 10, random(Geschl.values())))
 						.collect(Collectors.toList());
 
@@ -339,37 +346,75 @@ public class RandomDataGenerator {
 		// System.err.println(d);
 		// }
 
-		RootBucket<Person> rowBucket = printTimer("rowBucket", 10,
-				() -> new RootBucket<Person>(personen, p -> p.geschlecht, p -> p.alter));
+		RootBucket<Person> colBucket = printTimer("rowBucket", 10,
+				() -> new RootBucket<Person>(personen,
+//						p -> p.vorname.charAt(0),
+						p -> p.geschlecht
+						, p -> p.alter / 10
+						));
 
-		RootBucket<Person> colBucket = printTimer("colBucket",
-				() -> new RootBucket<Person>(personen, p -> p.vorname.charAt(0), p -> p.vorname));
+		RootBucket<Person> rowBucket = printTimer("colBucket", () -> new RootBucket<Person>(personen,
+				p -> Character.toUpperCase(p.nachname.charAt(0))
+//				,p -> p.nachname.charAt(1)
+//				p -> p.vorname
+				));
 
-		rowBucket.reverseStream().map(Bucket::getSize).forEach(System.err::println);
+		// rowBucket.reverseStream().map(Bucket::getSize).forEach(System.err::println);
 
-		System.err.println("row size:" + rowBucket.getSize());
-		System.err.println("col size:" + colBucket.getSize());
-		System.err.println("row size2:" + rowBucket.stream().collect(Collectors.counting()));
-		System.err.println("col size2:" + colBucket.stream().collect(Collectors.counting()));
+		// System.err.println("row size:" + rowBucket.getSize());
+		// System.err.println("col size:" + colBucket.getSize());
+		// System.err.println("row size2:" +
+		// rowBucket.stream().collect(Collectors.counting()));
+		// System.err.println("col size2:" +
+		// colBucket.stream().collect(Collectors.counting()));
+		//
+		// long cnt = BiBucket.getStream(rowBucket,
+		// colBucket).collect(Collectors.counting());
+		//
+		// // BiBucket.getStream(rowBucket,
+		// // colBucket).forEach(System.err::println);
+		// printTimer("doWithSubBuckets", () -> doWithSubBuckets(rowBucket,
+		// colBucket));
+		// String s = printTimer("doWithSubBuckets2", () -> {
+		// BiBucket2<Person> biBucket2 = new BiBucket2<Person>(personen, new
+		// Pair<Function<Person, Object>[]>(
+		// rowBucket.partitionCriterionsAndSubCriterions,
+		// colBucket.partitionCriterionsAndSubCriterions));
+		//
+		// return biBucket2.getCells().filter(v ->
+		// !v.values.isEmpty()).map(Object::toString).collect(joining("\r\n"));
+		// });
+		// System.err.println(s);
+		//
+		// System.err.println("biBucket:" + cnt);
 
-		long cnt = BiBucket.getStream(rowBucket, colBucket).collect(Collectors.counting());
+		printTimer("doWithSubBuckets", () -> write(personen, colBucket, rowBucket));
+	}
 
-		// BiBucket.getStream(rowBucket,
-		// colBucket).forEach(System.err::println);
-		printTimer("doWithSubBuckets", () -> doWithSubBuckets(rowBucket, colBucket));
-		String s = printTimer("doWithSubBuckets2", () -> {
-			BiBucket2<Person> biBucket2 = new BiBucket2<Person>(personen, new Pair<Function<Person, Object>[]>(
-					rowBucket.partitionCriterionsAndSubCriterions, colBucket.partitionCriterionsAndSubCriterions));
+	protected static void write(List<Person> personen, RootBucket<Person> colBucket, RootBucket<Person> rowBucket)
+			{
+		{
+			try (FileOutputStream fos = new FileOutputStream("C:\\Users\\Snap252\\Documents\\1.html")) {
 
-			return biBucket2.getCells().filter(v -> !v.isEmpty()).map(Object::toString).collect(joining("\r\n"));
-		});
-		System.err.println(s);
+				BiBucket2<Person> biBucket2 = new BiBucket2<Person>(personen, new Pair<Function<Person, Object>[]>(
+						rowBucket.partitionCriterionsAndSubCriterions, colBucket.partitionCriterionsAndSubCriterions));
+				try (OutputStreamWriter writer = new OutputStreamWriter(fos)) {
+					biBucket2.writeHtml(writer, t -> {
+//						String tt = t.stream().map(Object::toString).collect(joining("\n"));
+						String tt = t.stream().map(Object::toString).limit(5).collect(joining("\n"));
 
-		System.err.println("biBucket:" + cnt);
+						return MessageFormat.format("<div title=''{0}''>{1}</div>", tt, t.size() == 0 ? "" : t.size());
+					});
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
 	enum Geschl {
-		m, w
+		m, w, unbekannt
 	}
 
 	static class Person {

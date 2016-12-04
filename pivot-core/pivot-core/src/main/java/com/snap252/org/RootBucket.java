@@ -10,14 +10,13 @@ public class RootBucket<V> extends SubBucket<V> {
 
 	@SafeVarargs
 	public RootBucket(List<V> values, Function<V, Object>... partitionCriterionsAndSubCriterions) {
-		super("<root>", Arrays.asList(partitionCriterionsAndSubCriterions), null, null, values);
+		super("---root---", Arrays.asList(partitionCriterionsAndSubCriterions), null, null, values, 0);
 		this.partitionCriterionsAndSubCriterions = partitionCriterionsAndSubCriterions;
 	}
-	
+
 	public Bucket<V> createBucketWithNewValues(List<V> newValuesBase) {
 		return new CopyBucket<>(this, newValuesBase);
 	}
-
 
 	@Override
 	public String getParentString() {

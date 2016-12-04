@@ -1,18 +1,17 @@
 package com.snap252.org;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
 public class LeafBucket<V> extends Bucket<V> {
 
-	public LeafBucket(Object bucketValue, SubBucket<V> predicate, Function<V, Object> extractor, List<V> values) {
-		super(bucketValue, predicate, extractor, values);
+	public LeafBucket(Object bucketValue, SubBucket<V> predicate, Function<V, Object> extractor, List<V> values, int level) {
+		super(bucketValue, predicate, extractor, values, level);
 	}
 
 	@Override
-	protected int getSize() {
+	protected int getSize(int forSelf) {
 		return 1;
 	}
 
@@ -25,9 +24,14 @@ public class LeafBucket<V> extends Bucket<V> {
 	public Stream<Bucket<V>> reverseStream() {
 		return Stream.of(this);
 	}
-	
+
 	@Override
-	public Collection<Bucket<V>> getChilren() {
+	public List<Bucket<V>> getChilren() {
 		return null;
+	}
+
+	@Override
+	public int getDepth() {
+		return 1;
 	}
 }

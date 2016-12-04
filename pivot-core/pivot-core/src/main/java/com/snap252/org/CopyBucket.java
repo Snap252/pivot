@@ -14,7 +14,7 @@ public class CopyBucket<V> extends Bucket<V> {
 	private List<Bucket<V>> children;
 
 	public CopyBucket(Bucket<V> origBucket, List<V> valuesBase) {
-		super(origBucket.bucketValue, null, null, origBucket.filter(valuesBase));
+		super(origBucket.bucketValue, null, null, origBucket.filter(valuesBase), origBucket.getLevel());
 		this.origBucket = origBucket;
 
 		Collection<Bucket<V>> origChildren = origBucket.getChilren();
@@ -29,7 +29,7 @@ public class CopyBucket<V> extends Bucket<V> {
 	}
 
 	@Override
-	public Collection<Bucket<V>> getChilren() {
+	public List<Bucket<V>> getChilren() {
 		return children;
 	}
 
@@ -39,9 +39,8 @@ public class CopyBucket<V> extends Bucket<V> {
 	}
 
 	@Override
-	protected int getSize() {
-		assert false;
-		return 0;
+	protected int getSize(int forSelf) {
+		return origBucket.getSize(forSelf);
 	}
 
 	@Override
@@ -54,13 +53,20 @@ public class CopyBucket<V> extends Bucket<V> {
 
 	@Override
 	public Stream<Bucket<V>> reverseStream() {
-		assert false;
-		return null;
+		if (children == null || children.isEmpty()) {
+			return Stream.of(this);
+		}
+		return Stream.concat(children.stream().flatMap(Bucket::stream), Stream.of(this));
 	}
 
 	@Override
 	public String getParentString() {
 		return origBucket.getParentString();
+	}
+	
+	@Override
+	public int getDepth() {
+		return origBucket.getDepth();
 	}
 
 }

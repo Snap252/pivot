@@ -2,7 +2,6 @@ package com.snap252.org;
 
 import static java.util.stream.Collectors.toList;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -19,11 +18,14 @@ public abstract class Bucket<V> implements Predicate<V> {
 
 	protected final List<V> values;
 
-	public Bucket(Object bucketValue, Bucket<V> parent, Function<V, Object> extractor, List<V> values) {
+	private int level;
+
+	public Bucket(Object bucketValue, Bucket<V> parent, Function<V, Object> extractor, List<V> values, int level) {
 		this.bucketValue = bucketValue;
 		this.parent = parent;
 		this.extractor = extractor;
 		this.values = values;
+		this.level = level;
 	}
 
 	@Deprecated
@@ -43,12 +45,12 @@ public abstract class Bucket<V> implements Predicate<V> {
 	protected StringBuilder addString(String linePrefix, StringBuilder sb) {
 		sb.append(linePrefix).append(getClass().getSimpleName() + " [bucketValue=" + bucketValue + ", kvps="
 		// + Arrays.deepToString(kvps.toArray())
-				+ "#" + getSize() + "]");
+				+ "#" + getSize(0) + "]");
 		sb.append("\r\n");
 		return sb;
 	}
 
-	protected abstract int getSize();
+	protected abstract int getSize(int forSelf);
 
 	public abstract Stream<Bucket<V>> stream();
 
@@ -87,13 +89,19 @@ public abstract class Bucket<V> implements Predicate<V> {
 		return filter(values);
 	}
 
-	public abstract Collection<Bucket<V>> getChilren();
+	public abstract List<Bucket<V>> getChilren();
 
 	protected List<V> filter(List<V> l) {
 		if (l.isEmpty()) {
 			return l;
 		}
 		return l.stream().filter(this).collect(toList());
+	}
+
+	public abstract int getDepth();
+	
+	public int getLevel(){
+		return level;
 	}
 
 }

@@ -1,7 +1,6 @@
 package com.snap252.org;
 
-import java.util.Collection;
-
+@FunctionalInterface
 public interface Transformer<T, U> {
-	U transform(Collection<T> values);
+	U transform(T values);
 }

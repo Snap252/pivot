@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collector;
 import java.util.stream.Stream;
 
 public final class BiBucket<V> {
@@ -17,7 +18,7 @@ public final class BiBucket<V> {
 	private final RootBucket<V> colBucket;
 	private final List<RowBucketWrapper<V>> rows;
 
-	public BiBucket(List<V> values, Pair<Function<V, Object>[]> rowColsFnkt) {
+	public BiBucket(final List<V> values, final Pair<Function<V, Object>[]> rowColsFnkt) {
 		rowBucket = new RootBucket<>(values, rowColsFnkt.first);
 		colBucket = new RootBucket<>(values, rowColsFnkt.second);
 
@@ -35,6 +36,24 @@ public final class BiBucket<V> {
 
 		public Stream<Bucket<V>> getCells() {
 			return cells.stream();
+		}
+	}
+
+	public <W> Stream<BucketWithValues<V, W>> getTransformed(Transformer<V, W> t, Collector<W, ?, W> a) {
+		return getCells().map(r -> new BucketWithValues<V, W>(r, t, a));
+	}
+
+	public static class BucketWithValues<V, W> {
+		public final Bucket<V> bucket;
+		public final W aggregatedValue;
+
+		public BucketWithValues(Bucket<V> b, Transformer<V, W> t, Collector<W, ?, W> a) {
+			this(b, b.values.stream().map(v -> t.transform(v)).collect(a));
+		}
+
+		public BucketWithValues(Bucket<V> bucket, W value) {
+			this.bucket = bucket;
+			this.aggregatedValue = value;
 		}
 	}
 

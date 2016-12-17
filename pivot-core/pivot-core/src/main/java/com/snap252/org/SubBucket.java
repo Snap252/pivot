@@ -2,6 +2,7 @@ package com.snap252.org;
 
 import static java.util.stream.Collectors.toSet;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +15,7 @@ public class SubBucket<V> extends Bucket<V> {
 	public final int depth;
 
 	public SubBucket(Object bucketValue, List<Function<V, Object>> partitionCriterionsAndSubCriterions,
-			SubBucket<V> parent, Function<V, Object> extractor, List<V> values, int level) {
+			SubBucket<V> parent, Function<V, Object> extractor, Collection<V> values, int level) {
 		super(bucketValue, parent, extractor, values, level);
 		assert !partitionCriterionsAndSubCriterions.isEmpty();
 		this.depth = partitionCriterionsAndSubCriterions.size();

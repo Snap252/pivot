@@ -6,21 +6,28 @@ import java.io.IOException;
 import java.io.Writer;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 public final class BiBucket<V> {
 
 	private final RootBucket<V> rowBucket;
 	private final RootBucket<V> colBucket;
 	private final List<RowBucketWrapper<V>> rows;
+	private final int maxColDepth;
+	private final int maxRowDepth;
 
-	public BiBucket(final List<V> values, final Pair<Function<V, Object>[]> rowColsFnkt) {
-		rowBucket = new RootBucket<>(values, rowColsFnkt.first);
-		colBucket = new RootBucket<>(values, rowColsFnkt.second);
+	public BiBucket(BiBucketParameter<V> p) {
+		rowBucket = new RootBucket<>(p.values, p.rowFnkt);
+		this.maxRowDepth = p.rowFnkt.size();
+		colBucket = new RootBucket<>(p.values, p.colFnkt);
+		this.maxColDepth = p.colFnkt.size();
 
 		this.rows = rowBucket.stream().map(t -> new RowBucketWrapper<V>(t, colBucket)).collect(toList());
 	}
@@ -48,7 +55,7 @@ public final class BiBucket<V> {
 		public final W aggregatedValue;
 
 		public BucketWithValues(Bucket<V> b, Transformer<V, W> t, Collector<W, ?, W> a) {
-			this(b, b.values.stream().map(v -> t.transform(v)).collect(a));
+			this(b, b.values.stream().map(t::transform).collect(a));
 		}
 
 		public BucketWithValues(Bucket<V> bucket, W value) {
@@ -66,8 +73,8 @@ public final class BiBucket<V> {
 		final List<Bucket<V>> children = new ArrayList<Bucket<V>>();
 		w.write("<tr>");
 		if (level == 0)
-			w.write(MessageFormat.format("<th colspan=''{0}'' rowspan=''{1}''>---columns---</th>", spacerColumns,
-					depth + 1));
+			w.write(MessageFormat.format("<th colspan=''{0}'' rowspan=''{1}''>---columns---<br/>/<br/>---rows---</th>",
+					spacerColumns, depth + 1));
 		for (final Bucket<V> row : rows) {
 			// render "self" - cell
 			if (row == null) {
@@ -94,16 +101,18 @@ public final class BiBucket<V> {
 			printRow(w, children, depth - 1, spacerColumns, level + 1);
 	}
 
-	public void printRowHeader(Bucket<V> b, Writer w, int initDepth) throws IOException {
-		if (b.getLevel() != 0) {
-			printRowHeader(b.getParent(), w, initDepth);
-		}
-		w.write(MessageFormat.format("<td colspan=''{0}''>", initDepth - b.getLevel()));
+	public void printRowHeader(Bucket<V> b, Writer w, int colSpan) throws IOException {
+
+		w.write(MessageFormat.format("<td rowSpan=''{0}''>", b.getSize(1)));
+
 		w.write(b.getBucketValue().toString());
 		w.write("</td>");
+		if (b.getChilren() != null)
+			w.write(MessageFormat.format("<td colSpan=''{0}''>-</td>", colSpan));
 	}
 
-	public void writeHtml(Writer w, Function<List<V>, ?> cellHandler) throws IOException {
+	public <W> void writeHtml(Writer w, Transformer<V, W> tr, Collector<W, ?, W> a, Function<W, @NonNull ?> cellHandler)
+			throws IOException {
 		w.write("<html><body>");
 		w.write("<table border='1'>");
 
@@ -119,14 +128,20 @@ public final class BiBucket<V> {
 				try {
 					w.write("<tr>");
 
-					printRowHeader(r.rb, w, r.rb.getDepth());
+					printRowHeader(r.rb, w, maxRowDepth - r.rb.getLevel());
+
+					System.out.println("BiBucket.writeHtml()" + Arrays.deepToString(
+							new Object[] { r.rb.getBucketValue().toString(), maxRowDepth - r.rb.getLevel() + 1 }));
 
 					// w.write(MessageFormat.format("<td colspan=''{0}''/>",
 					// rowBucket.depth));
 					r.getCells().forEach(cell -> {
+
+						W collect = cell.values.stream().map(c -> tr.transform(c)).collect(a);
+
 						try {
 							w.write("<td>");
-							w.write(cellHandler.apply(cell.values).toString());
+							w.write(cellHandler.apply(collect).toString());
 							w.write("</td>");
 						} catch (final IOException e) {
 							throw new AssertionError(e);

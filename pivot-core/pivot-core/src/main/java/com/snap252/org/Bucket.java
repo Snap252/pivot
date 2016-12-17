@@ -2,6 +2,7 @@ package com.snap252.org;
 
 import static java.util.stream.Collectors.toList;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -16,11 +17,12 @@ public abstract class Bucket<V> implements Predicate<V> {
 
 	private final Bucket<V> parent;
 
-	protected final List<V> values;
+	protected final Collection<V> values;
 
 	private final int level;
 
-	public Bucket(Object bucketValue, Bucket<V> parent, Function<V, Object> extractor, List<V> values, int level) {
+	public Bucket(Object bucketValue, Bucket<V> parent, Function<V, Object> extractor, Collection<V> values,
+			int level) {
 		this.bucketValue = bucketValue;
 		this.parent = parent;
 		this.extractor = extractor;
@@ -85,13 +87,13 @@ public abstract class Bucket<V> implements Predicate<V> {
 		return /* parent.test(v) && */bucketValue.equals(extractedValue);
 	}
 
-	public final List<V> filterOwnValues(Predicate<V> f) {
+	public final Collection<V> filterOwnValues(Predicate<V> f) {
 		return filter(values);
 	}
 
 	public abstract List<Bucket<V>> getChilren();
 
-	protected List<V> filter(List<V> l) {
+	protected Collection<V> filter(Collection<V> l) {
 		if (l.isEmpty()) {
 			return l;
 		}
@@ -99,8 +101,8 @@ public abstract class Bucket<V> implements Predicate<V> {
 	}
 
 	public abstract int getDepth();
-	
-	public int getLevel(){
+
+	public int getLevel() {
 		return level;
 	}
 

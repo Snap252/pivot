@@ -1,7 +1,5 @@
 package com.snap252.org;
 
-import static java.util.stream.Collectors.joining;
-
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -9,18 +7,19 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
-import com.snap252.org.BiBucket.BucketWithValues;
-
+@NonNullByDefault
 public class RandomDataGenerator {
 	private static final Random random = new Random();
 
@@ -33,7 +32,7 @@ public class RandomDataGenerator {
 		return IntStream.range(0, cnt).mapToObj(_ignore -> generators.apply(random));
 	}
 
-	static <T> T random(T[] t) {
+	static <T> T random(@NonNull T[] t) {
 		return t[random.nextInt(t.length)];
 	}
 
@@ -42,12 +41,12 @@ public class RandomDataGenerator {
 		// String[] vorname = new String[] { "Hanne", "Herbert", "Karmen",
 		// "Klaus", "Helga", "Susanne", "Stefan", "Anne",
 		// "Arne" };
-		final String[] vorname = new String[] { "Mia", "Emma", "Hannah", "Hanna", "Sofia", "Sophia", "Anna", "Lea",
-				"Leah", "Emilia", "Marie", "Lena", "Leonie", "Emily", "Emilie", "Lina", "Amelie", "Sophie", "Sofie",
-				"Lilly", "Lilli", "Luisa", "Louisa", "Johanna", "Laura", "Nele", "Neele", "Lara", "Maja", "Maya",
-				"Charlotte", "Clara", "Klara", "Leni", "Sarah", "Sara", "Pia", "Mila", "Alina", "Lisa", "Lotta", "Ida",
-				"Julia", "Greta", "Mathilda", "Matilda", "Melina", "Zoe", "Zoé", "Frieda", "Frida", "Lia", "Liah",
-				"Lya", "Paula", "Marlene", "Ella", "Emely", "Emelie", "Jana", "Victoria", "Viktoria",
+		final @NonNull String[] vorname = new @NonNull String[] { "Mia", "Emma", "Hannah", "Hanna", "Sofia", "Sophia",
+				"Anna", "Lea", "Leah", "Emilia", "Marie", "Lena", "Leonie", "Emily", "Emilie", "Lina", "Amelie",
+				"Sophie", "Sofie", "Lilly", "Lilli", "Luisa", "Louisa", "Johanna", "Laura", "Nele", "Neele", "Lara",
+				"Maja", "Maya", "Charlotte", "Clara", "Klara", "Leni", "Sarah", "Sara", "Pia", "Mila", "Alina", "Lisa",
+				"Lotta", "Ida", "Julia", "Greta", "Mathilda", "Matilda", "Melina", "Zoe", "Zoé", "Frieda", "Frida",
+				"Lia", "Liah", "Lya", "Paula", "Marlene", "Ella", "Emely", "Emelie", "Jana", "Victoria", "Viktoria",
 				"Josephine/ Josefine", "Finja", "Finnja", "Isabell", "Isabel", "Isabelle", "Helena", "Isabella",
 				"Elisa", "Amy", "Mara", "Marah", "Mira", "Katharina", "Jasmin", "Yasmin", "Stella", "Lucy", "Lucie",
 				"Luise", "Louise", "Antonia", "Annika", "Fiona", "Pauline", "Nora", "Eva", "Jule", "Magdalena", "Luna",
@@ -103,19 +102,19 @@ public class RandomDataGenerator {
 		// String[] nachname = new String[] { "Gustavson", "Häger", "Berner",
 		// "Klaus", "Sommermann", "Chand", "Stenzel",
 		// "Ovan", "Kotzsack" };
-		final String[] nachname = new String[] { "Müller", "Schmidt", "Schneider", "Fischer", "Weber", "Meyer",
-				"Wagner", "Becker", "Schulz", "Hoffmann", "Schäfer", "Bauer", "Koch", "Richter", "Klein", "Wolf",
-				"Schröder", "Neumann", "Schwarz", "Braun", "Hofmann", "Zimmermann", "Schmitt", "Hartmann", "Krüger",
-				"Schmid", "Werner", "Lange", "Schmitz", "Meier", "Krause", "Maier", "Lehmann", "Huber", "Mayer",
-				"Herrmann", "Köhler", "Walter", "König", "Schulze", "Fuchs", "Kaiser", "Lang", "Weiß", "Peters",
-				"Scholz", "Jung", "Möller", "Hahn", "Keller", "Vogel", "Schubert", "Roth", "Frank", "Friedrich", "Beck",
-				"Günther", "Berger", "Winkler", "Lorenz", "Baumann", "Schuster", "Kraus", "Böhm", "Simon", "Franke",
-				"Albrecht", "Winter", "Ludwig", "Martin", "Krämer", "Schumacher", "Vogt", "Jäger", "Stein", "Otto",
-				"Groß", "Sommer", "Haas", "Graf", "Heinrich", "Seidel", "Schreiber", "Ziegler", "Brandt", "Kuhn",
-				"Schulte", "Dietrich", "Kühn", "Engel", "Pohl", "Horn", "Sauer", "Arnold", "Thomas", "Bergmann",
-				"Busch", "Pfeiffer", "Voigt", "Götz", "Seifert", "Lindner", "Ernst", "Hübner", "Kramer", "Franz",
-				"Beyer", "Wolff", "Peter", "Jansen", "Kern", "Barth", "Wenzel", "Hermann", "Ott", "Paul", "Riedel",
-				"Wilhelm", "Hansen", "Nagel", "Grimm", "Lenz", "Ritter", "Bock", "Langer", "Kaufmann", "Mohr",
+		final @NonNull String[] nachname = new @NonNull String[] { "Müller", "Schmidt", "Schneider", "Fischer", "Weber",
+				"Meyer", "Wagner", "Becker", "Schulz", "Hoffmann", "Schäfer", "Bauer", "Koch", "Richter", "Klein",
+				"Wolf", "Schröder", "Neumann", "Schwarz", "Braun", "Hofmann", "Zimmermann", "Schmitt", "Hartmann",
+				"Krüger", "Schmid", "Werner", "Lange", "Schmitz", "Meier", "Krause", "Maier", "Lehmann", "Huber",
+				"Mayer", "Herrmann", "Köhler", "Walter", "König", "Schulze", "Fuchs", "Kaiser", "Lang", "Weiß",
+				"Peters", "Scholz", "Jung", "Möller", "Hahn", "Keller", "Vogel", "Schubert", "Roth", "Frank",
+				"Friedrich", "Beck", "Günther", "Berger", "Winkler", "Lorenz", "Baumann", "Schuster", "Kraus", "Böhm",
+				"Simon", "Franke", "Albrecht", "Winter", "Ludwig", "Martin", "Krämer", "Schumacher", "Vogt", "Jäger",
+				"Stein", "Otto", "Groß", "Sommer", "Haas", "Graf", "Heinrich", "Seidel", "Schreiber", "Ziegler",
+				"Brandt", "Kuhn", "Schulte", "Dietrich", "Kühn", "Engel", "Pohl", "Horn", "Sauer", "Arnold", "Thomas",
+				"Bergmann", "Busch", "Pfeiffer", "Voigt", "Götz", "Seifert", "Lindner", "Ernst", "Hübner", "Kramer",
+				"Franz", "Beyer", "Wolff", "Peter", "Jansen", "Kern", "Barth", "Wenzel", "Hermann", "Ott", "Paul",
+				"Riedel", "Wilhelm", "Hansen", "Nagel", "Grimm", "Lenz", "Ritter", "Bock", "Langer", "Kaufmann", "Mohr",
 				"Förster", "Zimmer", "Haase", "Lutz", "Kruse", "Jahn", "Schumann", "Fiedler", "Thiel", "Hoppe", "Kraft",
 				"Michel", "Marx", "Fritz", "Arndt", "Eckert", "Schütz", "Walther", "Petersen", "Berg", "Schindler",
 				"Kunz", "Reuter", "Sander", "Schilling", "Reinhardt", "Frey", "Ebert", "Böttcher", "Thiele", "Gruber",
@@ -339,44 +338,41 @@ public class RandomDataGenerator {
 				"Zoller", "Schewe", "Zeiler", "Wehrmann", "Kutz", "Häuser", "Faulhaber", "Schunk", "Bast",
 				"Sternberg" };
 
-		final List<Person> personen = getAsStream(1000, r -> new Person(random(vorname), random(nachname),
-				r.nextInt(60) + 10, random(Geschl.values()), r.nextInt(500) / 10.)).collect(Collectors.toList());
+		final List<Person> personen = getAsStream(100, r -> new Person(random(vorname), random(nachname),
+				r.nextInt(60) + 10, random(Geschl.values()), r.nextInt(1000) / 10.)).collect(Collectors.toList());
 
-		final RootBucket<Person> colBucket = printTimer("rowBucket",
-				() -> new RootBucket<Person>(personen, p -> p.vorname.charAt(0), p -> p.geschlecht, p -> p.alter / 10));
+		BiBucketParameter<Person> parameter = new BiBucketParameter<Person>(personen,
+				Arrays.asList(p -> Character.toUpperCase(p.nachname.charAt(0))), Arrays.asList(p -> p.vorname.charAt(0),
+						/*p -> p.vorname.substring(0, 2),*/ p -> p.geschlecht, p -> p.alter / 10));
 
-		final RootBucket<Person> rowBucket = printTimer("colBucket",
-				() -> new RootBucket<Person>(personen, p -> Character.toUpperCase(p.nachname.charAt(0))
-				// ,p -> p.nachname.charAt(1)
-				// p -> p.vorname
-				));
+		final BiBucket<Person> biBucket = Timers.printTimer("doing bucket", () -> new BiBucket<Person>(parameter));
 
-		final BiBucket<Person> biBucket = printTimer("doing bucket",
-				() -> new BiBucket<Person>(personen, new Pair<Function<Person, Object>[]>(
-						rowBucket.partitionCriterionsAndSubCriterions, colBucket.partitionCriterionsAndSubCriterions)));
-
-		final Stream<BucketWithValues<Person, NumberStatistics<@NonNull Double>>> transformed = biBucket.getTransformed(
-				p -> new NumberStatistics<@NonNull Double>(p.wert, p.wert * p.wert),
-				NumberStatistics.getReducer((n1, n2) -> n1 + n2));
-
-		printTimer("transforming bucket", () -> transformed.forEach(b -> b.aggregatedValue.toString()));
-
-		printTimer("printing", () -> write(personen, biBucket));
+		Timers.printTimer("printing", () -> write(personen, biBucket));
 	}
 
 	protected static void write(List<Person> personen, BiBucket<Person> biBucket2) {
 		try (OutputStream fos = new FileOutputStream("C:\\Users\\Snap252\\Documents\\1.html")) {
-
 			try (Writer writer = new BufferedWriter(new OutputStreamWriter(fos))) {
-				biBucket2.writeHtml(writer, t -> {
-					final String tt = t.stream().map(Object::toString).limit(5).collect(joining("\n"));
-
-					return MessageFormat.format("<div title=''{0}''>{1}</div>", tt, t.isEmpty() ? "" : t.size());
-				});
+				writeHtml(biBucket2, writer);
 			}
 		} catch (final IOException e) {
 			throw new AssertionError();
 		}
+	}
+
+	protected static void writeHtml(BiBucket<Person> biBucket2, Writer writer) throws IOException {
+		Collector<NumberStatistics<Double>, ?, NumberStatistics<Double>> reducer = NumberStatistics
+				.getReducer((n1, n2) -> n1 + n2);
+
+		Function<NumberStatistics<Double>, @NonNull ?> cellHandler = (NumberStatistics<Double> ns) -> {
+			if (ns.isNeutralElement()) {
+				return "";
+			}
+
+			return MessageFormat.format("<div title=''{1}''>{0}</div>", ns.sum, ns);
+		};
+
+		biBucket2.writeHtml(writer, p -> new NumberStatistics<Double>(p.wert, p.wert * p.wert), reducer, cellHandler);
 	}
 
 	enum Geschl {
@@ -403,36 +399,5 @@ public class RandomDataGenerator {
 			return "Person [vorname=" + vorname + ", nachname=" + nachname + ", geschlecht=" + geschlecht + ", alter="
 					+ alter + "]";
 		}
-	}
-
-	static void printTimer(String name, Runnable r) {
-		printTimer(name, 1, r);
-	}
-
-	static void printTimer(String name, int cnt, Runnable r) {
-		System.err.println(MessageFormat.format("{0}: {1}ms", name, timer(() -> {
-			for (int i = 0; i < cnt; i++)
-				r.run();
-		})));
-	}
-
-	static long timer(Runnable r) {
-		final long l = System.nanoTime();
-		r.run();
-		return (System.nanoTime() - l) / 1000000L;
-	}
-
-	static <R> R printTimer(String name, Supplier<R> r) {
-		return printTimer(name, 1, r);
-	}
-
-	static <R> R printTimer(String name, int cnt, Supplier<R> r) {
-		assert cnt > 0;
-		final long l = System.nanoTime();
-		R ret = null;
-		for (int i = 0; i < cnt; i++)
-			ret = r.get();
-		System.err.println(MessageFormat.format("{0}: {1}ms", name, (System.nanoTime() - l) / 1000000L));
-		return ret;
 	}
 }

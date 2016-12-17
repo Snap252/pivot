@@ -1,10 +1,11 @@
 package com.snap252.org;
 
+import java.math.BigDecimal;
 import java.util.function.BinaryOperator;
-import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -16,7 +17,20 @@ public class NumberStatistics<N extends Number & Comparable<N>> {
 	public final N sum;
 	public final N sumSqr;
 
-	private static final NumberStatistics<?> NEUTRAL_ELEMENT = new NumberStatistics<Integer>(-1, -1);
+	private static final NumberStatistics<?> NEUTRAL_ELEMENT = new NumberStatistics<Integer>(0, 0) {
+		@Override
+		public @NonNull String toString() {
+			return "---";
+		}
+
+		public boolean isNeutralElement() {
+			return true;
+		}
+	};
+
+	public boolean isNeutralElement() {
+		return false;
+	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static <N extends Number & Comparable<N>> NumberStatistics<N> getNeutralElement() {
@@ -46,8 +60,7 @@ public class NumberStatistics<N extends Number & Comparable<N>> {
 
 	public static <N extends Number & Comparable<N>> Collector<NumberStatistics<N>, ?, NumberStatistics<N>> getReducer(
 			BinaryOperator<N> addFnkt) {
-		return Collectors.reducing(NumberStatistics.getNeutralElement(), Function.identity(),
-				(f1, f2) -> aggregate(f1, f2, addFnkt));
+		return Collectors.reducing(getNeutralElement(), (f1, f2) -> aggregate(f1, f2, addFnkt));
 	}
 
 	public NumberStatistics(N n, N sqr) {
@@ -66,26 +79,26 @@ public class NumberStatistics<N extends Number & Comparable<N>> {
 
 	@Nullable
 	public Double avg() {
-		if (this == NEUTRAL_ELEMENT)
-			return null;
-
+		assert !isNeutralElement();
 		return sum.doubleValue() / cnt;
 	}
 
-	@Nullable
-	public Double varianz() {
-		if (this == NEUTRAL_ELEMENT)
-			return null;
+	public double varianz() {
+		assert !isNeutralElement();
+		// see:
+		// https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
+		double doubleSum = sum.doubleValue();
+		return (sumSqr.doubleValue() - doubleSum * doubleSum / cnt) / cnt;
+	}
 
-		final Double avg = avg();
-		assert avg != null;
-		return Math.sqrt((sumSqr.doubleValue() - avg * avg) / cnt);
+	public double abweichung() {
+		return Math.sqrt(varianz());
 	}
 
 	@Override
 	public String toString() {
 		return "NumberStatistics [cnt=" + cnt + ", max=" + max + ", min=" + min + ", sum=" + sum + ", sumSqr=" + sumSqr
-				+ ", avg()=" + avg() + ", varianz()=" + varianz() + "]";
+				+ ", avg()=" + avg() + ", varianz()=" + varianz() + ", abweichung()=" + abweichung() + "]";
 	}
 
 }

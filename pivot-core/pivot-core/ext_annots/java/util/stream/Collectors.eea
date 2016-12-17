@@ -1,4 +1,7 @@
 class java/util/stream/Collectors
 reducing
+ <T:Ljava/lang/Object;>(TT;Ljava/util/function/BinaryOperator<TT;>;)Ljava/util/stream/Collector<TT;*TT;>;
+ <T:Ljava/lang/Object;>(TT;Ljava/util/function/BinaryOperator<TT;>;)L1java/util/stream/Collector<TT;*TT;>;
+reducing
  <T:Ljava/lang/Object;U:Ljava/lang/Object;>(TU;Ljava/util/function/Function<-TT;+TU;>;Ljava/util/function/BinaryOperator<TU;>;)Ljava/util/stream/Collector<TT;*TU;>;
  <T:Ljava/lang/Object;U:Ljava/lang/Object;>(TU;Ljava/util/function/Function<-TT;+TU;>;Ljava/util/function/BinaryOperator<TU;>;)L1java/util/stream/Collector<TT;*TU;>;

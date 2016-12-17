@@ -1,20 +1,22 @@
 package com.snap252.org;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
 public class RootBucket<V> extends SubBucket<V> {
 
-	public final Function<V, Object>[] partitionCriterionsAndSubCriterions;
+	public RootBucket(List<V> values, List<Function<V, Object>> partitionCriterionsAndSubCriterions) {
+		super("---root---", partitionCriterionsAndSubCriterions, null, null, values, 0);
+	}
 
 	@SafeVarargs
 	public RootBucket(List<V> values, Function<V, Object>... partitionCriterionsAndSubCriterions) {
-		super("---root---", Arrays.asList(partitionCriterionsAndSubCriterions), null, null, values, 0);
-		this.partitionCriterionsAndSubCriterions = partitionCriterionsAndSubCriterions;
+		this(values, Arrays.asList(partitionCriterionsAndSubCriterions));
 	}
 
-	public Bucket<V> createBucketWithNewValues(List<V> newValuesBase) {
+	public Bucket<V> createBucketWithNewValues(Collection<V> newValuesBase) {
 		return new CopyBucket<>(this, newValuesBase);
 	}
 
@@ -30,7 +32,7 @@ public class RootBucket<V> extends SubBucket<V> {
 	}
 
 	@Override
-	protected List<V> filter(List<V> l) {
+	protected Collection<V> filter(Collection<V> l) {
 		return l;
 	}
 }

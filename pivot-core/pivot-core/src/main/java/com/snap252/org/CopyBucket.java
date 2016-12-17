@@ -13,7 +13,7 @@ public class CopyBucket<V> extends Bucket<V> {
 	private Bucket<V> origBucket;
 	private List<Bucket<V>> children;
 
-	public CopyBucket(Bucket<V> origBucket, List<V> valuesBase) {
+	public CopyBucket(Bucket<V> origBucket, Collection<V> valuesBase) {
 		super(origBucket.bucketValue, null, null, origBucket.filter(valuesBase), origBucket.getLevel());
 		this.origBucket = origBucket;
 

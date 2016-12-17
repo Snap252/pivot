@@ -1,11 +1,11 @@
 package com.snap252.org;
 
+import java.text.MessageFormat;
 import java.util.function.Function;
 import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 
 @NonNullByDefault
 public class NumberStatistics<N extends Number> {
@@ -32,37 +32,169 @@ public class NumberStatistics<N extends Number> {
 		return false;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "unchecked" })
 	public static <N extends Number> NumberStatistics<N> getNeutralElement() {
-		return (NumberStatistics) NEUTRAL_ELEMENT;
+		return (NumberStatistics<N>) NEUTRAL_ELEMENT;
 	}
 
-	private static <N extends Number> NumberStatistics<N> aggregate(NumberStatistics<N> ns1, NumberStatistics<N> ns2,
+	@SuppressWarnings("null")
+	public static <P, N extends Number> Collector<P, MutableValue<N>, NumberStatistics<N>> getReducer(Function<P, N> f,
 			Arithmetics<N> arithmetics) {
-		assert ns2 != NEUTRAL_ELEMENT;
+		// Function<V, NumberStatistics<N>> transformer = valueExtractor
+		// .andThen(n -> new NumberStatistics<>(n, arithmetics));
 
-		if (ns1 == NEUTRAL_ELEMENT) {
-			assert ns2 != NEUTRAL_ELEMENT;
-			return ns2;
+		return Collector.of(() -> MutableValue.getNeutralElement(arithmetics), (t, u) -> t.addSingle(f.apply(u)),
+				MutableValue::merge, MutableValue::createNumberStatistics);
+		// return Collectors.reducing(getNeutralElement(), transformer, (f1, f2)
+		// -> aggregate(f1, f2, arithmetics));
+	}
+
+	public static final class MutableValue<N extends Number> {
+		public final Arithmetics<N> arithmetics;
+		public N sum;
+		public N sqrSum;
+
+		public int cnt;
+
+		@Nullable
+		public N min;
+		@Nullable
+		public N max;
+
+		public MutableValue(N n, Arithmetics<N> arithmetics) {
+			this.arithmetics = arithmetics;
+			this.sum = n;
+			this.sqrSum = arithmetics.sqr(n);
+			cnt = 1;
 		}
 
-		return new NumberStatistics<N>(ns1, ns2, arithmetics);
-	}
+		/* neutral element */
+		public static <N extends Number> MutableValue<N> getNeutralElement(Arithmetics<N> ar) {
+			return new MutableValue<N>(ar);
+		}
 
-	private NumberStatistics(NumberStatistics<N> ns1, NumberStatistics<N> ns2, Arithmetics<N> arithmetics) {
-		this.arithmetics = arithmetics;
-		cnt = ns1.cnt + ns2.cnt;
-		this.min = arithmetics.compare(ns1.min, ns2.min) < 0 ? ns1.min : ns2.min;
-		this.max = arithmetics.compare(ns1.max, ns2.max) > 0 ? ns1.max : ns2.max;
+		private MutableValue(Arithmetics<N> arithmetics) {
+			this.arithmetics = arithmetics;
+			this.sum = sqrSum = arithmetics.getNeutralAddElement();
+			cnt = 0;
+		}
 
-		this.sum = arithmetics.add(ns1.sum, ns2.sum);
-		this.sumSqr = arithmetics.add(ns1.sumSqr, ns2.sumSqr);
-	}
+		MutableValue<N> addSingle(N other) {
+			this.sum = arithmetics.add(sum, other);
+			this.sqrSum = arithmetics.add(sqrSum, arithmetics.sqr(other));
 
-	public static <N extends Number, V> Collector<V, ?, NumberStatistics<N>> getReducer(Function<V, N> valueExtractor,
-			Arithmetics<N> arithmetics) {
-		Function<V, NumberStatistics<N>> transformer = valueExtractor.andThen(n -> new NumberStatistics<>(n, arithmetics));
-		return Collectors.reducing(getNeutralElement(), transformer, (f1, f2) -> aggregate(f1, f2, arithmetics));
+			if (min != null) {
+				min = arithmetics.compare(min, other) < 0 ? min : other;
+			} else {
+				min = other;
+			}
+			if (max != null) {
+				max = arithmetics.compare(max, other) < 0 ? max : other;
+			} else {
+				max = other;
+			}
+			cnt++;
+			return this;
+		}
+
+		MutableValue<N> merge(MutableValue<N> other) {
+			assert other.arithmetics == this.arithmetics;
+			this.sum = arithmetics.add(sum, other.sum);
+			this.sqrSum = arithmetics.add(sqrSum, other.sqrSum);
+			this.cnt += other.cnt;
+
+			doMin(other.min);
+			doMax(other.max);
+			return this;
+		}
+
+		@Override
+		public String toString() {
+			return "MutableValue [sum=" + sum + ", sqrSum=" + sqrSum + ", cnt=" + cnt + ", min=" + min + ", max=" + max
+					+ ", arithmetics=" + arithmetics + "]";
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((arithmetics == null) ? 0 : arithmetics.hashCode());
+			result = prime * result + cnt;
+			@Nullable
+			N max$ = max;
+			result = prime * result + ((max$ == null) ? 0 : max$.hashCode());
+			@Nullable
+			N min$ = min;
+			result = prime * result + ((min$ == null) ? 0 : min$.hashCode());
+			result = prime * result + ((sqrSum == null) ? 0 : sqrSum.hashCode());
+			result = prime * result + ((sum == null) ? 0 : sum.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(@Nullable Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			MutableValue<?> other = (MutableValue<?>) obj;
+
+			if (!arithmetics.equals(other.arithmetics)) {
+				return false;
+			}
+
+			if (cnt != other.cnt)
+				return false;
+			@Nullable
+			N max$ = max;
+			if (max$ == null) {
+				if (other.max != null)
+					return false;
+			} else if (!max$.equals(other.max))
+				return false;
+			@Nullable
+			N min$ = min;
+			if (min$ == null) {
+				if (other.min != null)
+					return false;
+			} else if (!min$.equals(other.min))
+				return false;
+			if (!sqrSum.equals(other.sqrSum))
+				return false;
+			if (!sum.equals(other.sum))
+				return false;
+			return true;
+		}
+
+		protected void doMax(@Nullable N otherMax) {
+			if (max == null) {
+				max = otherMax;
+			} else if (otherMax != null) {
+				assert max != null;
+				max = arithmetics.compare(max, otherMax) < 0 ? max : otherMax;
+			}
+		}
+
+		protected void doMin(@Nullable N otherMin) {
+			if (min == null) {
+				min = otherMin;
+			} else if (otherMin != null) {
+				assert min != null;
+				min = arithmetics.compare(min, otherMin) < 0 ? min : otherMin;
+			}
+		}
+
+		public NumberStatistics<N> createNumberStatistics() {
+			if (cnt == 0) {
+				return NumberStatistics.getNeutralElement();
+			}
+			assert arithmetics.compare(arithmetics.sqr(sum), sqrSum) >= 0 : arithmetics.sqr(sum) + " => " + sqrSum;
+
+			assert max != null && min != null;
+			return new NumberStatistics<N>(cnt, max, min, sum, sqrSum, arithmetics);
+		}
 	}
 
 	/**
@@ -71,7 +203,7 @@ public class NumberStatistics<N extends Number> {
 	public NumberStatistics(N n, Arithmetics<N> arithmetics) {
 		this.arithmetics = arithmetics;
 		max = min = sum = n;
-		sumSqr = arithmetics.mul(n, n);
+		sumSqr = arithmetics.sqr(n);
 		cnt = 1;
 	}
 
@@ -97,14 +229,13 @@ public class NumberStatistics<N extends Number> {
 		return arithmetics.varianz(sum, sumSqr, cnt);
 	}
 
+	private static final MessageFormat mf = new MessageFormat(
+			"NumberStatistics [cnt={0}, max={1}, min={2}, sum={3}, sumSqr={4}, avg()={5}, varianz()={6}]");
+
 	@Override
 	public String toString() {
 		assert !isNeutralElement();
-		return "NumberStatistics [cnt=" + cnt + ", max=" + max + ", min=" + min + ", sum=" + sum + ", sumSqr=" + sumSqr
-				+ ", avg()=" + avg() + ", varianz()=" + varianz() + "]";
-		// return "NumberStatistics [cnt=" + cnt + ", max=" + max + ", min=" +
-		// min + ", sum=" + sum + ", sumSqr=" + sumSqr
-		// + ", avg()=" + avg() + ", varianz()=" + varianz() + "]";
+		return mf.format(new Object[] { cnt, max, min, sum, sumSqr, avg(), varianz() });
 	}
 
 }

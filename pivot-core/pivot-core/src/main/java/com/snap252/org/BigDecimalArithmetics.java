@@ -43,4 +43,9 @@ public class BigDecimalArithmetics implements Arithmetics<BigDecimal> {
 		return n1.compareTo(n2);
 	}
 
+	@Override
+	public BigDecimal getNeutralAddElement() {
+		return BigDecimal.ZERO;
+	}
+
 }

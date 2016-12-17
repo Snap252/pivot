@@ -15,7 +15,7 @@ public class Timers {
 		System.err.println(MessageFormat.format("{0}: {1}ms", name, timer(() -> {
 			for (int i = 0; i < cnt; i++)
 				r.run();
-		})));
+		}) / cnt));
 	}
 
 	static long timer(Runnable r) {
@@ -35,7 +35,7 @@ public class Timers {
 		R ret = null;
 		for (int i = 0; i < cnt; i++)
 			ret = r.get();
-		System.err.println(MessageFormat.format("{0}: {1}ms", name, (System.nanoTime() - l) / 1000000L));
+		System.err.println(MessageFormat.format("{0}: {1}ms", name, (System.nanoTime() - l) / 1000000L / cnt));
 		assert ret != null;
 		return ret;
 	}

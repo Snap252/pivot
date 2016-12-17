@@ -8,43 +8,35 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
-
-import org.eclipse.jdt.annotation.NonNull;
 
 public final class BiBucket<V> {
 
 	private final RootBucket<V> rowBucket;
 	private final RootBucket<V> colBucket;
-	private final List<RowBucketWrapper<V>> rows;
 	private final int maxRowDepth;
 
 	public BiBucket(BiBucketParameter<V> p) {
 		rowBucket = new RootBucket<>(p.values, p.rowFnkt);
 		this.maxRowDepth = p.rowFnkt.size();
 		colBucket = new RootBucket<>(p.values, p.colFnkt);
-
-		this.rows = rowBucket.stream().map(t -> new RowBucketWrapper<V>(t, colBucket)).collect(toList());
 	}
 
-	public static class RowBucketWrapper<V> {
+	public static class RowBucketWrapper<V, W> {
 		public final Bucket<V> rb;
-		public final Bucket<V> cells;
+		public final CopyBucket<V, W> cells;
 
-		public RowBucketWrapper(Bucket<V> rb, final RootBucket<V> colBucket) {
+		public RowBucketWrapper(Bucket<V> rb, final RootBucket<V> colBucket, Collector<V, W, W> x) {
 			this.rb = rb;
-			this.cells = colBucket.createBucketWithNewValues(rb.values);
+			this.cells = colBucket.createBucketWithNewValues(rb.values, x);
 		}
 
-		public Stream<Bucket<V>> getCells() {
+		public Stream<CopyBucket<V, W>> getCells() {
 			return cells.stream();
 		}
-	}
-
-	public <W> Stream<BucketWithValues<V, W>> getTransformed(Transformer<V, W> t, Collector<W, ?, W> a) {
-		return getCells().map(r -> new BucketWithValues<V, W>(r, t, a));
 	}
 
 	public static class BucketWithValues<V, W> {
@@ -61,92 +53,114 @@ public final class BiBucket<V> {
 		}
 	}
 
-	public Stream<Bucket<V>> getCells() {
-		return rows.stream().flatMap(RowBucketWrapper::getCells);
+	public <W, R> BiBucket<V>.X<W, R> createX(Collector<V, W, R> aggregator) {
+		return new X<W, R>(aggregator);
 	}
 
-	public void printRow(Writer w, List<Bucket<V>> rows, int depth, int spacerColumns, int level) throws IOException {
+	class X<W, R> {
 
-		final List<Bucket<V>> children = new ArrayList<Bucket<V>>();
-		w.write("<tr>");
-		if (level == 0)
-			w.write(MessageFormat.format("<th colspan=''{0}'' rowspan=''{1}''>---columns---<br/>/<br/>---rows---</th>",
-					spacerColumns, depth + 1));
+		private List<RowBucketWrapper<V, W>> rows;
+		private Function<W, R> finisher;
 
-		for (final Bucket<V> row : rows) {
-			// render "self" - cell
-			if (row == null) {
-				w.write(MessageFormat.format("<th rowspan=''{0}''>-</th>", depth + 1));
-				continue;
-			}
-
-			final int colSpan = row.getSize(1);
-			if (colSpan == 1)
-				w.write("<th>");
-			else
-				w.write(MessageFormat.format("<th colspan=''{0}''>", colSpan));
-			w.write(row.bucketValue.toString());
-			w.write("</th>");
-			if (row.getChilren() != null) {
-				// add "self" cell
-				children.add(null);
-				children.addAll(row.getChilren());
-			}
+		public X(Collector<V, W, R> x) {
+			this.finisher = x.finisher();
+			Collector<V, W, W> of = Collector.of(x.supplier(), x.accumulator(), x.combiner());
+			this.rows = rowBucket.stream().map(t -> new RowBucketWrapper<V, W>(t, colBucket, of)).collect(toList());
 		}
-		w.write("</tr>");
 
-		if (!children.isEmpty())
-			printRow(w, children, depth - 1, spacerColumns, level + 1);
-	}
-
-	public void printRowHeader(Bucket<V> b, Writer w, int colSpan) throws IOException {
-		w.write(MessageFormat.format("<th rowSpan=''{0}''>{1}</th>", b.getSize(1), b.getBucketValue()));
-		if (b.getChilren() != null)
-			w.write(MessageFormat.format("<th colSpan=''{0}''>-</th>", colSpan));
-	}
-
-	public <W> void writeHtml(Writer w, Collector<V, ?, W> a, Function<W, @NonNull ?> cellHandler) throws IOException {
-		w.write("<html>");
-		w.write("<head><style>");
-		w.write("	td {text-align: right; padding: 0px 5px;}");
-		w.write("</style></head>");
-		w.write("<body>");
-		w.write("<table border='1'>");
-
-		{
-			w.write("<thead>");
-			printRow(w, Collections.singletonList(colBucket), colBucket.depth, rowBucket.depth + 1, 0);
-			w.write("</thead>");
+		public Stream<BucketWithValues<V, W>> getTransformed(Transformer<V, W> t, Collector<W, ?, W> a) {
+			return getCells().map(r -> new BucketWithValues<V, W>(r, t, a));
 		}
-		{
-			w.write("<tbody>");
 
-			rows.forEach(r -> {
-				try {
-					w.write("<tr>");
+		public Stream<CopyBucket<V, W>> getCells() {
+			return rows.stream().flatMap(RowBucketWrapper::getCells);
+		}
 
-					printRowHeader(r.rb, w, maxRowDepth - r.rb.getLevel());
+		public void printRow(Writer w, List<Bucket<V>> rows, int depth, int spacerColumns, int level)
+				throws IOException {
 
-					r.getCells().forEach((Bucket<V> cell) -> {
-						W collect = cell.values.stream().collect(a);
+			final List<Bucket<V>> children = new ArrayList<Bucket<V>>();
+			w.write("<tr>");
+			if (level == 0)
+				w.write(MessageFormat.format(
+						"<th colspan=''{0}'' rowspan=''{1}''>---columns---<br/>/<br/>---rows---</th>", spacerColumns,
+						depth + 1));
 
-						try {
-							w.write("<td>");
-							w.write(cellHandler.apply(collect).toString());
-							w.write("</td>");
-						} catch (final IOException e) {
-							throw new AssertionError(e);
-						}
-					});
-					w.write("</tr>");
-				} catch (final IOException e) {
-					throw new AssertionError(e);
+			for (final Bucket<V> row : rows) {
+				// render "self" - cell
+				if (row == null) {
+					w.write(MessageFormat.format("<th rowspan=''{0}''>-</th>", depth + 1));
+					continue;
 				}
-			});
 
-			w.write("</tbody>");
+				final int colSpan = row.getSize(1);
+				if (colSpan == 1)
+					w.write("<th>");
+				else
+					w.write(MessageFormat.format("<th colspan=''{0}''>", colSpan));
+				w.write(row.bucketValue.toString());
+				w.write("</th>");
+				if (row.getChilren() != null) {
+					// add "self" cell
+					children.add(null);
+					children.addAll(row.getChilren());
+				}
+			}
+			w.write("</tr>");
+
+			if (!children.isEmpty())
+				printRow(w, children, depth - 1, spacerColumns, level + 1);
 		}
-		w.write("</table>");
-		w.write("</body></html>");
+
+		public void printRowHeader(Bucket<V> b, Writer w, int colSpan) throws IOException {
+			w.write(MessageFormat.format("<th rowSpan=''{0}''>{1}</th>", b.getSize(1), b.getBucketValue()));
+			if (b.getChilren() != null)
+				w.write(MessageFormat.format("<th colSpan=''{0}''>-</th>", colSpan));
+		}
+
+		public void writeHtml(Writer w, BiConsumer<Writer, R> cellWriter) throws IOException {
+			w.write("<html>");
+			w.write("<head><style>");
+			w.write("	td {text-align: right; padding: 0px 5px;}");
+			w.write("</style></head>");
+			w.write("<body>");
+			w.write("<table border='1'>");
+
+			{
+				w.write("<thead>");
+				printRow(w, Collections.singletonList(colBucket), colBucket.depth, rowBucket.depth + 1, 0);
+				w.write("</thead>");
+			}
+			{
+				w.write("<tbody>");
+
+				rows.forEach(r -> {
+					try {
+						w.write("<tr>");
+
+						printRowHeader(r.rb, w, maxRowDepth - r.rb.getLevel());
+
+						r.getCells().forEachOrdered((CopyBucket<V, W> cell) -> {
+							R collect = finisher.apply(cell.aggregatedValue);
+							try {
+								w.write("<td>");
+								cellWriter.accept(w, collect);
+								// w.write(cellHandler.apply(collect));
+								w.write("</td>");
+							} catch (final IOException e) {
+								throw new AssertionError(e);
+							}
+						});
+						w.write("</tr>");
+					} catch (final IOException e) {
+						throw new AssertionError(e);
+					}
+				});
+
+				w.write("</tbody>");
+			}
+			w.write("</table>");
+			w.write("</body></html>");
+		}
 	}
 }

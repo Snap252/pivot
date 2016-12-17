@@ -49,9 +49,9 @@ public abstract class Bucket<V> implements Predicate<V> {
 
 	protected abstract int getSize(int forSelf);
 
-	public abstract Stream<Bucket<V>> stream();
+	public abstract Stream<? extends Bucket<V>> stream();
 
-	public abstract Stream<Bucket<V>> reverseStream();
+	public abstract Stream<? extends Bucket<V>> reverseStream();
 
 	// public abstract Bucket<V> getMaterialized();
 
@@ -86,7 +86,7 @@ public abstract class Bucket<V> implements Predicate<V> {
 		return filter(values);
 	}
 
-	public abstract List<Bucket<V>> getChilren();
+	public abstract List<? extends Bucket<V>> getChilren();
 
 	protected Collection<V> filter(Collection<V> l) {
 		if (l.isEmpty()) {

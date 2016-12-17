@@ -1,4 +1,13 @@
 class java/math/BigDecimal
+ONE
+ Ljava/math/BigDecimal;
+ L1java/math/BigDecimal;
+TEN
+ Ljava/math/BigDecimal;
+ L1java/math/BigDecimal;
+ZERO
+ Ljava/math/BigDecimal;
+ L1java/math/BigDecimal;
 add
  (Ljava/math/BigDecimal;)Ljava/math/BigDecimal;
  (L1java/math/BigDecimal;)L1java/math/BigDecimal;
@@ -17,3 +26,6 @@ negate
 scaleByPowerOfTen
  (I)Ljava/math/BigDecimal;
  (I)L1java/math/BigDecimal;
+toPlainString
+ ()Ljava/lang/String;
+ ()L1java/lang/String;

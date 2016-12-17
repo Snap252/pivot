@@ -1,15 +1,16 @@
 package com.snap252.org;
 
-import java.io.BufferedWriter;
+import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.math.BigDecimal;
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.Random;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -18,6 +19,8 @@ import java.util.stream.Stream;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+
+import com.snap252.org.NumberStatistics.MutableValue;
 
 @NonNullByDefault
 public class RandomDataGenerator {
@@ -338,46 +341,69 @@ public class RandomDataGenerator {
 				"Zoller", "Schewe", "Zeiler", "Wehrmann", "Kutz", "Häuser", "Faulhaber", "Schunk", "Bast",
 				"Sternberg" };
 
-		final List<Person> personen = getAsStream(10000, r -> new Person(random(vorname), random(nachname),
+		final List<Person> personen = getAsStream(2000, r -> new Person(random(vorname), random(nachname),
 				r.nextInt(60) + 10, random(Geschl.values()), new BigDecimal(r.nextInt(10000)).scaleByPowerOfTen(-2)))
 						.collect(Collectors.toList());
 
 		BiBucketParameter<Person> parameter = new BiBucketParameter<Person>(personen)
 				.setColFnkt(p -> Character.toUpperCase(p.nachname.charAt(0)))
-				.setRowFnkt(p -> p.vorname.charAt(0), p -> p.geschlecht, p -> p.alter / 10
+
+				.setRowFnkt(p -> p.vorname.charAt(0)
+
+		// ,p -> p.geschlecht
+		// ,p -> p.alter / 10
 
 		);
 
-		final BiBucket<Person> biBucket = Timers.printTimer("doing bucket", () -> new BiBucket<Person>(parameter));
+		final BiBucket<Person> biBucket = Timers.printTimer("doing bucket", 20, () -> new BiBucket<Person>(parameter));
 
 		Timers.printTimer("printing", () -> write(personen, biBucket));
 	}
 
 	protected static void write(List<Person> personen, BiBucket<Person> biBucket2) {
-		try (OutputStream fos = new FileOutputStream("C:\\Users\\Snap252\\Documents\\1.html")) {
-			try (Writer writer = new BufferedWriter(new OutputStreamWriter(fos))) {
+		try (OutputStream os = new BufferedOutputStream(
+				new FileOutputStream("C:\\Users\\Snap252\\Documents\\1.html"))) {
+			try (Writer writer = new OutputStreamWriter(os)) {
 				writeHtml(biBucket2, writer);
 			}
+			os.flush();
 		} catch (final IOException e) {
 			throw new AssertionError();
 		}
+		Timers.printTimer("just write to memory", 10, () -> {
+			try (Writer writer = new StringWriter(1 << 20)) {
+				writeHtml(biBucket2, writer);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
 	}
 
-	protected static void writeHtml(BiBucket<Person> biBucket2, Writer writer) throws IOException {
+	protected static void writeHtml(BiBucket<Person> biBucket2, Writer writerx) throws IOException {
 		// Collector<NumberStatistics<Double>, ?, NumberStatistics<Double>>
 		// reducer = NumberStatistics
 		// .getReducer((n1, n2) -> n1 + n2);
-		Collector<Person, ?, NumberStatistics<BigDecimal>> reducer = NumberStatistics.getReducer(p -> p.wert,
-				new BigDecimalArithmetics());
+		Collector<Person, MutableValue<BigDecimal>, NumberStatistics<BigDecimal>> reducer = NumberStatistics
+				.getReducer(p -> p.wert, new BigDecimalArithmetics());
 
-		Function<NumberStatistics<BigDecimal>, @NonNull ?> cellHandler = (NumberStatistics<BigDecimal> ns) -> {
+		BiConsumer<Writer, NumberStatistics<BigDecimal>> cellWriter = (writer, ns) -> {
 			if (ns.isNeutralElement()) {
-				return "";
+				return;
 			}
-			return MessageFormat.format("<div title=''{1}''>{0}</div>", ns.sum.toPlainString(), ns);
+			try {
+				writer.write("<div title='");
+				writer.write(ns.toString());
+				writer.write("'>");
+				writer.write(ns.sum.toPlainString());
+				writer.write("</div>");
+			} catch (IOException e) {
+				assert false;
+				e.printStackTrace();
+			}
+			
+			// writer.write(ns.sum.toPlainString());
 		};
-
-		biBucket2.writeHtml(writer, reducer, cellHandler);
+		biBucket2.createX(reducer).writeHtml(writerx, cellWriter);
 	}
 
 	enum Geschl {

@@ -1,5 +1,6 @@
 package com.snap252.org;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 @NonNullByDefault
@@ -27,5 +28,10 @@ final class IntegerArithmetics implements Arithmetics<Integer> {
 	@Override
 	public int compare(Integer n1, Integer n2) {
 		return n1.compareTo(n2);
+	}
+
+	@Override
+	public Integer getNeutralAddElement() {
+		return 0;
 	}
 }

@@ -31,7 +31,7 @@ public class RandomDataGenerator {
 		return IntStream.range(0, cnt).mapToObj(_ignore -> Stream.of(generators).map(g -> g.apply(random)).toArray());
 	}
 
-	public static <T> Stream<T> getAsStream(int cnt, Function<Random, T> generators) {
+	public static <@NonNull T> Stream<T> getAsStream(int cnt, Function<Random, T> generators) {
 		return IntStream.range(0, cnt).mapToObj(_ignore -> generators.apply(random));
 	}
 
@@ -379,31 +379,31 @@ public class RandomDataGenerator {
 		});
 	}
 
-	protected static void writeHtml(BiBucket<Person> biBucket2, Writer writerx) throws IOException {
+	protected static void writeHtml(BiBucket<Person> biBucket2, Writer writer) throws IOException {
 		// Collector<NumberStatistics<Double>, ?, NumberStatistics<Double>>
 		// reducer = NumberStatistics
 		// .getReducer((n1, n2) -> n1 + n2);
 		Collector<Person, MutableValue<BigDecimal>, NumberStatistics<BigDecimal>> reducer = NumberStatistics
 				.getReducer(p -> p.wert, new BigDecimalArithmetics());
 
-		BiConsumer<Writer, NumberStatistics<BigDecimal>> cellWriter = (writer, ns) -> {
+		BiConsumer<Writer, NumberStatistics<BigDecimal>> cellWriter = (w, ns) -> {
 			if (ns.isNeutralElement()) {
 				return;
 			}
 			try {
-				writer.write("<div title='");
-				writer.write(ns.toString());
-				writer.write("'>");
-				writer.write(ns.sum.toPlainString());
-				writer.write("</div>");
+				w.write("<div title='");
+				w.write(ns.toString());
+				w.write("'>");
+				w.write(ns.sum.toPlainString());
+				w.write("</div>");
 			} catch (IOException e) {
 				assert false;
 				e.printStackTrace();
 			}
-			
+
 			// writer.write(ns.sum.toPlainString());
 		};
-		biBucket2.createX(reducer).writeHtml(writerx, cellWriter);
+		biBucket2.createX(reducer).writeHtml(writer, cellWriter);
 	}
 
 	enum Geschl {

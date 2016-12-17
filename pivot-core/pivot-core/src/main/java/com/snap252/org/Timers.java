@@ -3,8 +3,11 @@ package com.snap252.org;
 import java.text.MessageFormat;
 import java.util.function.Supplier;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
+@NonNullByDefault
 public class Timers {
 
 	static void printTimer(String name, Runnable r) {
@@ -24,11 +27,11 @@ public class Timers {
 		return (System.nanoTime() - l) / 1000000L;
 	}
 
-	static <R> R printTimer(String name, Supplier<R> r) {
+	static <@NonNull R> R printTimer(String name, Supplier<R> r) {
 		return printTimer(name, 1, r);
 	}
 
-	static <R> R printTimer(String name, int cnt, Supplier<R> r) {
+	static <@NonNull R> R printTimer(String name, int cnt, Supplier<R> r) {
 		assert cnt > 0;
 		final long l = System.nanoTime();
 		@Nullable

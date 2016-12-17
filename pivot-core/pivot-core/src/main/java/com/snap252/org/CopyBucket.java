@@ -16,6 +16,7 @@ public class CopyBucket<V, W> extends Bucket<V> {
 
 	public W aggregatedValue;
 
+	@SuppressWarnings("null")
 	public CopyBucket(Bucket<V> origBucket, Collection<V> valuesBase, Collector<V, W, W> collector,
 			Collector<W, W, W> collector2) {
 		super(origBucket.bucketValue, null, null, origBucket.filter(valuesBase), origBucket.getLevel());
@@ -34,7 +35,8 @@ public class CopyBucket<V, W> extends Bucket<V> {
 				.collect(toList());
 
 		this.aggregatedValue = children.stream().map(c -> c.aggregatedValue).collect(collector2);
-		assert this.aggregatedValue.equals(values.stream().collect(collector));
+		assert this.aggregatedValue == null && values.stream().collect(collector) == null
+				|| this.aggregatedValue.equals(values.stream().collect(collector));
 
 		assert this.children.stream().flatMap(c -> c.values.stream()).collect(toSet())
 				.equals(new HashSet<V>(values)) : origBucket + "=> own: " + new HashSet<V>(values);

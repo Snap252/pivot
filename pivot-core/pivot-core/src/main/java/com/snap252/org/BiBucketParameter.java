@@ -1,16 +1,34 @@
 package com.snap252.org;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
-public class BiBucketParameter<V> {
-	public final List<V> values;
-	public final List<Function<V, Object>> rowFnkt;
-	public final List<Function<V, Object>> colFnkt;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
-	public BiBucketParameter(List<V> values, List<Function<V, Object>> colFnkt, List<Function<V, Object>> rowFnkt) {
+@NonNullByDefault
+public final class BiBucketParameter<V> {
+	public final List<V> values;
+	public List<Function<V, Object>> rowFnkt = new ArrayList<>();
+	public List<Function<V, Object>> colFnkt = new ArrayList<>();
+
+	public BiBucketParameter(List<V> values) {
 		this.values = values;
-		this.colFnkt = colFnkt;
-		this.rowFnkt = rowFnkt;
+	}
+
+	@SafeVarargs
+	public final BiBucketParameter<V> setRowFnkt(@NonNull Function<V, Object>... rowFnkt) {
+		assert this.rowFnkt.isEmpty();
+		this.rowFnkt = Arrays.asList(rowFnkt);
+		return this;
+	}
+
+	@SafeVarargs
+	public final BiBucketParameter<V> setColFnkt(@NonNull Function<V, Object>... colFnkt) {
+		assert this.colFnkt.isEmpty();
+		this.colFnkt = Arrays.asList(colFnkt);
+		return this;
 	}
 }

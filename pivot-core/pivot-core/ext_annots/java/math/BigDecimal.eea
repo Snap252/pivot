@@ -1,0 +1,19 @@
+class java/math/BigDecimal
+add
+ (Ljava/math/BigDecimal;)Ljava/math/BigDecimal;
+ (L1java/math/BigDecimal;)L1java/math/BigDecimal;
+divide
+ (Ljava/math/BigDecimal;)Ljava/math/BigDecimal;
+ (L1java/math/BigDecimal;)L1java/math/BigDecimal;
+divide
+ (Ljava/math/BigDecimal;Ljava/math/MathContext;)Ljava/math/BigDecimal;
+ (Ljava/math/BigDecimal;Ljava/math/MathContext;)L1java/math/BigDecimal;
+multiply
+ (Ljava/math/BigDecimal;)Ljava/math/BigDecimal;
+ (L1java/math/BigDecimal;)L1java/math/BigDecimal;
+negate
+ ()Ljava/math/BigDecimal;
+ ()L1java/math/BigDecimal;
+scaleByPowerOfTen
+ (I)Ljava/math/BigDecimal;
+ (I)L1java/math/BigDecimal;

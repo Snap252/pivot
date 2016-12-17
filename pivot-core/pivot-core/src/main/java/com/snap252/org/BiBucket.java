@@ -75,6 +75,7 @@ public final class BiBucket<V> {
 		if (level == 0)
 			w.write(MessageFormat.format("<th colspan=''{0}'' rowspan=''{1}''>---columns---<br/>/<br/>---rows---</th>",
 					spacerColumns, depth + 1));
+
 		for (final Bucket<V> row : rows) {
 			// render "self" - cell
 			if (row == null) {
@@ -102,13 +103,9 @@ public final class BiBucket<V> {
 	}
 
 	public void printRowHeader(Bucket<V> b, Writer w, int colSpan) throws IOException {
-
-		w.write(MessageFormat.format("<td rowSpan=''{0}''>", b.getSize(1)));
-
-		w.write(b.getBucketValue().toString());
-		w.write("</td>");
+		w.write(MessageFormat.format("<th rowSpan=''{0}''>{1}</th>", b.getSize(1), b.getBucketValue()));
 		if (b.getChilren() != null)
-			w.write(MessageFormat.format("<td colSpan=''{0}''>-</td>", colSpan));
+			w.write(MessageFormat.format("<th colSpan=''{0}''>-</th>", colSpan));
 	}
 
 	public <W> void writeHtml(Writer w, Transformer<V, W> tr, Collector<W, ?, W> a, Function<W, @NonNull ?> cellHandler)
@@ -130,11 +127,6 @@ public final class BiBucket<V> {
 
 					printRowHeader(r.rb, w, maxRowDepth - r.rb.getLevel());
 
-					System.out.println("BiBucket.writeHtml()" + Arrays.deepToString(
-							new Object[] { r.rb.getBucketValue().toString(), maxRowDepth - r.rb.getLevel() + 1 }));
-
-					// w.write(MessageFormat.format("<td colspan=''{0}''/>",
-					// rowBucket.depth));
 					r.getCells().forEach(cell -> {
 
 						W collect = cell.values.stream().map(c -> tr.transform(c)).collect(a);

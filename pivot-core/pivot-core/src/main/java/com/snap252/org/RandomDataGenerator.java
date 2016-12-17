@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.math.BigDecimal;
 import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Function;
@@ -338,12 +338,15 @@ public class RandomDataGenerator {
 				"Zoller", "Schewe", "Zeiler", "Wehrmann", "Kutz", "Häuser", "Faulhaber", "Schunk", "Bast",
 				"Sternberg" };
 
-		final List<Person> personen = getAsStream(100, r -> new Person(random(vorname), random(nachname),
-				r.nextInt(60) + 10, random(Geschl.values()), r.nextInt(1000) / 10.)).collect(Collectors.toList());
+		final List<Person> personen = getAsStream(10000, r -> new Person(random(vorname), random(nachname),
+				r.nextInt(60) + 10, random(Geschl.values()), new BigDecimal(r.nextInt(1000)).scaleByPowerOfTen(-1)))
+						.collect(Collectors.toList());
 
-		BiBucketParameter<Person> parameter = new BiBucketParameter<Person>(personen,
-				Arrays.asList(p -> Character.toUpperCase(p.nachname.charAt(0))), Arrays.asList(p -> p.vorname.charAt(0),
-						/*p -> p.vorname.substring(0, 2),*/ p -> p.geschlecht, p -> p.alter / 10));
+		BiBucketParameter<Person> parameter = new BiBucketParameter<Person>(personen)
+				.setColFnkt(p -> Character.toUpperCase(p.nachname.charAt(0)))
+				.setRowFnkt(p -> p.vorname.charAt(0), p -> p.geschlecht, p -> p.alter / 10
+
+		);
 
 		final BiBucket<Person> biBucket = Timers.printTimer("doing bucket", () -> new BiBucket<Person>(parameter));
 
@@ -361,10 +364,14 @@ public class RandomDataGenerator {
 	}
 
 	protected static void writeHtml(BiBucket<Person> biBucket2, Writer writer) throws IOException {
-		Collector<NumberStatistics<Double>, ?, NumberStatistics<Double>> reducer = NumberStatistics
-				.getReducer((n1, n2) -> n1 + n2);
+		// Collector<NumberStatistics<Double>, ?, NumberStatistics<Double>>
+		// reducer = NumberStatistics
+		// .getReducer((n1, n2) -> n1 + n2);
+		BigDecimalArithmetics bda = new BigDecimalArithmetics();
+		Collector<NumberStatistics<BigDecimal>, ?, NumberStatistics<BigDecimal>> reducer = NumberStatistics
+				.getReducer(bda);
 
-		Function<NumberStatistics<Double>, @NonNull ?> cellHandler = (NumberStatistics<Double> ns) -> {
+		Function<NumberStatistics<BigDecimal>, @NonNull ?> cellHandler = (NumberStatistics<BigDecimal> ns) -> {
 			if (ns.isNeutralElement()) {
 				return "";
 			}
@@ -372,7 +379,7 @@ public class RandomDataGenerator {
 			return MessageFormat.format("<div title=''{1}''>{0}</div>", ns.sum, ns);
 		};
 
-		biBucket2.writeHtml(writer, p -> new NumberStatistics<Double>(p.wert, p.wert * p.wert), reducer, cellHandler);
+		biBucket2.writeHtml(writer, p -> new NumberStatistics<BigDecimal>(p.wert, bda), reducer, cellHandler);
 	}
 
 	enum Geschl {
@@ -384,9 +391,9 @@ public class RandomDataGenerator {
 		protected final String nachname;
 		protected final Geschl geschlecht;
 		private final int alter;
-		private final double wert;
+		private final BigDecimal wert;
 
-		public Person(String vorname, String nachname, int alter, Geschl g, double wert) {
+		public Person(String vorname, String nachname, int alter, Geschl g, BigDecimal wert) {
 			this.vorname = vorname;
 			this.nachname = nachname;
 			this.alter = alter;

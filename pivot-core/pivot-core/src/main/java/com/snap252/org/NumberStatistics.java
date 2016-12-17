@@ -1,13 +1,9 @@
 package com.snap252.org;
 
-import java.math.BigDecimal;
-import java.util.function.BinaryOperator;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.jdt.annotation.Nullable;
 
 @NonNullByDefault
 public class NumberStatistics<N extends Number & Comparable<N>> {
@@ -17,9 +13,10 @@ public class NumberStatistics<N extends Number & Comparable<N>> {
 	public final N sum;
 	public final N sumSqr;
 
-	private static final NumberStatistics<?> NEUTRAL_ELEMENT = new NumberStatistics<Integer>(0, 0) {
+	private static final NumberStatistics<?> NEUTRAL_ELEMENT = new NumberStatistics<Integer>(0,
+			new IntegerArithmetics()) {
 		@Override
-		public @NonNull String toString() {
+		public String toString() {
 			return "---";
 		}
 
@@ -27,6 +24,7 @@ public class NumberStatistics<N extends Number & Comparable<N>> {
 			return true;
 		}
 	};
+	private Arithmetics<N> arithmetics;
 
 	public boolean isNeutralElement() {
 		return false;
@@ -38,7 +36,7 @@ public class NumberStatistics<N extends Number & Comparable<N>> {
 	}
 
 	private static <N extends Number & Comparable<N>> NumberStatistics<N> aggregate(NumberStatistics<N> ns1,
-			NumberStatistics<N> ns2, BinaryOperator<N> addFunction) {
+			NumberStatistics<N> ns2, Arithmetics<N> arithmetics) {
 		assert ns2 != NEUTRAL_ELEMENT;
 
 		if (ns1 == NEUTRAL_ELEMENT) {
@@ -46,59 +44,60 @@ public class NumberStatistics<N extends Number & Comparable<N>> {
 			return ns2;
 		}
 
-		return new NumberStatistics<N>(ns1, ns2, addFunction);
+		return new NumberStatistics<N>(ns1, ns2, arithmetics);
 	}
 
-	private NumberStatistics(NumberStatistics<N> ns1, NumberStatistics<N> ns2, BinaryOperator<N> addFunction) {
+	private NumberStatistics(NumberStatistics<N> ns1, NumberStatistics<N> ns2, Arithmetics<N> arithmetics) {
+		this.arithmetics = arithmetics;
 		cnt = ns1.cnt + ns2.cnt;
 		this.min = ns1.min.compareTo(ns2.min) < 0 ? ns1.min : ns2.min;
 		this.max = ns1.max.compareTo(ns2.max) > 0 ? ns1.max : ns2.max;
 
-		this.sum = addFunction.apply(ns1.sum, ns2.sum);
-		this.sumSqr = addFunction.apply(ns1.sumSqr, ns2.sumSqr);
+		this.sum = arithmetics.add(ns1.sum, ns2.sum);
+		this.sumSqr = arithmetics.add(ns1.sumSqr, ns2.sumSqr);
 	}
 
 	public static <N extends Number & Comparable<N>> Collector<NumberStatistics<N>, ?, NumberStatistics<N>> getReducer(
-			BinaryOperator<N> addFnkt) {
-		return Collectors.reducing(getNeutralElement(), (f1, f2) -> aggregate(f1, f2, addFnkt));
+			Arithmetics<N> arithmetics) {
+		return Collectors.reducing(getNeutralElement(), (f1, f2) -> aggregate(f1, f2, arithmetics));
 	}
 
-	public NumberStatistics(N n, N sqr) {
+	public NumberStatistics(N n, Arithmetics<N> arithmetics) {
+		this.arithmetics = arithmetics;
 		max = min = sum = n;
-		sumSqr = sqr;
+		sumSqr = arithmetics.mul(n, n);
 		cnt = 1;
 	}
 
-	public NumberStatistics(int cnt, N max, N min, N sum, N sumSqr) {
+	public NumberStatistics(int cnt, N max, N min, N sum, N sumSqr, Arithmetics<N> arithmetics) {
 		this.cnt = cnt;
 		this.max = max;
 		this.min = min;
 		this.sum = sum;
 		this.sumSqr = sumSqr;
+		this.arithmetics = arithmetics;
 	}
 
-	@Nullable
-	public Double avg() {
+	public N avg() {
 		assert !isNeutralElement();
-		return sum.doubleValue() / cnt;
+		return arithmetics.part(sum, cnt);
 	}
 
-	public double varianz() {
+	public N varianz() {
 		assert !isNeutralElement();
 		// see:
 		// https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
-		double doubleSum = sum.doubleValue();
-		return (sumSqr.doubleValue() - doubleSum * doubleSum / cnt) / cnt;
-	}
 
-	public double abweichung() {
-		return Math.sqrt(varianz());
+		return arithmetics.varianz(sum, sumSqr, cnt);
 	}
 
 	@Override
 	public String toString() {
+		assert !isNeutralElement();
 		return "NumberStatistics [cnt=" + cnt + ", max=" + max + ", min=" + min + ", sum=" + sum + ", sumSqr=" + sumSqr
-				+ ", avg()=" + avg() + ", varianz()=" + varianz() + ", abweichung()=" + abweichung() + "]";
+				+ ", avg()=" + avg() + ", varianz()=" + varianz() + "]";
+//		return "NumberStatistics [cnt=" + cnt + ", max=" + max + ", min=" + min + ", sum=" + sum + ", sumSqr=" + sumSqr
+//				+ ", avg()=" + avg() + ", varianz()=" + varianz() + "]";
 	}
 
 }

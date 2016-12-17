@@ -12,6 +12,8 @@ public interface Arithmetics<N extends Number> {
 	
 	public N negate(N n);
 
+	public int compare(N n1, N n2);
+	
 	default N varianz(N sum, N sumSqr, int cnt) {
 		// see:
 		// https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
@@ -21,5 +23,6 @@ public interface Arithmetics<N extends Number> {
 //		double doubleSum = sum.doubleValue();
 //		return (sumSqr.doubleValue() - doubleSum * doubleSum / cnt) / cnt;
 
-	};
+	}
+
 }

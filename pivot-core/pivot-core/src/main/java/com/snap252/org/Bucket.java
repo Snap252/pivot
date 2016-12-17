@@ -15,11 +15,11 @@ public abstract class Bucket<V> implements Predicate<V> {
 
 	private final Function<V, Object> extractor;
 
-	private final Bucket<V> parent;
-
 	protected final Collection<V> values;
 
 	private final int level;
+
+	private final Bucket<V> parent;
 
 	public Bucket(Object bucketValue, Bucket<V> parent, Function<V, Object> extractor, Collection<V> values,
 			int level) {
@@ -28,11 +28,6 @@ public abstract class Bucket<V> implements Predicate<V> {
 		this.extractor = extractor;
 		this.values = values;
 		this.level = level;
-	}
-
-	@Deprecated
-	public final Bucket<V> getParent() {
-		return parent;
 	}
 
 	public final Object getBucketValue() {

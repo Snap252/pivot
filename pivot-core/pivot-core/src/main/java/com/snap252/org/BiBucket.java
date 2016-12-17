@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
@@ -20,14 +19,12 @@ public final class BiBucket<V> {
 	private final RootBucket<V> rowBucket;
 	private final RootBucket<V> colBucket;
 	private final List<RowBucketWrapper<V>> rows;
-	private final int maxColDepth;
 	private final int maxRowDepth;
 
 	public BiBucket(BiBucketParameter<V> p) {
 		rowBucket = new RootBucket<>(p.values, p.rowFnkt);
 		this.maxRowDepth = p.rowFnkt.size();
 		colBucket = new RootBucket<>(p.values, p.colFnkt);
-		this.maxColDepth = p.colFnkt.size();
 
 		this.rows = rowBucket.stream().map(t -> new RowBucketWrapper<V>(t, colBucket)).collect(toList());
 	}
@@ -108,9 +105,12 @@ public final class BiBucket<V> {
 			w.write(MessageFormat.format("<th colSpan=''{0}''>-</th>", colSpan));
 	}
 
-	public <W> void writeHtml(Writer w, Transformer<V, W> tr, Collector<W, ?, W> a, Function<W, @NonNull ?> cellHandler)
-			throws IOException {
-		w.write("<html><body>");
+	public <W> void writeHtml(Writer w, Collector<V, ?, W> a, Function<W, @NonNull ?> cellHandler) throws IOException {
+		w.write("<html>");
+		w.write("<head><style>");
+		w.write("	td {text-align: right; padding: 0px 5px;}");
+		w.write("</style></head>");
+		w.write("<body>");
 		w.write("<table border='1'>");
 
 		{
@@ -127,9 +127,8 @@ public final class BiBucket<V> {
 
 					printRowHeader(r.rb, w, maxRowDepth - r.rb.getLevel());
 
-					r.getCells().forEach(cell -> {
-
-						W collect = cell.values.stream().map(c -> tr.transform(c)).collect(a);
+					r.getCells().forEach((Bucket<V> cell) -> {
+						W collect = cell.values.stream().collect(a);
 
 						try {
 							w.write("<td>");

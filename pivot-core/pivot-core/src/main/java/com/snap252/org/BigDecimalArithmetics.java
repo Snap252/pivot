@@ -38,4 +38,9 @@ public class BigDecimalArithmetics implements Arithmetics<BigDecimal> {
 		return n.negate();
 	}
 
+	@Override
+	public int compare(BigDecimal n1, BigDecimal n2) {
+		return n1.compareTo(n2);
+	}
+
 }

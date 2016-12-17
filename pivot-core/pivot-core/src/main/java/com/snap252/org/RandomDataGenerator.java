@@ -339,7 +339,7 @@ public class RandomDataGenerator {
 				"Sternberg" };
 
 		final List<Person> personen = getAsStream(10000, r -> new Person(random(vorname), random(nachname),
-				r.nextInt(60) + 10, random(Geschl.values()), new BigDecimal(r.nextInt(1000)).scaleByPowerOfTen(-1)))
+				r.nextInt(60) + 10, random(Geschl.values()), new BigDecimal(r.nextInt(10000)).scaleByPowerOfTen(-2)))
 						.collect(Collectors.toList());
 
 		BiBucketParameter<Person> parameter = new BiBucketParameter<Person>(personen)
@@ -367,19 +367,17 @@ public class RandomDataGenerator {
 		// Collector<NumberStatistics<Double>, ?, NumberStatistics<Double>>
 		// reducer = NumberStatistics
 		// .getReducer((n1, n2) -> n1 + n2);
-		BigDecimalArithmetics bda = new BigDecimalArithmetics();
-		Collector<NumberStatistics<BigDecimal>, ?, NumberStatistics<BigDecimal>> reducer = NumberStatistics
-				.getReducer(bda);
+		Collector<Person, ?, NumberStatistics<BigDecimal>> reducer = NumberStatistics.getReducer(p -> p.wert,
+				new BigDecimalArithmetics());
 
 		Function<NumberStatistics<BigDecimal>, @NonNull ?> cellHandler = (NumberStatistics<BigDecimal> ns) -> {
 			if (ns.isNeutralElement()) {
 				return "";
 			}
-
-			return MessageFormat.format("<div title=''{1}''>{0}</div>", ns.sum, ns);
+			return MessageFormat.format("<div title=''{1}''>{0}</div>", ns.sum.toPlainString(), ns);
 		};
 
-		biBucket2.writeHtml(writer, p -> new NumberStatistics<BigDecimal>(p.wert, bda), reducer, cellHandler);
+		biBucket2.writeHtml(writer, reducer, cellHandler);
 	}
 
 	enum Geschl {

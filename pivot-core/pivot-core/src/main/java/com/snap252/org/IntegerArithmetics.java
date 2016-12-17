@@ -23,4 +23,9 @@ final class IntegerArithmetics implements Arithmetics<Integer> {
 	public Integer negate(Integer n) {
 		return -n;
 	}
+
+	@Override
+	public int compare(Integer n1, Integer n2) {
+		return n1.compareTo(n2);
+	}
 }

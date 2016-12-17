@@ -1,12 +1,14 @@
 package com.snap252.org;
 
+import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 @NonNullByDefault
-public class NumberStatistics<N extends Number & Comparable<N>> {
+public class NumberStatistics<N extends Number> {
 	public final int cnt;
 	public final N max;
 	public final N min;
@@ -31,12 +33,12 @@ public class NumberStatistics<N extends Number & Comparable<N>> {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static <N extends Number & Comparable<N>> NumberStatistics<N> getNeutralElement() {
+	public static <N extends Number> NumberStatistics<N> getNeutralElement() {
 		return (NumberStatistics) NEUTRAL_ELEMENT;
 	}
 
-	private static <N extends Number & Comparable<N>> NumberStatistics<N> aggregate(NumberStatistics<N> ns1,
-			NumberStatistics<N> ns2, Arithmetics<N> arithmetics) {
+	private static <N extends Number> NumberStatistics<N> aggregate(NumberStatistics<N> ns1, NumberStatistics<N> ns2,
+			Arithmetics<N> arithmetics) {
 		assert ns2 != NEUTRAL_ELEMENT;
 
 		if (ns1 == NEUTRAL_ELEMENT) {
@@ -50,18 +52,22 @@ public class NumberStatistics<N extends Number & Comparable<N>> {
 	private NumberStatistics(NumberStatistics<N> ns1, NumberStatistics<N> ns2, Arithmetics<N> arithmetics) {
 		this.arithmetics = arithmetics;
 		cnt = ns1.cnt + ns2.cnt;
-		this.min = ns1.min.compareTo(ns2.min) < 0 ? ns1.min : ns2.min;
-		this.max = ns1.max.compareTo(ns2.max) > 0 ? ns1.max : ns2.max;
+		this.min = arithmetics.compare(ns1.min, ns2.min) < 0 ? ns1.min : ns2.min;
+		this.max = arithmetics.compare(ns1.max, ns2.max) > 0 ? ns1.max : ns2.max;
 
 		this.sum = arithmetics.add(ns1.sum, ns2.sum);
 		this.sumSqr = arithmetics.add(ns1.sumSqr, ns2.sumSqr);
 	}
 
-	public static <N extends Number & Comparable<N>> Collector<NumberStatistics<N>, ?, NumberStatistics<N>> getReducer(
+	public static <N extends Number, V> Collector<V, ?, NumberStatistics<N>> getReducer(Function<V, N> valueExtractor,
 			Arithmetics<N> arithmetics) {
-		return Collectors.reducing(getNeutralElement(), (f1, f2) -> aggregate(f1, f2, arithmetics));
+		Function<V, NumberStatistics<N>> transformer = valueExtractor.andThen(n -> new NumberStatistics<>(n, arithmetics));
+		return Collectors.reducing(getNeutralElement(), transformer, (f1, f2) -> aggregate(f1, f2, arithmetics));
 	}
 
+	/**
+	 * Creates an atomic cell.
+	 */
 	public NumberStatistics(N n, Arithmetics<N> arithmetics) {
 		this.arithmetics = arithmetics;
 		max = min = sum = n;
@@ -96,8 +102,9 @@ public class NumberStatistics<N extends Number & Comparable<N>> {
 		assert !isNeutralElement();
 		return "NumberStatistics [cnt=" + cnt + ", max=" + max + ", min=" + min + ", sum=" + sum + ", sumSqr=" + sumSqr
 				+ ", avg()=" + avg() + ", varianz()=" + varianz() + "]";
-//		return "NumberStatistics [cnt=" + cnt + ", max=" + max + ", min=" + min + ", sum=" + sum + ", sumSqr=" + sumSqr
-//				+ ", avg()=" + avg() + ", varianz()=" + varianz() + "]";
+		// return "NumberStatistics [cnt=" + cnt + ", max=" + max + ", min=" +
+		// min + ", sum=" + sum + ", sumSqr=" + sumSqr
+		// + ", avg()=" + avg() + ", varianz()=" + varianz() + "]";
 	}
 
 }

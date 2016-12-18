@@ -1,4 +1,4 @@
-package com.snap252.org;
+package com.snap252.org.pivoting;
 
 import static java.util.stream.Collectors.toList;
 
@@ -8,21 +8,25 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import org.eclipse.jdt.annotation.Nullable;
+
 public abstract class Bucket<V> implements Predicate<V> {
 	// private final Predicate<V> predicate;
 
 	protected final Object bucketValue;
 
+	@Nullable
 	private final Function<V, Object> extractor;
 
 	protected final Collection<V> values;
 
 	private final int level;
 
+	@Nullable
 	private final Bucket<V> parent;
 
-	public Bucket(Object bucketValue, Bucket<V> parent, Function<V, Object> extractor, Collection<V> values,
-			int level) {
+	public Bucket(final Object bucketValue, final @Nullable Bucket<V> parent,
+			final @Nullable Function<V, Object> extractor, final Collection<V> values, final int level) {
 		this.bucketValue = bucketValue;
 		this.parent = parent;
 		this.extractor = extractor;
@@ -39,7 +43,7 @@ public abstract class Bucket<V> implements Predicate<V> {
 		return addString("", new StringBuilder()).toString();
 	}
 
-	protected StringBuilder addString(String linePrefix, StringBuilder sb) {
+	protected StringBuilder addString(final String linePrefix, final StringBuilder sb) {
 		sb.append(linePrefix).append(getClass().getSimpleName() + " [bucketValue=" + bucketValue + ", kvps="
 		// + Arrays.deepToString(kvps.toArray())
 				+ "#" + getSize(0) + "]");
@@ -51,44 +55,21 @@ public abstract class Bucket<V> implements Predicate<V> {
 
 	public abstract Stream<? extends Bucket<V>> stream();
 
-	public abstract Stream<? extends Bucket<V>> reverseStream();
-
-	// public abstract Bucket<V> getMaterialized();
-
-	public String getParentString() {
-		// char prefix = getClass().getSimpleName().charAt(0);
-		String prefix;
-		if (this instanceof LeafBucket) {
-			prefix = "L";
-		} else if (this instanceof SubBucket) {
-			prefix = "S";
-		} else {
-			assert false;
-			prefix = "<unknown>";
-		}
-
-		final String v = prefix + ":" + getBucketValue();
-		if (parent == null) {
-			return v;
-		}
-		return parent.getParentString() + ", " + v;
-	}
-
 	@Override
-	public boolean test(V v) {
+	public boolean test(final V v) {
 		assert parent != null;
 		assert extractor != null;
 		final Object extractedValue = extractor.apply(v);
 		return /* parent.test(v) && */bucketValue.equals(extractedValue);
 	}
 
-	public final Collection<V> filterOwnValues(Predicate<V> f) {
+	public final Collection<V> filterOwnValues(final Predicate<V> f) {
 		return filter(values);
 	}
 
-	public abstract List<? extends Bucket<V>> getChilren();
+	public abstract @Nullable List<? extends Bucket<V>> getChilren();
 
-	protected Collection<V> filter(Collection<V> l) {
+	protected Collection<V> filter(final Collection<V> l) {
 		if (l.isEmpty()) {
 			return l;
 		}

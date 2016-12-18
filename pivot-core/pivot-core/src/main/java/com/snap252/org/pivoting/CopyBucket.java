@@ -1,4 +1,4 @@
-package com.snap252.org;
+package com.snap252.org.pivoting;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -9,9 +9,13 @@ import java.util.List;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
 
+import org.eclipse.jdt.annotation.Nullable;
+
 public class CopyBucket<V, W> extends Bucket<V> {
 
 	private Bucket<V> origBucket;
+
+	@Nullable
 	private List<CopyBucket<V, W>> children;
 
 	public W aggregatedValue;
@@ -30,18 +34,19 @@ public class CopyBucket<V, W> extends Bucket<V> {
 			return;
 		}
 
-		this.children = origChildren.stream().map(c -> new CopyBucket<>(c, values, collector, collector2))
-				.collect(toList());
+		final List<CopyBucket<V, W>> children$ = origChildren.stream()
+				.map(c -> new CopyBucket<>(c, values, collector, collector2)).collect(toList());
+		this.children = children$;
 
-		this.aggregatedValue = children.stream().map(c -> c.aggregatedValue).collect(collector2);
+		this.aggregatedValue = children$.stream().map(c -> c.aggregatedValue).collect(collector2);
 		assert equals(this.aggregatedValue, values.stream().collect(collector)) : this.aggregatedValue + "=>"
 				+ values.stream().collect(collector);
 
-		assert this.children.stream().flatMap(c -> c.values.stream()).collect(toSet())
+		assert children$.stream().flatMap(c -> c.values.stream()).collect(toSet())
 				.equals(new HashSet<V>(values)) : origBucket + "=> own: " + new HashSet<V>(values);
 	}
 
-	private static boolean equals(final Object o1, final Object o2) {
+	private static boolean equals(@Nullable final Object o1, @Nullable final Object o2) {
 		if (o1 == null)
 			return o2 == null;
 
@@ -50,7 +55,7 @@ public class CopyBucket<V, W> extends Bucket<V> {
 	}
 
 	@Override
-	public List<CopyBucket<V, W>> getChilren() {
+	public @Nullable List<CopyBucket<V, W>> getChilren() {
 		return children;
 	}
 
@@ -66,23 +71,12 @@ public class CopyBucket<V, W> extends Bucket<V> {
 
 	@Override
 	public Stream<CopyBucket<V, W>> stream() {
-		if (children == null || children.isEmpty()) {
+
+		final List<CopyBucket<V, W>> children$ = children;
+		if (children$ == null || children$.isEmpty()) {
 			return Stream.of(this);
 		}
-		return Stream.concat(Stream.of(this), children.stream().flatMap(CopyBucket::stream));
-	}
-
-	@Override
-	public Stream<CopyBucket<V, W>> reverseStream() {
-		if (children == null || children.isEmpty()) {
-			return Stream.of(this);
-		}
-		return Stream.concat(children.stream().flatMap(CopyBucket::reverseStream), Stream.of(this));
-	}
-
-	@Override
-	public String getParentString() {
-		return origBucket.getParentString();
+		return Stream.concat(Stream.of(this), children$.stream().flatMap(CopyBucket::stream));
 	}
 
 	@Override

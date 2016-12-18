@@ -1,4 +1,4 @@
-package com.snap252.org;
+package com.snap252.org.pivoting;
 
 import static java.util.stream.Collectors.toSet;
 
@@ -7,21 +7,28 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 public class SubBucket<V> extends Bucket<V> {
 	public final List<Bucket<V>> children;
 	public final int depth;
 
-	public SubBucket(Object bucketValue, List<Function<V, Object>> partitionCriterionsAndSubCriterions,
-			SubBucket<V> parent, Function<V, Object> extractor, Collection<V> values, int level) {
+	public SubBucket(final Object bucketValue, final List<Function<V, Object>> partitionCriterionsAndSubCriterions,
+			@Nullable final SubBucket<V> parent, @Nullable final Function<V, Object> extractor,
+			final Collection<V> values, final int level) {
 		super(bucketValue, parent, extractor, values, level);
 		assert !partitionCriterionsAndSubCriterions.isEmpty();
 		this.depth = partitionCriterionsAndSubCriterions.size();
 
 		final Function<V, Object> ownCriterion = partitionCriterionsAndSubCriterions.get(0);
-		final Map<Object, List<V>> collect = values.stream().filter(this).collect(Collectors.groupingBy(ownCriterion::apply));
+
+		final Collector<V, ?, Map<Object, List<V>>> groupingBy = Collectors.groupingBy(ownCriterion::apply);
+		final Map<Object, List<V>> collect = values.stream().filter(this).collect(groupingBy);
 
 		final List<Function<V, Object>> childCriterions = partitionCriterionsAndSubCriterions.subList(1,
 				partitionCriterionsAndSubCriterions.size());
@@ -43,7 +50,7 @@ public class SubBucket<V> extends Bucket<V> {
 	}
 
 	@Override
-	protected StringBuilder addString(String linePrefix, StringBuilder sb) {
+	protected StringBuilder addString(final String linePrefix, final StringBuilder sb) {
 		super.addString(linePrefix, sb);
 		for (final Bucket<V> child : children) {
 			child.addString(linePrefix + "\t", sb);
@@ -52,7 +59,7 @@ public class SubBucket<V> extends Bucket<V> {
 	}
 
 	@Override
-	protected int getSize(int forSelf) {
+	protected int getSize(final int forSelf) {
 		return children.stream().mapToInt(b -> b.getSize(forSelf)).sum() + forSelf;
 	}
 
@@ -62,12 +69,7 @@ public class SubBucket<V> extends Bucket<V> {
 	}
 
 	@Override
-	public Stream<Bucket<V>> reverseStream() {
-		return Stream.concat(children.stream().flatMap(Bucket::reverseStream), Stream.of(this));
-	}
-
-	@Override
-	public List<Bucket<V>> getChilren() {
+	public @NonNull List<Bucket<V>> getChilren() {
 		return children;
 	}
 

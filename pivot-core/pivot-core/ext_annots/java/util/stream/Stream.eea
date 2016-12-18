@@ -1,4 +1,19 @@
 class java/util/stream/Stream
+collect
+ <R:Ljava/lang/Object;A:Ljava/lang/Object;>(Ljava/util/stream/Collector<-TT;TA;TR;>;)TR;
+ <R:Ljava/lang/Object;A:Ljava/lang/Object;>(L1java/util/stream/Collector<-TT;TA;TR;>;)TR;
+concat
+ <T:Ljava/lang/Object;>(Ljava/util/stream/Stream<+TT;>;Ljava/util/stream/Stream<+TT;>;)Ljava/util/stream/Stream<TT;>;
+ <T:Ljava/lang/Object;>(L1java/util/stream/Stream<+TT;>;L1java/util/stream/Stream<+TT;>;)L1java/util/stream/Stream<TT;>;
+filter
+ (Ljava/util/function/Predicate<-TT;>;)Ljava/util/stream/Stream<TT;>;
+ (Ljava/util/function/Predicate<-TT;>;)L1java/util/stream/Stream<TT;>;
+flatMap
+ <R:Ljava/lang/Object;>(Ljava/util/function/Function<-TT;+Ljava/util/stream/Stream<+TR;>;>;)Ljava/util/stream/Stream<TR;>;
+ <R:Ljava/lang/Object;>(Ljava/util/function/Function<-TT;+Ljava/util/stream/Stream<+TR;>;>;)L1java/util/stream/Stream<TR;>;
+of
+ <T:Ljava/lang/Object;>(TT;)Ljava/util/stream/Stream<TT;>;
+ <T:Ljava/lang/Object;>(TT;)L1java/util/stream/Stream<TT;>;
 of
  <T:Ljava/lang/Object;>([TT;)Ljava/util/stream/Stream<TT;>;
  <T:Ljava/lang/Object;>([TT;)L1java/util/stream/Stream<TT;>;

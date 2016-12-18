@@ -6,7 +6,7 @@
  *
  */
 @NonNullByDefault({ PARAMETER, RETURN_TYPE, FIELD, TYPE_BOUND, TYPE_ARGUMENT, ARRAY_CONTENTS })
-package com.snap252.org;
+package com.snap252.org.testing;
 
 import static org.eclipse.jdt.annotation.DefaultLocation.ARRAY_CONTENTS;
 import static org.eclipse.jdt.annotation.DefaultLocation.FIELD;

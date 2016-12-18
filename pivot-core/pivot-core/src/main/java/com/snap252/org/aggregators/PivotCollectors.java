@@ -10,11 +10,11 @@ import org.eclipse.jdt.annotation.Nullable;
 
 public class PivotCollectors {
 
-	public static <P, N extends Number> Collector<P, MutableValue<N>, @Nullable NumberStatistics<N>> getReducer(
-			final Function<P, N> f, final Arithmetics<N> arithmetics) {
+	public static <RawType, N extends Number> Collector<RawType, MutableValue<N>, @Nullable NumberStatistics<N>> getReducer(
+			final Function<RawType, N> extractorFunction, final Arithmetics<N> arithmetics) {
 
 		final Supplier<MutableValue<N>> supplier = () -> MutableValue.getNeutralElement(arithmetics);
-		final BiConsumer<MutableValue<N>, P> accumulator = (t, u) -> t.addSingle(f.apply(u));
+		final BiConsumer<MutableValue<N>, RawType> accumulator = (t, u) -> t.addSingle(extractorFunction.apply(u));
 		final BinaryOperator<MutableValue<N>> combiner = MutableValue::merge;
 
 		final Function<MutableValue<N>, @Nullable NumberStatistics<N>> finisher = MutableValue::createNumberStatistics;

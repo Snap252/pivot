@@ -20,7 +20,9 @@ import java.util.stream.Stream;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
-import com.snap252.org.NumberStatistics.MutableValue;
+import com.snap252.org.aggregators.BigDecimalArithmetics;
+import com.snap252.org.aggregators.NumberStatistics;
+import com.snap252.org.aggregators.NumberStatistics.MutableValue;
 
 @NonNullByDefault
 public class RandomDataGenerator {

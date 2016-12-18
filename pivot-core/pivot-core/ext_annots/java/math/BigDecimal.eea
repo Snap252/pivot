@@ -16,7 +16,7 @@ divide
  (L1java/math/BigDecimal;)L1java/math/BigDecimal;
 divide
  (Ljava/math/BigDecimal;Ljava/math/MathContext;)Ljava/math/BigDecimal;
- (Ljava/math/BigDecimal;Ljava/math/MathContext;)L1java/math/BigDecimal;
+ (L1java/math/BigDecimal;L1java/math/MathContext;)L1java/math/BigDecimal;
 multiply
  (Ljava/math/BigDecimal;)Ljava/math/BigDecimal;
  (L1java/math/BigDecimal;)L1java/math/BigDecimal;
@@ -26,6 +26,9 @@ negate
 scaleByPowerOfTen
  (I)Ljava/math/BigDecimal;
  (I)L1java/math/BigDecimal;
+subtract
+ (Ljava/math/BigDecimal;)Ljava/math/BigDecimal;
+ (L1java/math/BigDecimal;)L1java/math/BigDecimal;
 toPlainString
  ()Ljava/lang/String;
  ()L1java/lang/String;

@@ -16,9 +16,8 @@ public class CopyBucket<V, W> extends Bucket<V> {
 
 	public W aggregatedValue;
 
-	@SuppressWarnings("null")
-	public CopyBucket(Bucket<V> origBucket, Collection<V> valuesBase, Collector<V, W, W> collector,
-			Collector<W, W, W> collector2) {
+	public CopyBucket(final Bucket<V> origBucket, final Collection<V> valuesBase, final Collector<V, W, W> collector,
+			final Collector<W, W, W> collector2) {
 		super(origBucket.bucketValue, null, null, origBucket.filter(valuesBase), origBucket.getLevel());
 		this.origBucket = origBucket;
 
@@ -35,11 +34,14 @@ public class CopyBucket<V, W> extends Bucket<V> {
 				.collect(toList());
 
 		this.aggregatedValue = children.stream().map(c -> c.aggregatedValue).collect(collector2);
-		assert this.aggregatedValue == null && values.stream().collect(collector) == null
-				|| this.aggregatedValue.equals(values.stream().collect(collector));
+		assert equals(this.aggregatedValue, values.stream().collect(collector));
 
 		assert this.children.stream().flatMap(c -> c.values.stream()).collect(toSet())
 				.equals(new HashSet<V>(values)) : origBucket + "=> own: " + new HashSet<V>(values);
+	}
+
+	private static boolean equals(final Object o1, final Object o2) {
+		return o1 == null ? o2 == null : o1.equals(o2);
 	}
 
 	@Override
@@ -48,12 +50,12 @@ public class CopyBucket<V, W> extends Bucket<V> {
 	}
 
 	@Override
-	public boolean test(V v) {
+	public boolean test(final V v) {
 		return origBucket.test(v);
 	}
 
 	@Override
-	protected int getSize(int forSelf) {
+	protected int getSize(final int forSelf) {
 		return origBucket.getSize(forSelf);
 	}
 

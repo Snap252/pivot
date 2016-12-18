@@ -28,15 +28,18 @@ public final class BiBucket<RAW> {
 	}
 
 	private static class RowBucketWrapper<V, W> {
-		public final Bucket<V> rb;
-		public final CopyBucket<V, W> cells;
+		private final Bucket<V> rowBucket;
+		private final CopyBucket<V, W> cells;
 
-		public RowBucketWrapper(final Bucket<V> rb, final RootBucket<V> colBucket, final Collector<V, W, W> x) {
-			this.rb = rb;
-			this.cells = colBucket.createBucketWithNewValues(rb.values, x);
+		private RowBucketWrapper(final Bucket<V> rowBucket, final RootBucket<V> colBucket,
+				final Collector<V, W, W> collectorWithoutFinisher,
+				final Collector<W, W, W> collectorWithoutTransformer) {
+			this.rowBucket = rowBucket;
+			this.cells = colBucket.createBucketWithNewValues(rowBucket.values, collectorWithoutFinisher,
+					collectorWithoutTransformer);
 		}
 
-		public Stream<CopyBucket<V, W>> getCells() {
+		private Stream<CopyBucket<V, W>> getCells() {
 			return cells.stream();
 		}
 	}
@@ -51,14 +54,15 @@ public final class BiBucket<RAW> {
 		private final List<RowBucketWrapper<RAW, W>> rows;
 		private final Function<W, R> finisher;
 
-		public CollectedValues(final Collector<RAW, W, R> x) {
-			this.finisher = x.finisher();
-			final Collector<RAW, W, W> of = Collector.of(x.supplier(), x.accumulator(), x.combiner());
-			this.rows = rowBucket.stream().map(t -> new RowBucketWrapper<RAW, W>(t, colBucket, of)).collect(toList());
-		}
+		private CollectedValues(final Collector<RAW, W, R> collector) {
+			this.finisher = collector.finisher();
+			final Collector<RAW, W, W> collectorWithoutFinisher = Collector.of(collector.supplier(),
+					collector.accumulator(), collector.combiner());
 
-		public Stream<CopyBucket<RAW, W>> getCells() {
-			return rows.stream().flatMap(RowBucketWrapper::getCells);
+			final Collector<W, W, W> collectorWithoutTransformer = Collector.of(collectorWithoutFinisher.supplier(),
+					collectorWithoutFinisher.combiner()::apply, collectorWithoutFinisher.combiner());
+			this.rows = rowBucket.stream().map(t -> new RowBucketWrapper<RAW, W>(t, colBucket, collectorWithoutFinisher,
+					collectorWithoutTransformer)).collect(toList());
 		}
 
 		public void printRow(final Writer w, final List<@Nullable Bucket<RAW>> rows, final int depth,
@@ -123,7 +127,7 @@ public final class BiBucket<RAW> {
 					try {
 						w.write("<tr>");
 
-						printRowHeader(r.rb, w, maxRowDepth - r.rb.getLevel());
+						printRowHeader(r.rowBucket, w, maxRowDepth - r.rowBucket.getLevel());
 
 						r.getCells().forEachOrdered((final CopyBucket<RAW, W> cell) -> {
 							final R collect = finisher.apply(cell.aggregatedValue);

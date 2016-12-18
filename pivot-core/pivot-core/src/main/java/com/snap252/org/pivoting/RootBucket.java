@@ -20,11 +20,8 @@ public class RootBucket<V> extends SubBucket<V> {
 	}
 
 	public <W> CopyBucket<V, W> createBucketWithNewValues(final Collection<V> newValuesBase,
-			final Collector<V, W, W> collector) {
-		final Collector<W, W, W> collector2 = Collector.of(collector.supplier(), collector.combiner()::apply,
-				collector.combiner());
-
-		return new CopyBucket<>(this, newValuesBase, collector, collector2);
+			final Collector<V, W, W> collectorWithoutFinisher, final Collector<W, W, W> collectorWithoutTransformer) {
+		return new CopyBucket<>(this, newValuesBase, collectorWithoutFinisher, collectorWithoutTransformer);
 	}
 
 	@Override

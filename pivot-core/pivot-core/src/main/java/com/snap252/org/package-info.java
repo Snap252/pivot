@@ -1,9 +1,7 @@
 /**
+ * We should move the contents to the test package.
  * 
- */
-/**
  * @author Snap252
- *
  */
 @NonNullByDefault({ PARAMETER, RETURN_TYPE, FIELD, TYPE_BOUND, TYPE_ARGUMENT, ARRAY_CONTENTS })
 package com.snap252.org;

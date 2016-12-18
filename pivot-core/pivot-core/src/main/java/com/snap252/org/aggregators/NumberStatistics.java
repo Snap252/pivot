@@ -1,7 +1,10 @@
 package com.snap252.org.aggregators;
 
 import java.text.MessageFormat;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collector;
 
 import org.eclipse.jdt.annotation.Nullable;
@@ -17,26 +20,26 @@ public final class NumberStatistics<N extends Number> {
 
 	public static <P, N extends Number> Collector<P, MutableValue<N>, @Nullable NumberStatistics<N>> getReducer(
 			final Function<P, N> f, final Arithmetics<N> arithmetics) {
-		// Function<V, NumberStatistics<N>> transformer = valueExtractor
-		// .andThen(n -> new NumberStatistics<>(n, arithmetics));
 
-		return Collector.of(() -> MutableValue.getNeutralElement(arithmetics), (t, u) -> t.addSingle(f.apply(u)),
-				MutableValue::merge, MutableValue::createNumberStatistics);
-		// return Collectors.reducing(getNeutralElement(), transformer, (f1, f2)
-		// -> aggregate(f1, f2, arithmetics));
+		final Supplier<MutableValue<N>> supplier = () -> MutableValue.getNeutralElement(arithmetics);
+		final BiConsumer<MutableValue<N>, P> accumulator = (t, u) -> t.addSingle(f.apply(u));
+		final BinaryOperator<MutableValue<N>> combiner = MutableValue::merge;
+		final Function<MutableValue<N>, @Nullable NumberStatistics<N>> finisher = MutableValue::createNumberStatistics;
+
+		return Collector.of(supplier, accumulator, combiner, finisher);
 	}
 
 	public static final class MutableValue<N extends Number> {
-		public final Arithmetics<N> arithmetics;
-		public N sum;
-		public N sqrSum;
+		private final Arithmetics<N> arithmetics;
+		private N sum;
+		private N sqrSum;
 
-		public int cnt;
+		private int cnt;
 
 		@Nullable
-		public N min;
+		private N min;
 		@Nullable
-		public N max;
+		private N max;
 
 		public MutableValue(final N n, final Arithmetics<N> arithmetics) {
 			this.arithmetics = arithmetics;

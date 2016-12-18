@@ -19,6 +19,7 @@ import java.util.stream.Stream;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 
 import com.snap252.org.aggregators.BigDecimalArithmetics;
 import com.snap252.org.aggregators.NumberStatistics;
@@ -26,22 +27,22 @@ import com.snap252.org.aggregators.NumberStatistics.MutableValue;
 
 @NonNullByDefault
 public class RandomDataGenerator {
-	private static final Random random = new Random();
+	private static final Random RANDOM = new Random();
 
 	@SafeVarargs
-	public static Stream<Object[]> getAsStream(int cnt, Function<Random, Object>... generators) {
-		return IntStream.range(0, cnt).mapToObj(_ignore -> Stream.of(generators).map(g -> g.apply(random)).toArray());
+	public static Stream<Object[]> getAsStream(final int cnt, final Function<Random, Object>... generators) {
+		return IntStream.range(0, cnt).mapToObj(_ignore -> Stream.of(generators).map(g -> g.apply(RANDOM)).toArray());
 	}
 
-	public static <@NonNull T> Stream<T> getAsStream(int cnt, Function<Random, T> generators) {
-		return IntStream.range(0, cnt).mapToObj(_ignore -> generators.apply(random));
+	public static <@NonNull T> Stream<T> getAsStream(final int cnt, final Function<Random, T> generators) {
+		return IntStream.range(0, cnt).mapToObj(_ignore -> generators.apply(RANDOM));
 	}
 
-	static <T> T random(@NonNull T[] t) {
-		return t[random.nextInt(t.length)];
+	static <T> T random(@NonNull final T[] t) {
+		return t[RANDOM.nextInt(t.length)];
 	}
 
-	public static void main(String[] args) throws Exception {
+	public static void main(final String[] args) throws Exception {
 
 		// String[] vorname = new String[] { "Hanne", "Herbert", "Karmen",
 		// "Klaus", "Helga", "Susanne", "Stefan", "Anne",
@@ -347,7 +348,7 @@ public class RandomDataGenerator {
 				r.nextInt(60) + 10, random(Geschl.values()), new BigDecimal(r.nextInt(10000)).scaleByPowerOfTen(-2)))
 						.collect(Collectors.toList());
 
-		BiBucketParameter<Person> parameter = new BiBucketParameter<Person>(personen)
+		final BiBucketParameter<Person> parameter = new BiBucketParameter<Person>(personen)
 				.setColFnkt(p -> Character.toUpperCase(p.nachname.charAt(0)))
 
 				.setRowFnkt(p -> p.vorname.charAt(0)
@@ -362,7 +363,7 @@ public class RandomDataGenerator {
 		Timers.printTimer("printing", () -> write(personen, biBucket));
 	}
 
-	protected static void write(List<Person> personen, BiBucket<Person> biBucket2) {
+	protected static void write(final List<Person> personen, final BiBucket<Person> biBucket2) {
 		try (OutputStream os = new BufferedOutputStream(
 				new FileOutputStream("C:\\Users\\Snap252\\Documents\\1.html"))) {
 			try (Writer writer = new OutputStreamWriter(os)) {
@@ -375,21 +376,21 @@ public class RandomDataGenerator {
 		Timers.printTimer("just write to memory", 10, () -> {
 			try (Writer writer = new StringWriter(1 << 20)) {
 				writeHtml(biBucket2, writer);
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				e.printStackTrace();
 			}
 		});
 	}
 
-	protected static void writeHtml(BiBucket<Person> biBucket2, Writer writer) throws IOException {
+	protected static void writeHtml(final BiBucket<Person> biBucket2, final Writer writer) throws IOException {
 		// Collector<NumberStatistics<Double>, ?, NumberStatistics<Double>>
 		// reducer = NumberStatistics
 		// .getReducer((n1, n2) -> n1 + n2);
-		Collector<Person, MutableValue<BigDecimal>, NumberStatistics<BigDecimal>> reducer = NumberStatistics
+		final Collector<Person, MutableValue<BigDecimal>, @Nullable NumberStatistics<BigDecimal>> reducer = NumberStatistics
 				.getReducer(p -> p.wert, new BigDecimalArithmetics());
 
-		BiConsumer<Writer, NumberStatistics<BigDecimal>> cellWriter = (w, ns) -> {
-			if (ns.isNeutralElement()) {
+		final BiConsumer<Writer, @Nullable NumberStatistics<BigDecimal>> cellWriter = (w, ns) -> {
+			if (ns == null) {
 				return;
 			}
 			try {
@@ -398,7 +399,7 @@ public class RandomDataGenerator {
 				w.write("'>");
 				w.write(ns.sum.toPlainString());
 				w.write("</div>");
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				assert false;
 				e.printStackTrace();
 			}
@@ -419,7 +420,8 @@ public class RandomDataGenerator {
 		private final int alter;
 		private final BigDecimal wert;
 
-		public Person(String vorname, String nachname, int alter, Geschl g, BigDecimal wert) {
+		public Person(final String vorname, final String nachname, final int alter, final Geschl g,
+				final BigDecimal wert) {
 			this.vorname = vorname;
 			this.nachname = nachname;
 			this.alter = alter;

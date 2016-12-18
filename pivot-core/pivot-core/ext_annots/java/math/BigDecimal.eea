@@ -17,6 +17,12 @@ divide
 divide
  (Ljava/math/BigDecimal;Ljava/math/MathContext;)Ljava/math/BigDecimal;
  (L1java/math/BigDecimal;L1java/math/MathContext;)L1java/math/BigDecimal;
+max
+ (Ljava/math/BigDecimal;)Ljava/math/BigDecimal;
+ (L1java/math/BigDecimal;)L1java/math/BigDecimal;
+min
+ (Ljava/math/BigDecimal;)Ljava/math/BigDecimal;
+ (L1java/math/BigDecimal;)L1java/math/BigDecimal;
 multiply
  (Ljava/math/BigDecimal;)Ljava/math/BigDecimal;
  (L1java/math/BigDecimal;)L1java/math/BigDecimal;

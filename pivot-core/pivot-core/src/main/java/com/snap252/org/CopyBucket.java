@@ -34,14 +34,19 @@ public class CopyBucket<V, W> extends Bucket<V> {
 				.collect(toList());
 
 		this.aggregatedValue = children.stream().map(c -> c.aggregatedValue).collect(collector2);
-		assert equals(this.aggregatedValue, values.stream().collect(collector));
+		assert equals(this.aggregatedValue, values.stream().collect(collector)) : this.aggregatedValue + "=>"
+				+ values.stream().collect(collector);
 
 		assert this.children.stream().flatMap(c -> c.values.stream()).collect(toSet())
 				.equals(new HashSet<V>(values)) : origBucket + "=> own: " + new HashSet<V>(values);
 	}
 
 	private static boolean equals(final Object o1, final Object o2) {
-		return o1 == null ? o2 == null : o1.equals(o2);
+		if (o1 == null)
+			return o2 == null;
+
+		assert o1.equals(o2) : o1 + "=>" + o2;
+		return o1.equals(o2);
 	}
 
 	@Override

@@ -6,37 +6,16 @@ import java.util.stream.Collector;
 
 import org.eclipse.jdt.annotation.Nullable;
 
-public class NumberStatistics<N extends Number> {
+public final class NumberStatistics<N extends Number> {
 	public final int cnt;
 	public final N max;
 	public final N min;
 	public final N sum;
 	public final N sumSqr;
 
-	private static final NumberStatistics<?> NEUTRAL_ELEMENT = new NumberStatistics<Integer>(0,
-			new IntegerArithmetics()) {
-		@Override
-		public String toString() {
-			return "---";
-		}
-
-		@Override
-		public boolean isNeutralElement() {
-			return true;
-		}
-	};
 	private final Arithmetics<N> arithmetics;
 
-	public boolean isNeutralElement() {
-		return false;
-	}
-
-	@SuppressWarnings({ "unchecked" })
-	public static <N extends Number> NumberStatistics<N> getNeutralElement() {
-		return (NumberStatistics<N>) NEUTRAL_ELEMENT;
-	}
-
-	public static <P, N extends Number> Collector<P, MutableValue<N>, NumberStatistics<N>> getReducer(
+	public static <P, N extends Number> Collector<P, MutableValue<N>, @Nullable NumberStatistics<N>> getReducer(
 			final Function<P, N> f, final Arithmetics<N> arithmetics) {
 		// Function<V, NumberStatistics<N>> transformer = valueExtractor
 		// .andThen(n -> new NumberStatistics<>(n, arithmetics));
@@ -83,16 +62,9 @@ public class NumberStatistics<N extends Number> {
 			this.sum = arithmetics.add(sum, other);
 			this.sqrSum = arithmetics.add(sqrSum, arithmetics.sqr(other));
 
-			if (min != null) {
-				min = arithmetics.compare(min, other) < 0 ? min : other;
-			} else {
-				min = other;
-			}
-			if (max != null) {
-				max = arithmetics.compare(max, other) < 0 ? max : other;
-			} else {
-				max = other;
-			}
+			min = min != null ? arithmetics.min(min, other) : other;
+			max = max != null ? arithmetics.max(max, other) : other;
+
 			cnt++;
 			return this;
 		}
@@ -168,27 +140,27 @@ public class NumberStatistics<N extends Number> {
 			return true;
 		}
 
-		protected void doMax(@Nullable final N otherMax) {
+		private void doMax(@Nullable final N otherMax) {
 			if (max == null) {
 				max = otherMax;
 			} else if (otherMax != null) {
 				assert max != null;
-				max = arithmetics.compare(max, otherMax) < 0 ? max : otherMax;
+				max = arithmetics.max(max, otherMax);
 			}
 		}
 
-		protected void doMin(@Nullable final N otherMin) {
+		private void doMin(@Nullable final N otherMin) {
 			if (min == null) {
 				min = otherMin;
 			} else if (otherMin != null) {
 				assert min != null;
-				min = arithmetics.compare(min, otherMin) < 0 ? min : otherMin;
+				min = arithmetics.min(min, otherMin);
 			}
 		}
 
-		public NumberStatistics<N> createNumberStatistics() {
+		public @Nullable NumberStatistics<N> createNumberStatistics() {
 			if (cnt == 0) {
-				return NumberStatistics.getNeutralElement();
+				return null;
 			}
 			assert arithmetics.compare(arithmetics.sqr(sum), sqrSum) >= 0 : arithmetics.sqr(sum) + " => " + sqrSum;
 
@@ -218,25 +190,19 @@ public class NumberStatistics<N extends Number> {
 	}
 
 	public N avg() {
-		assert !isNeutralElement();
 		return arithmetics.part(sum, cnt);
 	}
 
 	public N varianz() {
-		assert !isNeutralElement();
-		// see:
-		// https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
-
 		return arithmetics.varianz(sum, sumSqr, cnt);
 	}
 
-	private static final MessageFormat mf = new MessageFormat(
+	private static final MessageFormat MF = new MessageFormat(
 			"NumberStatistics [cnt={0}, max={1}, min={2}, sum={3}, sumSqr={4}, avg()={5}, varianz()={6}]");
 
 	@Override
 	public String toString() {
-		assert !isNeutralElement();
-		return mf.format(new Object[] { cnt, max, min, sum, sumSqr, avg(), varianz() });
+		return MF.format(new Object[] { cnt, max, min, sum, sumSqr, avg(), varianz() });
 	}
 
 }

@@ -6,10 +6,16 @@ public class NamedPivotCriteria<F, T extends Comparable<T>> implements PivotCrit
 
 	private final String stringValue;
 	private final Function<F, T> f;
+	private int inverse;
 
 	public NamedPivotCriteria(final Function<F, T> f, final String stringValue) {
+		this(f, stringValue, false);
+	}
+
+	public NamedPivotCriteria(final Function<F, T> f, final String stringValue, final boolean inverse) {
 		this.f = f;
 		this.stringValue = stringValue;
+		this.inverse = inverse ? -1 : 1;
 	}
 
 	@Override
@@ -20,6 +26,11 @@ public class NamedPivotCriteria<F, T extends Comparable<T>> implements PivotCrit
 	@Override
 	public T apply(final F t) {
 		return f.apply(t);
+	}
+
+	@Override
+	public int compare(final T f1, final T f2) {
+		return inverse * PivotCriteria.super.compare(f1, f2);
 	}
 
 }

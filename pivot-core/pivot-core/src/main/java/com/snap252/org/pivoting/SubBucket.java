@@ -19,8 +19,8 @@ public class SubBucket<V> extends Bucket<V> {
 	public final int depth;
 
 	public SubBucket(final Object bucketValue, final List<PivotCriteria<V, ?>> partitionCriterionsAndSubCriterions,
-			@Nullable final SubBucket<V> parent, @Nullable final PivotCriteria<V, ?> extractor,
-			final Collection<V> values, final int level) {
+			@Nullable final SubBucket<V> parent, final PivotCriteria<V, ?> extractor, final Collection<V> values,
+			final int level) {
 		super(bucketValue, parent, extractor, values, level);
 		assert !partitionCriterionsAndSubCriterions.isEmpty();
 		this.depth = partitionCriterionsAndSubCriterions.size();
@@ -43,8 +43,7 @@ public class SubBucket<V> extends Bucket<V> {
 
 		assert childCriterions.size() == partitionCriterionsAndSubCriterions.size() - 1;
 
-		final List<Bucket<V>> children$ = collect.entrySet().stream()
-				.sorted(Entry.comparingByKey(ownCriterion.reversed()))
+		final List<Bucket<V>> children$ = collect.entrySet().stream().sorted(Entry.comparingByKey(ownCriterion))
 
 				.map(e -> {
 					return childCriterions.isEmpty()

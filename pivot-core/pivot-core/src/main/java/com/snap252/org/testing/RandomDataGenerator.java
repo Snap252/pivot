@@ -8,6 +8,7 @@ import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.function.BiConsumer;
@@ -27,7 +28,6 @@ import com.snap252.org.aggregators.PivotCollectors;
 import com.snap252.org.pivoting.BiBucket;
 import com.snap252.org.pivoting.BiBucketParameter;
 import com.snap252.org.pivoting.NamedPivotCriteria;
-import com.snap252.org.pivoting.PivotCriteria;
 
 public class RandomDataGenerator {
 	private static final Random RANDOM = new Random();
@@ -48,13 +48,19 @@ public class RandomDataGenerator {
 	public static void main(final String[] args) throws Exception {
 		final List<Person> personen = getAsStream(2000,
 				r -> new Person(random(TestData.vorname), random(TestData.nachname), r.nextInt(60) + 10,
-						random(Geschl.values()), new BigDecimal(r.nextInt(10000)).scaleByPowerOfTen(-2)))
-								.collect(Collectors.toList());
+						random(Geschl.values()), new BigDecimal(r.nextInt(10000)).scaleByPowerOfTen(-2),
+						new Date((RANDOM.nextInt(2500) - 1500) * 86400000L))).collect(Collectors.toList());
 
 		final BiBucketParameter<Person> parameter = new BiBucketParameter<Person>(personen)
-				.setColFnkt(new NamedPivotCriteria<>(p -> Character.toUpperCase(p.nachname.charAt(0)), "Test"))
+				.setColFnkt(new NamedPivotCriteria<>(p -> p.birthday.getYear() + 1900, "GebDat(Jahr)"),
+						new NamedPivotCriteria<>(p -> p.birthday.getMonth() + 1, "GebDat(Monat)")
 
-				.setRowFnkt((PivotCriteria<Person, Character>) p -> p.vorname.charAt(0)
+				)
+
+				.setRowFnkt(
+
+						new NamedPivotCriteria<>(p -> Character.toUpperCase(p.vorname.charAt(0)), "Vorname(0)"),
+						new NamedPivotCriteria<>(p -> p.geschlecht, "Geschlecht", false)
 
 		// ,p -> p.geschlecht
 		// ,p -> p.alter / 10
@@ -117,19 +123,21 @@ public class RandomDataGenerator {
 	}
 
 	static class Person {
-		protected final String vorname;
-		protected final String nachname;
-		protected final Geschl geschlecht;
+		private final String vorname;
+		private final String nachname;
+		private final Geschl geschlecht;
 		private final int alter;
 		private final BigDecimal wert;
+		private final Date birthday;
 
 		public Person(final String vorname, final String nachname, final int alter, final Geschl g,
-				final BigDecimal wert) {
+				final BigDecimal wert, final Date birthday) {
 			this.vorname = vorname;
 			this.nachname = nachname;
 			this.alter = alter;
 			this.geschlecht = g;
 			this.wert = wert;
+			this.birthday = birthday;
 		}
 
 		@Override

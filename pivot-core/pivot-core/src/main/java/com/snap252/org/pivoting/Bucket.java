@@ -4,28 +4,32 @@ import static java.util.stream.Collectors.toList;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collector;
 import java.util.stream.Stream;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
-public abstract class Bucket<V> implements Predicate<V> {
+public abstract class Bucket<V> implements Predicate<@NonNull V> {
 	// private final Predicate<V> predicate;
 
 	protected final Object bucketValue;
 
-	@Nullable
-	private final Function<V, ?> extractor;
+	private final PivotCriteria<V, ?> extractor;
 
 	protected final Collection<V> values;
 
 	private final int level;
 
 	@Nullable
-	private final Bucket<V> parent;
+	public final Bucket<V> parent;
 
-	public Bucket(final Object bucketValue, final @Nullable Bucket<V> parent, final @Nullable Function<V, ?> extractor,
+	public final @Nullable String getStyleClass() {
+		return extractor.getStyleClass();
+	}
+
+	public Bucket(final Object bucketValue, final @Nullable Bucket<V> parent, final PivotCriteria<V, ?> extractor,
 			final Collection<V> values, final int level) {
 		this.bucketValue = bucketValue;
 		this.parent = parent;
@@ -40,7 +44,8 @@ public abstract class Bucket<V> implements Predicate<V> {
 
 	@Override
 	public String toString() {
-		return addString("", new StringBuilder()).toString();
+		assert extractor != null;
+		return extractor.toString();
 	}
 
 	protected StringBuilder addString(final String linePrefix, final StringBuilder sb) {
@@ -82,4 +87,8 @@ public abstract class Bucket<V> implements Predicate<V> {
 		return level;
 	}
 
+	public <W> CopyBucket<V, W> createBucketWithNewValues(final Collection<V> newValuesBase,
+			final Collector<V, W, W> collectorWithoutFinisher, final Collector<W, W, W> collectorWithoutTransformer) {
+		return new CopyBucket<>(this, newValuesBase, collectorWithoutFinisher, collectorWithoutTransformer);
+	}
 }

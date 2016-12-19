@@ -65,8 +65,8 @@ public final class BiBucket<RAW> {
 					collectorWithoutTransformer)).collect(toList());
 		}
 
-		public void printRow(final Writer w, final List<@Nullable Bucket<RAW>> rows, final int depth,
-				final int spacerColumns, final int level) throws IOException {
+		public void printColumnHeaders(final Bucket<RAW> parent, final Writer w, final List<@Nullable Bucket<RAW>> rows,
+				final int depth, final int spacerColumns, final int level) throws IOException {
 
 			final List<@Nullable Bucket<RAW>> children = new ArrayList<>();
 			w.write("<tr>");
@@ -74,21 +74,22 @@ public final class BiBucket<RAW> {
 				w.write(MessageFormat.format(
 						"<th colspan=''{0}'' rowspan=''{1}''>---columns---<br/>/<br/>---rows---</th>", spacerColumns,
 						depth + 1));
+			w.write(MessageFormat.format("<th class=''{1}''>{0}</th>", parent.toString(), parent.getStyleClass()));
 
 			for (final Bucket<RAW> row : rows) {
 				// render "self" - cell
 				if (row == null) {
-					w.write(MessageFormat.format("<th rowspan=''{0}''>-</th>", depth + 1));
+					w.write(MessageFormat.format(
+							"<th class=''ges col ges-col'' title=''gesamt'' rowspan=''{0}''>-</th>", depth + 1 + 1));
 					continue;
 				}
 
 				final int colSpan = row.getSize(1);
-				if (colSpan == 1)
-					w.write("<th>");
-				else
-					w.write(MessageFormat.format("<th colspan=''{0}''>", colSpan));
+				w.write(MessageFormat.format("<th colspan=''{0}'' rowspan=''{1}'' class=''{2}''>", colSpan,
+						row.getChilren() == null ? 2 : 1, row.getStyleClass()));
 				w.write(row.bucketValue.toString());
 				w.write("</th>");
+
 				if (row.getChilren() != null) {
 					// add "self" cell
 					children.add(null);
@@ -97,27 +98,51 @@ public final class BiBucket<RAW> {
 			}
 			w.write("</tr>");
 
-			if (!children.isEmpty())
-				printRow(w, children, depth - 1, spacerColumns, level + 1);
+			if (!children.isEmpty()) {
+				// first child is dummy
+				final Bucket<RAW> bucket = children.size() > 1 ? children.get(1) : children.get(0);
+				assert bucket != null;
+				printColumnHeaders(bucket, w, children, depth - 1, spacerColumns, level + 1);
+			}
 		}
 
 		public void printRowHeader(final Bucket<RAW> b, final Writer w, final int colSpan) throws IOException {
-			w.write(MessageFormat.format("<th rowSpan=''{0}''>{1}</th>", b.getSize(1), b.getBucketValue()));
-			if (b.getChilren() != null)
-				w.write(MessageFormat.format("<th colSpan=''{0}''>-</th>", colSpan));
+			if (b.getChilren() != null) {
+				w.write(MessageFormat.format("<th rowSpan=''{0}'' class=''{2}''>{1}</th>", b.getSize(1),
+						b.getBucketValue(), b.getStyleClass()));
+				w.write(MessageFormat.format("<th colSpan=''{0}'' class=''row ges row-ges'' title=''gesamt''>-</th>",
+						colSpan));
+			} else
+				w.write(MessageFormat.format("<th rowSpan=''{0}'' class=''{2}''>{1}</th>", b.getSize(1),
+						b.getBucketValue(), b.getStyleClass()));
 		}
 
 		public void writeHtml(final Writer w, final BiConsumer<Writer, R> cellWriter) throws IOException {
 			w.write("<html>");
 			w.write("<head><style>");
-			w.write("	td {text-align: right; padding: 0px 5px;}");
+			w.write("	td {text-align: right; padding: 0px 5px;} ");
 			w.write("</style></head>");
 			w.write("<body>");
 			w.write("<table border='1'>");
 
 			{
 				w.write("<thead>");
-				printRow(w, Collections.singletonList(colBucket), colBucket.depth, rowBucket.depth + 1, 0);
+				printColumnHeaders(colBucket, w, Collections.singletonList(colBucket), colBucket.depth, rowBucket.depth,
+						0);
+				{
+					w.write("<tr>");
+					Bucket<RAW> b = rowBucket;
+					do {
+						assert b != null;
+						final List<? extends Bucket<RAW>> children = b.getChilren();
+						w.write(MessageFormat.format("<th class=''{1}''>{0}</th>", b, b.getStyleClass()));
+						if (children != null) {
+							b = children.get(0);
+						} else
+							b = null;
+					} while (b != null);
+					w.write("</tr>");
+				}
 				w.write("</thead>");
 			}
 			{

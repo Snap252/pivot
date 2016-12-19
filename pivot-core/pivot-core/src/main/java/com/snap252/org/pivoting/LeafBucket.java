@@ -8,7 +8,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 public class LeafBucket<V> extends Bucket<V> {
 
-	public LeafBucket(final Object bucketValue, final Bucket<V> parent, final Function<V, Object> extractor,
+	public LeafBucket(final Object bucketValue, final Bucket<V> parent, final Function<V, ?> extractor,
 			final List<V> values, final int level) {
 		super(bucketValue, parent, extractor, values, level);
 	}

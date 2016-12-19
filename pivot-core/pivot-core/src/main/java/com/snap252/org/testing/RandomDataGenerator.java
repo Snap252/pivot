@@ -26,6 +26,8 @@ import com.snap252.org.aggregators.NumberStatistics;
 import com.snap252.org.aggregators.PivotCollectors;
 import com.snap252.org.pivoting.BiBucket;
 import com.snap252.org.pivoting.BiBucketParameter;
+import com.snap252.org.pivoting.NamedPivotCriteria;
+import com.snap252.org.pivoting.PivotCriteria;
 
 public class RandomDataGenerator {
 	private static final Random RANDOM = new Random();
@@ -50,9 +52,9 @@ public class RandomDataGenerator {
 								.collect(Collectors.toList());
 
 		final BiBucketParameter<Person> parameter = new BiBucketParameter<Person>(personen)
-				.setColFnkt(p -> Character.toUpperCase(p.nachname.charAt(0)))
+				.setColFnkt(new NamedPivotCriteria<>(p -> Character.toUpperCase(p.nachname.charAt(0)), "Test"))
 
-				.setRowFnkt(p -> p.vorname.charAt(0)
+				.setRowFnkt((PivotCriteria<Person, Character>) p -> p.vorname.charAt(0)
 
 		// ,p -> p.geschlecht
 		// ,p -> p.alter / 10

@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.Map.Entry;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -18,35 +18,48 @@ public class SubBucket<V> extends Bucket<V> {
 	public final List<Bucket<V>> children;
 	public final int depth;
 
-	public SubBucket(final Object bucketValue, final List<Function<V, Object>> partitionCriterionsAndSubCriterions,
-			@Nullable final SubBucket<V> parent, @Nullable final Function<V, Object> extractor,
+	public SubBucket(final Object bucketValue, final List<PivotCriteria<V, ?>> partitionCriterionsAndSubCriterions,
+			@Nullable final SubBucket<V> parent, @Nullable final PivotCriteria<V, ?> extractor,
 			final Collection<V> values, final int level) {
 		super(bucketValue, parent, extractor, values, level);
 		assert !partitionCriterionsAndSubCriterions.isEmpty();
 		this.depth = partitionCriterionsAndSubCriterions.size();
 
-		final Function<V, Object> ownCriterion = partitionCriterionsAndSubCriterions.get(0);
+		this.children = createChildren(partitionCriterionsAndSubCriterions, parent, values, level);
+	}
 
-		final Collector<V, ?, Map<Object, List<V>>> groupingBy = Collectors.groupingBy(ownCriterion::apply);
-		final Map<Object, List<V>> collect = values.stream().filter(this).collect(groupingBy);
+	protected <A extends Comparable<A>> List<Bucket<V>> createChildren(
+			final List<PivotCriteria<V, ?>> partitionCriterionsAndSubCriterions, @Nullable final SubBucket<V> parent,
+			final Collection<V> values, final int level) {
+		@SuppressWarnings("unchecked")
+		final PivotCriteria<V, A> ownCriterion = (PivotCriteria<V, A>) partitionCriterionsAndSubCriterions.get(0);
 
-		final List<Function<V, Object>> childCriterions = partitionCriterionsAndSubCriterions.subList(1,
+		@SuppressWarnings("null")
+		final Collector<V, ?, Map<A, List<V>>> groupingBy = Collectors.groupingBy(ownCriterion::apply);
+		final Map<A, List<V>> collect = values.stream().filter(this).collect(groupingBy);
+
+		final List<PivotCriteria<V, ?>> childCriterions = partitionCriterionsAndSubCriterions.subList(1,
 				partitionCriterionsAndSubCriterions.size());
 
 		assert childCriterions.size() == partitionCriterionsAndSubCriterions.size() - 1;
 
-		this.children = collect.entrySet().stream().map(e -> {
-			return childCriterions.isEmpty()
-					? new LeafBucket<V>(e.getKey(), this, ownCriterion, e.getValue(), level + 1)
-					: new SubBucket<V>(e.getKey(), childCriterions, this, ownCriterion, e.getValue(), level + 1);
-		}).collect(Collectors.toList());
+		final List<Bucket<V>> children$ = collect.entrySet().stream()
+				.sorted(Entry.comparingByKey(ownCriterion.reversed()))
 
-		assert children.stream().flatMap(c -> c.values.stream()).collect(toSet()).equals(new HashSet<V>(
+				.map(e -> {
+					return childCriterions.isEmpty()
+							? new LeafBucket<V>(e.getKey(), this, ownCriterion, e.getValue(), level + 1)
+							: new SubBucket<V>(e.getKey(), childCriterions, this, ownCriterion, e.getValue(),
+									level + 1);
+				}).collect(Collectors.toList());
+
+		assert children$.stream().flatMap(c -> c.values.stream()).collect(toSet()).equals(new HashSet<V>(
 				values)) : parent/*
 									 * .stream().flatMap(c ->
 									 * c.values.stream()).collect(toSet())
 									 */
 						+ "=> own: " + new HashSet<V>(values);
+		return children$;
 	}
 
 	@Override

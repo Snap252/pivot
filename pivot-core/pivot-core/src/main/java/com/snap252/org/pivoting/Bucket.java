@@ -16,7 +16,7 @@ public abstract class Bucket<V> implements Predicate<V> {
 	protected final Object bucketValue;
 
 	@Nullable
-	private final Function<V, Object> extractor;
+	private final Function<V, ?> extractor;
 
 	protected final Collection<V> values;
 
@@ -25,8 +25,8 @@ public abstract class Bucket<V> implements Predicate<V> {
 	@Nullable
 	private final Bucket<V> parent;
 
-	public Bucket(final Object bucketValue, final @Nullable Bucket<V> parent,
-			final @Nullable Function<V, Object> extractor, final Collection<V> values, final int level) {
+	public Bucket(final Object bucketValue, final @Nullable Bucket<V> parent, final @Nullable Function<V, ?> extractor,
+			final Collection<V> values, final int level) {
 		this.bucketValue = bucketValue;
 		this.parent = parent;
 		this.extractor = extractor;

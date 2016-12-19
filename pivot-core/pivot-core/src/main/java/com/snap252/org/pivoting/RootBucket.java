@@ -3,19 +3,18 @@ package com.snap252.org.pivoting;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collector;
 
 import org.eclipse.jdt.annotation.NonNull;
 
 public class RootBucket<V> extends SubBucket<V> {
 
-	public RootBucket(final List<V> values, final List<Function<V, Object>> partitionCriterionsAndSubCriterions) {
+	public RootBucket(final List<V> values, final List<PivotCriteria<V, ?>> partitionCriterionsAndSubCriterions) {
 		super("---root---", partitionCriterionsAndSubCriterions, null, null, values, 0);
 	}
 
 	@SafeVarargs
-	public RootBucket(final List<V> values, @NonNull final Function<V, Object>... partitionCriterionsAndSubCriterions) {
+	public RootBucket(final List<V> values, @NonNull final PivotCriteria<V, ?>... partitionCriterionsAndSubCriterions) {
 		this(values, Arrays.asList(partitionCriterionsAndSubCriterions));
 	}
 

@@ -25,11 +25,14 @@ interface Arithmetics<N extends Number> {
 	int compare(N n1, N n2);
 
 	default N varianz(final N sum, final N sumSqr, final int cnt) {
+		assert cnt != 0;
 		// see:
 		// https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
 
 		// return part(sub(sumSqr, part(sqr(sum), cnt)), cnt);
-		return part(sub(multi(sumSqr, cnt), sqr(sum)), cnt * cnt);
+		if (cnt == 1)
+			return getNeutralAddElement();
+		return part(sub(sumSqr, part(sqr(sum), cnt)), cnt - 1);
 
 		// double doubleSum = sum.doubleValue();
 		// return (sumSqr.doubleValue() - doubleSum * doubleSum / cnt) / cnt;

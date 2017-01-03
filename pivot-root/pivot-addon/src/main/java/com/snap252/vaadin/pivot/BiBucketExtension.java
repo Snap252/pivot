@@ -10,10 +10,11 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collector;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 
 import com.snap252.org.pivoting.BiBucket;
 import com.snap252.org.pivoting.BiBucketParameter;
@@ -23,13 +24,16 @@ import com.vaadin.data.Container.Hierarchical;
 import com.vaadin.data.Container.Indexed;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
+import com.vaadin.data.util.ObjectProperty;
+import com.vaadin.data.util.converter.Converter;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.Column;
 import com.vaadin.ui.Grid.HeaderCell;
 import com.vaadin.ui.Grid.HeaderRow;
 import com.vaadin.ui.renderers.NumberRenderer;
 
-final class BiBucketExtension<RAW> extends BiBucket<RAW> {
+@NonNullByDefault
+final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 	BiBucketExtension(BiBucketParameter<RAW> p) {
 		super(p);
 	}
@@ -38,17 +42,19 @@ final class BiBucketExtension<RAW> extends BiBucket<RAW> {
 		return new GridWriter<>(aggregator);
 	}
 
+	@NonNullByDefault({})
 	class BucketContainer<R, W> implements Indexed, Hierarchical {
 		private final Collector<RAW, W, R> collector;
-		private Function<R, ?> f;
+		private Class<? extends R> cellClass;
 
-		public BucketContainer(Collector<RAW, W, R> collector, Function<R, ?> f) {
+		public BucketContainer(Collector<RAW, W, R> collector, Class<? extends R> cellClass) {
 			this.collector = collector;
-			this.f = f;
+			this.cellClass = cellClass;
 		}
 
 		@Override
 		public Object nextItemId(Object itemId) {
+			assert false;
 			return null;
 		}
 
@@ -95,6 +101,7 @@ final class BiBucketExtension<RAW> extends BiBucket<RAW> {
 		}
 
 		private final Map<Object, BucketItem> cache = new HashMap<>();
+		private final Object colProp = new Object();
 
 		@SuppressWarnings("unchecked")
 		@Override
@@ -103,23 +110,21 @@ final class BiBucketExtension<RAW> extends BiBucket<RAW> {
 		}
 
 		class BucketItem implements Item {
-			class CellProperty implements Property {
+			class CellProperty implements Property<R> {
 
 				private final Bucket<RAW> c;
-				private final Object v;
-				public final R rawValue;
+				private final R v;
 
 				public CellProperty(Bucket<RAW> colBucket) {
 					c = colBucket;
 					assert rowBucket != c;
 					R ret = rowBucket.filterOwnValues(c).collect(collector);
-					this.rawValue = ret;
-					this.v = f.apply(ret);
+					this.v = ret;
 
 				}
 
 				@Override
-				public Object getValue() {
+				public R getValue() {
 					return v;
 				}
 
@@ -129,8 +134,8 @@ final class BiBucketExtension<RAW> extends BiBucket<RAW> {
 				}
 
 				@Override
-				public Class<?> getType() {
-					return Object.class;
+				public Class<? extends R> getType() {
+					return cellClass;
 				}
 
 				@Override
@@ -153,7 +158,10 @@ final class BiBucketExtension<RAW> extends BiBucket<RAW> {
 
 			@SuppressWarnings("unchecked")
 			@Override
-			public CellProperty getItemProperty(Object id) {
+			public Property<?> getItemProperty(Object id) {
+				if (id == colProp) {
+					return new ObjectProperty<>(rowBucket.getBucketValue());
+				}
 				return cache.computeIfAbsent(id, x -> new CellProperty((Bucket<RAW>) x));
 			}
 
@@ -177,15 +185,14 @@ final class BiBucketExtension<RAW> extends BiBucket<RAW> {
 
 		@Override
 		public Collection<?> getContainerPropertyIds() {
-			return colBucket.stream().collect(toList());
+			List<Object> collect = colBucket.stream().collect(toList());
+			collect.add(0, colProp);
+			return collect;
 		}
 
 		@Override
 		public Collection<?> getItemIds() {
-			List<Bucket<RAW>> itemIds = rowBucket.stream().collect(toList());
-			return itemIds;
-			// assert false;
-			// return null;
+			return rowBucket.stream().collect(toList());
 		}
 
 		@Override
@@ -196,9 +203,7 @@ final class BiBucketExtension<RAW> extends BiBucket<RAW> {
 
 		@Override
 		public Class<?> getType(Object propertyId) {
-			return Number.class;
-			// assert false;
-			// return null;
+			return cellClass;
 		}
 
 		@Override
@@ -329,35 +334,43 @@ final class BiBucketExtension<RAW> extends BiBucket<RAW> {
 			this.collector = collector;
 		}
 
-		public void writeGrid(final Grid g, Function<R, ?> f) {
+		public void writeGrid(final Grid g, Converter<@Nullable Number, @Nullable ? super R> c0) {
 			g.removeAllColumns();
+
 			for (int i = g.getHeaderRowCount() - 1; i >= 0; i--) {
 				g.removeHeaderRow(i);
 			}
-			g.setContainerDataSource(new BucketContainer<>(collector, f));
-			{
 
-				// colBucket.getChilren().stream().coll
-				doHeader(g, colBucket, 0);
-			}
+			BiBucketExtension<@Nullable RAW>.BucketContainer<R, W> bc = new BucketContainer<>(collector,
+					(Class<R>) c0.getModelType());
+			g.setContainerDataSource(bc);
+			doHeader(g, colBucket, 0);
+			
 			g.setCellDescriptionGenerator(cell -> {
+				if (cell.getPropertyId() == bc.colProp) {
+					return null;
+				}
+
 				@SuppressWarnings({ "unchecked", "rawtypes" })
 				BucketContainer<R, W>.BucketItem.CellProperty cellProperty = (CellProperty) cell.getProperty();
-				R rawValue = cellProperty.rawValue;
+				R rawValue = cellProperty.getValue();
 				if (rawValue == null)
 					return null;
 				return rawValue.toString().replace("; ", "<br/>").replace("[", "<br/>").replace("]", "<br/>");
 			});
-			
 
 			for (Column c : g.getColumns()) {
-				NumberFormat decimalFormat = NumberFormat.getNumberInstance();
-				c.setRenderer(new NumberRenderer(decimalFormat));
-//				if (c.getPropertyId() instanceof LeafBucket) {
-//					c.setHidden(true);
-//					c.setHidable(true);
-//				}
+				if (c.getPropertyId() == bc.colProp) {
+					continue;
+				}
+				NumberRenderer renderer = new NumberRenderer(NumberFormat.getNumberInstance());
+				c.setRenderer(renderer, c0);
+				// if (c.getPropertyId() instanceof LeafBucket) {
+				// c.setHidden(true);
+				// c.setHidable(true);
+				// }
 			}
+			g.setFrozenColumnCount(2);
 		}
 
 		protected void doHeader(Grid g, Bucket<?> b, int depth) {

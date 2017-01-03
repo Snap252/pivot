@@ -8,8 +8,9 @@ import org.eclipse.jdt.annotation.NonNull;
 
 public class RootBucket<V> extends SubBucket<V> {
 
-	public RootBucket(final List<V> values, final List<PivotCriteria<V, ?>> partitionCriterionsAndSubCriterions) {
-		super("---root---", partitionCriterionsAndSubCriterions, null,
+	public RootBucket(final String prefix, final List<V> values,
+			final List<PivotCriteria<V, ?>> partitionCriterionsAndSubCriterions) {
+		super(prefix + "---root---", partitionCriterionsAndSubCriterions, null,
 				new NamedPivotCriteria<V, String>(_ignore -> "", "r") {
 					@Override
 					public @NonNull String getStyleClass() {
@@ -19,8 +20,9 @@ public class RootBucket<V> extends SubBucket<V> {
 	}
 
 	@SafeVarargs
-	public RootBucket(final List<V> values, @NonNull final PivotCriteria<V, ?>... partitionCriterionsAndSubCriterions) {
-		this(values, Arrays.asList(partitionCriterionsAndSubCriterions));
+	public RootBucket(final String prefix, final List<V> values,
+			@NonNull final PivotCriteria<V, ?>... partitionCriterionsAndSubCriterions) {
+		this(prefix, values, Arrays.asList(partitionCriterionsAndSubCriterions));
 	}
 
 	@Override

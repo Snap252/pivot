@@ -4,8 +4,10 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
 
@@ -15,18 +17,43 @@ public class CopyBucket<V, W> extends Bucket<V> {
 
 	private Bucket<V> origBucket;
 
+	public boolean isOrigBucket(final Object b) {
+		return b == origBucket;
+	}
+
 	@Nullable
 	private List<CopyBucket<V, W>> children;
+
+	private final Map<Bucket<V>, CopyBucket<V, W>> childMap = new HashMap<>();
+
+	public @Nullable CopyBucket<V, W> getChild(final Bucket<V> b) {
+		// assert !(b instanceof CopyBucket);
+		if (b == origBucket) {
+			return this;
+		}
+		if (children == null)
+			return null;
+		return childMap.computeIfAbsent(b, (final Bucket<V> key) -> {
+			assert children != null;
+			for (final CopyBucket<V, W> s : children) {
+				final CopyBucket<V, W> child = s.getChild(b);
+				if (child != null) {
+					return child;
+				}
+			}
+			return null;
+		});
+	}
 
 	public W aggregatedValue;
 
 	public CopyBucket(final Bucket<V> origBucket, final Collection<V> valuesBase, final Collector<V, W, W> collector,
-			final Collector<W, W, W> collector2) {
-		super(origBucket.bucketValue, null, (PivotCriteria<V, String>) (x -> ""), origBucket.filter(valuesBase),
+			final Collector<W, W, W> collector2, @Nullable final CopyBucket<V, W> parent) {
+		super(origBucket.bucketValue, parent, (PivotCriteria<V, String>) (x -> ""), origBucket.filter(valuesBase),
 				origBucket.getLevel());
 		this.origBucket = origBucket;
 
-		final Collection<? extends Bucket<V>> origChildren = origBucket.getChilren();
+		final Collection<? extends Bucket<V>> origChildren = origBucket.getChildren();
 		if (origChildren == null) {
 			if (values.isEmpty()) {
 				aggregatedValue = collector.supplier().get();
@@ -36,7 +63,7 @@ public class CopyBucket<V, W> extends Bucket<V> {
 		}
 
 		final List<CopyBucket<V, W>> children$ = origChildren.stream()
-				.map(c -> new CopyBucket<>(c, values, collector, collector2)).collect(toList());
+				.map(c -> new CopyBucket<>(c, values, collector, collector2, this)).collect(toList());
 		this.children = children$;
 
 		this.aggregatedValue = children$.stream().map(c -> c.aggregatedValue).collect(collector2);
@@ -56,7 +83,7 @@ public class CopyBucket<V, W> extends Bucket<V> {
 	}
 
 	@Override
-	public @Nullable List<CopyBucket<V, W>> getChilren() {
+	public @Nullable List<CopyBucket<V, W>> getChildren() {
 		return children;
 	}
 
@@ -66,7 +93,7 @@ public class CopyBucket<V, W> extends Bucket<V> {
 	}
 
 	@Override
-	protected int getSize(final int forSelf) {
+	public int getSize(final int forSelf) {
 		return origBucket.getSize(forSelf);
 	}
 

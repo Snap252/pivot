@@ -46,12 +46,7 @@ public class RandomDataGenerator {
 	}
 
 	public static void main(final String[] args) throws Exception {
-		final List<Person> personen = getAsStream(2000,
-				r -> new Person(random(TestData.vorname), random(TestData.nachname), r.nextInt(60) + 10,
-						random(Geschl.values()), new BigDecimal(r.nextInt(10000)).scaleByPowerOfTen(-2),
-						new Date((RANDOM.nextInt(2500) - 1500) * 86400000L))).collect(Collectors.toList());
-
-		final BiBucketParameter<Person> parameter = new BiBucketParameter<Person>(personen)
+		final BiBucketParameter<Person> parameter = new BiBucketParameter<Person>(createPersons(20000))
 				.setColFnkt(new NamedPivotCriteria<>(p -> p.birthday.getYear() + 1900, "GebDat(Jahr)"),
 						new NamedPivotCriteria<>(p -> p.birthday.getMonth() + 1, "GebDat(Monat)")
 
@@ -69,14 +64,21 @@ public class RandomDataGenerator {
 
 		final BiBucket<Person> biBucket = Timers.printTimer("doing bucket", 20, () -> new BiBucket<Person>(parameter));
 
-		Timers.printTimer("printing", () -> write(personen, biBucket));
+		Timers.printTimer("printing", () -> write(createPersons(20000), biBucket));
 	}
 
-	protected static void write(final List<Person> personen, final BiBucket<Person> biBucket2) {
+	public static List<Person> createPersons(final int cnt) {
+		return getAsStream(cnt,
+				r -> new Person(random(TestData.vorname), random(TestData.nachname), r.nextInt(60) + 10,
+						random(Geschl.values()), new BigDecimal(r.nextInt(10001)).scaleByPowerOfTen(-2),
+						new Date((RANDOM.nextInt(1200) - 750) * 86400000L))).collect(Collectors.toList());
+	}
+
+	protected static void write(final List<Person> personen, final BiBucket<Person> biBucket) {
 		try (OutputStream os = new BufferedOutputStream(
 				new FileOutputStream("C:\\Users\\Snap252\\Documents\\1.html"))) {
 			try (Writer writer = new OutputStreamWriter(os)) {
-				writeHtml(biBucket2, writer);
+				writeHtml(biBucket, writer);
 			}
 			os.flush();
 		} catch (final IOException e) {
@@ -84,7 +86,7 @@ public class RandomDataGenerator {
 		}
 		Timers.printTimer("just write to memory", 10, () -> {
 			try (Writer writer = new StringWriter(1 << 20)) {
-				writeHtml(biBucket2, writer);
+				writeHtml(biBucket, writer);
 			} catch (final IOException e) {
 				e.printStackTrace();
 			}
@@ -115,14 +117,14 @@ public class RandomDataGenerator {
 
 			// writer.write(ns.sum.toPlainString());
 		};
-		biBucket2.createCollectedValues(reducer).writeHtml(writer, cellWriter);
+		biBucket2.createHtmlWriter(reducer).writeHtml(writer, cellWriter);
 	}
 
-	enum Geschl {
+	public enum Geschl {
 		m, w, unbekannt
 	}
 
-	static class Person {
+	public static class Person {
 		private final String vorname;
 		private final String nachname;
 		private final Geschl geschlecht;
@@ -138,6 +140,30 @@ public class RandomDataGenerator {
 			this.geschlecht = g;
 			this.wert = wert;
 			this.birthday = birthday;
+		}
+
+		public String getVorname() {
+			return vorname;
+		}
+
+		public String getNachname() {
+			return nachname;
+		}
+
+		public Geschl getGeschlecht() {
+			return geschlecht;
+		}
+
+		public int getAlter() {
+			return alter;
+		}
+
+		public BigDecimal getWert() {
+			return wert;
+		}
+
+		public Date getGeburtstag() {
+			return birthday;
 		}
 
 		@Override

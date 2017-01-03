@@ -14,7 +14,7 @@ import org.eclipse.jdt.annotation.Nullable;
 public abstract class Bucket<V> implements Predicate<@NonNull V> {
 	// private final Predicate<V> predicate;
 
-	protected final Object bucketValue;
+	public final Object bucketValue;
 
 	private final PivotCriteria<V, ?> extractor;
 
@@ -45,7 +45,7 @@ public abstract class Bucket<V> implements Predicate<@NonNull V> {
 	@Override
 	public String toString() {
 		assert extractor != null;
-		return extractor.toString();
+		return extractor.toString() + "=>" + bucketValue;
 	}
 
 	protected StringBuilder addString(final String linePrefix, final StringBuilder sb) {
@@ -56,7 +56,7 @@ public abstract class Bucket<V> implements Predicate<@NonNull V> {
 		return sb;
 	}
 
-	protected abstract int getSize(int forSelf);
+	public abstract int getSize(int forSelf);
 
 	public abstract Stream<? extends Bucket<V>> stream();
 
@@ -68,11 +68,11 @@ public abstract class Bucket<V> implements Predicate<@NonNull V> {
 		return /* parent.test(v) && */bucketValue.equals(extractedValue);
 	}
 
-	public final Collection<V> filterOwnValues(final Predicate<V> f) {
-		return filter(values);
+	public final Stream<V> filterOwnValues(final Predicate<V> f) {
+		return values.stream().filter(f);
 	}
 
-	public abstract @Nullable List<? extends Bucket<V>> getChilren();
+	public abstract @Nullable List<? extends Bucket<V>> getChildren();
 
 	protected Collection<V> filter(final Collection<V> l) {
 		if (l.isEmpty()) {
@@ -89,6 +89,6 @@ public abstract class Bucket<V> implements Predicate<@NonNull V> {
 
 	public <W> CopyBucket<V, W> createBucketWithNewValues(final Collection<V> newValuesBase,
 			final Collector<V, W, W> collectorWithoutFinisher, final Collector<W, W, W> collectorWithoutTransformer) {
-		return new CopyBucket<>(this, newValuesBase, collectorWithoutFinisher, collectorWithoutTransformer);
+		return new CopyBucket<>(this, newValuesBase, collectorWithoutFinisher, collectorWithoutTransformer, null);
 	}
 }

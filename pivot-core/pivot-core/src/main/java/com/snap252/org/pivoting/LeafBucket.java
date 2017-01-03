@@ -13,7 +13,7 @@ public class LeafBucket<V> extends Bucket<V> {
 	}
 
 	@Override
-	protected int getSize(final int forSelf) {
+	public int getSize(final int forSelf) {
 		return 1;
 	}
 
@@ -23,7 +23,7 @@ public class LeafBucket<V> extends Bucket<V> {
 	}
 
 	@Override
-	public @Nullable List<Bucket<V>> getChilren() {
+	public @Nullable List<Bucket<V>> getChildren() {
 		return null;
 	}
 

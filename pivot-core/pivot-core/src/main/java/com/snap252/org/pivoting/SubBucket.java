@@ -71,7 +71,7 @@ public class SubBucket<V> extends Bucket<V> {
 	}
 
 	@Override
-	protected int getSize(final int forSelf) {
+	public int getSize(final int forSelf) {
 		return children.stream().mapToInt(b -> b.getSize(forSelf)).sum() + forSelf;
 	}
 
@@ -81,7 +81,7 @@ public class SubBucket<V> extends Bucket<V> {
 	}
 
 	@Override
-	public @NonNull List<Bucket<V>> getChilren() {
+	public @NonNull List<Bucket<V>> getChildren() {
 		return children;
 	}
 

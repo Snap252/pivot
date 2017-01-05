@@ -3,13 +3,13 @@ package com.snap252.vaadin.pivot;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.toList;
 
-import java.text.NumberFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
 
@@ -26,7 +26,6 @@ import com.vaadin.data.Container.Indexed;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.ObjectProperty;
-import com.vaadin.data.util.converter.Converter;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -35,7 +34,6 @@ import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.Column;
 import com.vaadin.ui.Grid.HeaderCell;
 import com.vaadin.ui.Grid.HeaderRow;
-import com.vaadin.ui.renderers.NumberRenderer;
 import com.vaadin.ui.themes.ValoTheme;
 
 @NonNullByDefault
@@ -340,7 +338,7 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 			this.collector = collector;
 		}
 
-		public void writeGrid(final Grid g, Converter<@Nullable Number, @Nullable ? super R> c0) {
+		public void writeGrid(final Grid g, Class<? super R> modelType, Consumer<Column> columnHandler) {
 			for (int i = 0; i < g.getHeaderRowCount(); i++) {
 				g.removeHeaderRow(i);
 			}
@@ -353,8 +351,8 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 
 			g.removeAllColumns();
 
-			BiBucketExtension<RAW>.BucketContainer<R, W> bc = new BucketContainer<>(collector,
-					(Class<R>) c0.getModelType());
+			@SuppressWarnings("unchecked")
+			BiBucketExtension<RAW>.BucketContainer<R, W> bc = new BucketContainer<>(collector, (Class<R>) modelType);
 			g.setContainerDataSource(bc);
 			doHeader(g, colBucket, 0);
 
@@ -368,15 +366,14 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 				R rawValue = cellProperty.getValue();
 				if (rawValue == null)
 					return null;
-				return rawValue.toString().replace("; ", "<br/>").replace("[", "<br/>").replace("]", "<br/>");
+				return rawValue.toString().replace("; ", "<br/>").replace("NumberStatistics [", "").replace("]", "<br/>");
 			});
 
 			for (Column c : g.getColumns()) {
 				if (c.getPropertyId() == bc.colProp) {
 					continue;
 				}
-				NumberRenderer renderer = new NumberRenderer(NumberFormat.getNumberInstance());
-				c.setRenderer(renderer, c0);
+				columnHandler.accept(c);
 			}
 
 			// g.setFrozenColumnCount(Math.min(2, g.getColumns().size()));

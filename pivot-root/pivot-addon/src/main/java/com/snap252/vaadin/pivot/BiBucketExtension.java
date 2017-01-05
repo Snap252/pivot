@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collector;
+import java.util.stream.Stream;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -26,11 +27,16 @@ import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.data.util.converter.Converter;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.Column;
 import com.vaadin.ui.Grid.HeaderCell;
 import com.vaadin.ui.Grid.HeaderRow;
 import com.vaadin.ui.renderers.NumberRenderer;
+import com.vaadin.ui.themes.ValoTheme;
 
 @NonNullByDefault
 final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
@@ -335,17 +341,23 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 		}
 
 		public void writeGrid(final Grid g, Converter<@Nullable Number, @Nullable ? super R> c0) {
-			g.removeAllColumns();
-
-			for (int i = g.getHeaderRowCount() - 1; i >= 0; i--) {
+			for (int i = 0; i < g.getHeaderRowCount(); i++) {
 				g.removeHeaderRow(i);
 			}
+			g.setDefaultHeaderRow(null);
 
-			BiBucketExtension<@Nullable RAW>.BucketContainer<R, W> bc = new BucketContainer<>(collector,
+			g.setFrozenColumnCount(0);
+			g.setCellDescriptionGenerator(null);
+			g.setRowDescriptionGenerator(null);
+			// g.addStyleName("pivot");
+
+			g.removeAllColumns();
+
+			BiBucketExtension<RAW>.BucketContainer<R, W> bc = new BucketContainer<>(collector,
 					(Class<R>) c0.getModelType());
 			g.setContainerDataSource(bc);
 			doHeader(g, colBucket, 0);
-			
+
 			g.setCellDescriptionGenerator(cell -> {
 				if (cell.getPropertyId() == bc.colProp) {
 					return null;
@@ -365,12 +377,9 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 				}
 				NumberRenderer renderer = new NumberRenderer(NumberFormat.getNumberInstance());
 				c.setRenderer(renderer, c0);
-				// if (c.getPropertyId() instanceof LeafBucket) {
-				// c.setHidden(true);
-				// c.setHidable(true);
-				// }
 			}
-			g.setFrozenColumnCount(2);
+
+			// g.setFrozenColumnCount(Math.min(2, g.getColumns().size()));
 		}
 
 		protected void doHeader(Grid g, Bucket<?> b, int depth) {
@@ -390,15 +399,33 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 				}
 
 				l.entrySet().forEach(oa -> {
-					HeaderCell join;
+					final HeaderCell join;
 					if (oa.getValue().length > 1) {
 						join = headerRow.join(oa.getValue());
+						Button collapser = new Button(String.valueOf(oa.getKey().bucketValue), FontAwesome.CARET_DOWN);
+						collapser.addStyleName(ValoTheme.BUTTON_BORDERLESS);
+						collapser.addStyleName("pivot-grid-expander");
+						collapser.addClickListener(new ClickListener() {
+							private boolean collapsed;
+
+							@Override
+							public void buttonClick(ClickEvent event) {
+								collapsed = !collapsed;
+								event.getButton().setIcon(collapsed ? FontAwesome.CARET_RIGHT : FontAwesome.CARET_DOWN);
+								Stream.of(oa.getValue()).skip(1).map(g::getColumn).forEach(c -> c.setHidden(collapsed));
+							}
+						});
+						join.setText("text");
+						join.setComponent(collapser);
 					} else {
 						join = headerRow.getCell(oa.getValue()[0]);
 						assert join != null;
+						join.setText(String.valueOf(oa.getKey().bucketValue));
 					}
-					join.setText(String.valueOf(oa.getKey().bucketValue));
 				});
+				headerRow.getCell(b).setText("\u2211" /*
+														 * + b.getBucketValue()
+														 */);
 				for (Bucket<?> child : children) {
 					doHeader(g, child, depth + 1);
 				}

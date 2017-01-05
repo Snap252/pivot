@@ -19,11 +19,6 @@ import com.vaadin.data.util.converter.Converter;
 public class PivotGrid extends TreeGrid {
 
 	public PivotGrid() {
-		// addColumn("c1");
-		// addColumn("c2");
-		// HeaderRow headerRow = addHeaderRowAt(0);
-		// headerRow.join("c1", "c2");
-		// headerRow.getCell("c1").setText("t1");
 	}
 
 	public <@Nullable T> void setContainerDataSource(BiBucketParameter<T> bucketParams,

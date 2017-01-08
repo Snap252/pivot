@@ -40,7 +40,7 @@ public final class NumberStatistics<N extends Number> {
 	}
 
 	private static final MessageFormat MF = new MessageFormat(
-			"NumberStatistics [cnt={0}; max={1}; min={2}; sum={3}; avg()={5}; varianz()={6}]");
+			"NumberStatistics [Anzahl={0}; max={1}; min={2}; sum={3}; avg={5}; var={6}]");
 
 	@Override
 	public String toString() {

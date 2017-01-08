@@ -7,5 +7,6 @@
 
 	<!-- Widget styles in public -directory -->
 	<stylesheet src="pivot/styles.css"/>
+	<set-configuration-property name="devModeRedirectEnabled" value="true" />
 
 </module>

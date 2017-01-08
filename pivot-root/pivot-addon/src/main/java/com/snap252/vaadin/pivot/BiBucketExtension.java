@@ -38,8 +38,12 @@ import com.vaadin.ui.themes.ValoTheme;
 
 @NonNullByDefault
 final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
-	BiBucketExtension(BiBucketParameter<RAW> p) {
+	BiBucketExtension(BiBucketParameter<RAW> p) throws IllegalArgumentException {
 		super(p);
+		if (rowBucket.getSize(1) > 10000)
+			throw new IllegalArgumentException("too many rows: " + rowBucket.getSize(1));
+		if (colBucket.getSize(1) > 100)
+			throw new IllegalArgumentException("too many columns: " + colBucket.getSize(1));
 	}
 
 	public <AGG, REN> GridWriter<AGG, REN> createGridWriter(final Collector<RAW, AGG, REN> aggregator) {
@@ -200,7 +204,7 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 		}
 
 		@Override
-		public Property getContainerProperty(Object itemId, Object propertyId) {
+		public Property<?> getContainerProperty(Object itemId, Object propertyId) {
 			assert false;
 			return null;
 		}
@@ -344,10 +348,10 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 			}
 			g.setDefaultHeaderRow(null);
 
-			g.setFrozenColumnCount(0);
+			// g.setFrozenColumnCount(0);
 			g.setCellDescriptionGenerator(null);
 			g.setRowDescriptionGenerator(null);
-			// g.addStyleName("pivot");
+			g.addStyleName("pivot");
 
 			g.removeAllColumns();
 
@@ -356,6 +360,12 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 			g.setContainerDataSource(bc);
 			doHeader(g, colBucket, 0);
 
+			g.setCellStyleGenerator(cell -> {
+				if (cell.getPropertyId() == bc.colProp) {
+					return "row-header";
+				}
+				return null;
+			});
 			g.setCellDescriptionGenerator(cell -> {
 				if (cell.getPropertyId() == bc.colProp) {
 					return null;
@@ -366,7 +376,8 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 				R rawValue = cellProperty.getValue();
 				if (rawValue == null)
 					return null;
-				return rawValue.toString().replace("; ", "<br/>").replace("NumberStatistics [", "").replace("]", "<br/>");
+				return rawValue.toString().replace("; ", "<br/>").replace("NumberStatistics [", "").replace("]",
+						"<br/>");
 			});
 
 			for (Column c : g.getColumns()) {
@@ -386,7 +397,6 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 					g.appendHeaderRow();
 					assert depth < g.getHeaderRowCount();
 				}
-				// HeaderRow headerRow = g.appendHeaderRow();
 				HeaderRow headerRow = g.getHeaderRow(depth);
 
 				Map<Bucket<?>, Object[]> l = new LinkedHashMap<>();
@@ -412,7 +422,7 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 								Stream.of(oa.getValue()).skip(1).map(g::getColumn).forEach(c -> c.setHidden(collapsed));
 							}
 						});
-						join.setText("text");
+						// join.setText("text");
 						join.setComponent(collapser);
 					} else {
 						join = headerRow.getCell(oa.getValue()[0]);

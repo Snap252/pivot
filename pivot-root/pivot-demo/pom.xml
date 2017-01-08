@@ -69,6 +69,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>org.vaadin.addons</groupId>
+			<artifactId>mapcontainer</artifactId>
+			<version>0.0.2</version>
+		</dependency>
+		<dependency>
 			<groupId>com.snap252.vaadin</groupId>
 			<artifactId>pivot</artifactId>
 			<version>${project.version}</version>

@@ -3,8 +3,6 @@ package com.snap252.vaadin.pivot.renderer;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
-import java.util.Locale;
 
 import com.snap252.org.aggregators.NumberStatistics;
 import com.snap252.vaadin.pivot.client.ClientNS;

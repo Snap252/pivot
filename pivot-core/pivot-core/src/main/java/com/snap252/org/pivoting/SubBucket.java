@@ -15,6 +15,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
 public class SubBucket<V> extends Bucket<V> {
+	@Nullable
 	public final List<Bucket<V>> children;
 	public final int depth;
 
@@ -22,10 +23,13 @@ public class SubBucket<V> extends Bucket<V> {
 			@Nullable final SubBucket<V> parent, final PivotCriteria<V, ?> extractor, final Collection<V> values,
 			final int level) {
 		super(bucketValue, parent, extractor, values, level);
-		assert !partitionCriterionsAndSubCriterions.isEmpty();
+		// assert !partitionCriterionsAndSubCriterions.isEmpty();
 		this.depth = partitionCriterionsAndSubCriterions.size();
 
-		this.children = createChildren(partitionCriterionsAndSubCriterions, parent, values, level);
+		if (!partitionCriterionsAndSubCriterions.isEmpty())
+			this.children = createChildren(partitionCriterionsAndSubCriterions, parent, values, level);
+		else
+			children = null;
 	}
 
 	protected <A extends Comparable<A>> List<Bucket<V>> createChildren(
@@ -64,24 +68,33 @@ public class SubBucket<V> extends Bucket<V> {
 	@Override
 	protected StringBuilder addString(final String linePrefix, final StringBuilder sb) {
 		super.addString(linePrefix, sb);
-		for (final Bucket<V> child : children) {
-			child.addString(linePrefix + "\t", sb);
-		}
+		if (children != null)
+			for (final Bucket<V> child : children) {
+				child.addString(linePrefix + "\t", sb);
+			}
 		return sb;
 	}
 
 	@Override
 	public int getSize(final int forSelf) {
-		return children.stream().mapToInt(b -> b.getSize(forSelf)).sum() + forSelf;
+		if (children != null)
+			return children.stream().mapToInt(b -> b.getSize(forSelf)).sum() + forSelf;
+		else
+			return forSelf;
 	}
 
 	@Override
 	public Stream<Bucket<V>> stream() {
-		return Stream.concat(Stream.of(this), children.stream().flatMap(Bucket::stream));
+		@Nullable
+		final List<@NonNull Bucket<V>> children$ = children;
+		if (children$ != null)
+			return Stream.concat(Stream.of(this), children$.stream().flatMap(Bucket::stream));
+		else
+			return Stream.of(this);
 	}
 
 	@Override
-	public @NonNull List<Bucket<V>> getChildren() {
+	public @Nullable List<Bucket<V>> getChildren() {
 		return children;
 	}
 

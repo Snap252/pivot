@@ -5,6 +5,26 @@ $gray: #d1d1cf;
 $green: #40b527;
 $darkgreen: darken($green, 30%);
 
+@mixin scale-grid($primary-stylename: v-grid-tiny, $scale-factor: 0.85) {
+	$border-factor: 0.75;
+	
+	$v-grid-row-height: ceil($v-table-row-height * $scale-factor * $border-factor);
+	$v-grid-header-font-size: ceil($v-table-header-font-size * $scale-factor);
+	
+//	$v-grid-cell-padding-horizontal: 1.5 * $v-table-cell-padding-horizontal * $scale-factor;
+	$v-grid-cell-padding-horizontal: round($v-table-cell-padding-horizontal * $scale-factor * $border-factor);
+	
+	$v-font-size: ceil($v-font-size * $scale-factor); 
+	$v-unit-size--small: round($v-unit-size * $v-scaling-factor--small);
+	$v-font-size--small: ceil($v-font-size * $v-scaling-factor--small);
+	
+	@include valo-grid ($primary-stylename: $primary-stylename);
+	
+	.#{$primary-stylename} {
+		font-weight: normal;
+	}
+}
+
 // Prefix all selectors in your theme with .demo
 .demo {
 
@@ -12,12 +32,21 @@ $darkgreen: darken($green, 30%);
 	@include valo;
 	@include addons;
 	.pivot {
-		.v-grid-header {
+		.v-grid-tiny-header {
 			.v-button-pivot-grid-expander {
+				height: inherit;
 				&:focus:after {
 					box-shadow: none;
 				}
 			}
 		}
 	}
+	.pivot .row-header {
+		font-weight: bold;
+	}
+
+	.v-tree-grid-expander {
+		padding-left: 4px;
+	}
+	@include scale-grid;
 }

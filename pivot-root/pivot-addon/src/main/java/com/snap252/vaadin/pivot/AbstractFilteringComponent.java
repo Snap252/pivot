@@ -1,9 +1,14 @@
 package com.snap252.vaadin.pivot;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
+import com.snap252.org.pivoting.PivotCriteria;
+import com.vaadin.data.Item;
+
 @NonNullByDefault
-public abstract class AbstractFilteringComponent<T extends Comparable<T>> implements FilteringComponent<T> {
+public abstract class AbstractFilteringComponent<T extends Comparable<T>>
+		implements FilteringComponent<T> {
 
 	protected final NameType nameType;
 	protected final Object propertyId;
@@ -18,4 +23,9 @@ public abstract class AbstractFilteringComponent<T extends Comparable<T>> implem
 		return nameType.propertyId.toString();
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public T apply(Item item) {
+		return (T) item.getItemProperty(propertyId).getValue();
+	}
 }

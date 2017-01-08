@@ -24,26 +24,22 @@ public class StringFilteringComponent extends AbstractFilteringComponent<String>
 		slider.setCaption("SubString");
 		formLayout.addComponent(slider);
 		formLayout.setWidth("200px");
-		formLayout.addComponent(new Button("Close"));
 		this.comp = formLayout;
 	}
 
 	@Override
-	public @NonNull AbstractComponent getComponent(PopupButton b) {
+	public @NonNull AbstractComponent getComponent() {
 		return comp;
 	}
 
-	@SuppressWarnings("null")
 	@Override
-	public PivotCriteria<Item, String> getCriteria() {
-		return item -> {
-			int sliderValue = slider.getValue().intValue();
-			String ret = (String) item.getItemProperty(propertyId).getValue();
-			if (sliderValue > 0 && sliderValue < ret.length()) {
-				return ret.substring(0, sliderValue);
-			}
-			return ret;
-		};
+	public String apply(Item item) {
+		int sliderValue = slider.getValue().intValue();
+		String ret = super.apply(item);
+		if (sliderValue > 0 && sliderValue < ret.length()) {
+			return ret.substring(0, sliderValue);
+		}
+		return ret;
 	}
 
 	@Override

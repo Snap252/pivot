@@ -16,16 +16,8 @@ public class EnumFilteringComponent<T extends Enum<T>> extends AbstractFiltering
 	}
 
 	@Override
-	public @Nullable AbstractComponent getComponent(PopupButton b) {
+	public @Nullable AbstractComponent getComponent() {
 		return null;
-	}
-
-	@SuppressWarnings({ "unchecked" })
-	@Override
-	public PivotCriteria<Item, T> getCriteria() {
-		return item -> {
-			return (T) item.getItemProperty(propertyId).getValue();
-		};
 	}
 
 	@Override

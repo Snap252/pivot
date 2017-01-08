@@ -3,19 +3,14 @@ package com.snap252.vaadin.pivot;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Date;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.vaadin.hene.popupbutton.PopupButton;
 
-import com.snap252.org.pivoting.PivotCriteria;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.AbstractComponent;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
 
@@ -34,12 +29,11 @@ public class DateFilteringComponent extends AbstractFilteringComponent<String> {
 
 		formLayout.addComponent(c);
 		formLayout.setWidth("400px");
-		formLayout.addComponent(new Button("Close"));
 		this.comp = formLayout;
 	}
 
 	@Override
-	public @NonNull AbstractComponent getComponent(PopupButton b) {
+	public @NonNull AbstractComponent getComponent() {
 		return comp;
 	}
 
@@ -47,13 +41,13 @@ public class DateFilteringComponent extends AbstractFilteringComponent<String> {
 		YEAR(new SimpleDateFormat("yyyy"), "Jahr"),
 
 		MONTH_VERY_SHORT(new SimpleDateFormat("MM/yyyy"), "Monat(sehr kurz)"),
-		
+
 		MONTH_SHORT(new SimpleDateFormat("MMM / yyyy"), "Monat(kurz)"),
-		
+
 		MONTH_LONG(new SimpleDateFormat("MMMM yyyy"), "Monat(lang)"),
 
 		MONTH_ONLY_SHORT(new SimpleDateFormat("MMM"), "nur Monat (kurz)"),
-		
+
 		MONTH_ONLY_LONG(new SimpleDateFormat("MMMM"), "nur Monat (lang)"),
 
 		WEEK(new SimpleDateFormat("'KW' w yyyy"), "Woche"),
@@ -91,34 +85,25 @@ public class DateFilteringComponent extends AbstractFilteringComponent<String> {
 		}
 	}
 
-	@SuppressWarnings("null")
 	@Override
-	public PivotCriteria<Item, String> getCriteria() {
-		@NonNull
-		PivotCriteria<Item, String> pivotCriteria = new PivotCriteria<Item, String>() {
-			@Override
-			public @NonNull String apply(Item item) {
-				Rounding value = (Rounding) c.getValue();
-				if (value == null)
-					value = Rounding.DAY;
+	public String apply(Item item) {
+		Rounding value = (Rounding) c.getValue();
+		if (value == null)
+			value = Rounding.DAY;
+		return value.df.format(super.apply(item));
+	}
 
-				return value.df.format((Date) item.getItemProperty(propertyId).getValue());
-			}
-
-			@Override
-			public int compare(String f1, String f2) {
-				Rounding value = (Rounding) c.getValue();
-				if (value == null)
-					value = Rounding.DAY;
-				SimpleDateFormat df = value.df;
-				try {
-					return df.parse(f1).compareTo(df.parse(f2));
-				} catch (ParseException e) {
-					throw new AssertionError();
-				}
-			}
-		};
-		return pivotCriteria;
+	@Override
+	public int compare(String f1, String f2) {
+		Rounding value = (Rounding) c.getValue();
+		if (value == null)
+			value = Rounding.DAY;
+		SimpleDateFormat df = value.df;
+		try {
+			return df.parse(f1).compareTo(df.parse(f2));
+		} catch (ParseException e) {
+			throw new AssertionError();
+		}
 	}
 
 	@Override
@@ -133,4 +118,5 @@ public class DateFilteringComponent extends AbstractFilteringComponent<String> {
 			return super.toString();
 		return super.toString() + " (" + v.s + ")";
 	}
+
 }

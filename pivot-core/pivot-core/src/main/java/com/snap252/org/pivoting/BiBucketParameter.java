@@ -15,6 +15,13 @@ public final class BiBucketParameter<V> {
 		this.values = values;
 	}
 
+	public BiBucketParameter(final List<V> values, final List<PivotCriteria<V, ?>> rowFnkt,
+			final List<PivotCriteria<V, ?>> colFnkt) {
+		this.values = values;
+		this.rowFnkt = rowFnkt;
+		this.colFnkt = colFnkt;
+	}
+
 	@SafeVarargs
 	public final BiBucketParameter<V> setRowFnkt(@NonNull final PivotCriteria<V, ?>... rowFnkt) {
 		assert this.rowFnkt.isEmpty();

@@ -57,6 +57,7 @@ public class DemoUI extends UI {
 			layout.setExpandRatio(pivotGrid, 1);
 //			layout.setComponentAlignment(pivotGrid, Alignment.MIDDLE_CENTER);
 		}
+		pivotGrid.setMargin(true);
 		setContent(layout);
 	}
 

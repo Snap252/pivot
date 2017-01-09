@@ -49,4 +49,15 @@ $darkgreen: darken($green, 30%);
 		padding-left: 4px;
 	}
 	@include scale-grid;
+	
+	.v-gridlayout-slot > .v-ddwrapper {
+		$v-grid-border-color-source: $v-grid-row-background-color;
+		border: valo-border($color: $v-grid-border-color-source, $strength: 0.8);
+		padding: 4px;
+		.v-button {
+			line-height: 1.75;
+			height: inherit;
+			text-align: right;
+		}
+	}
 }

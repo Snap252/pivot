@@ -5,12 +5,14 @@ import static java.util.stream.Collectors.toMap;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.vaadin.miki.mapcontainer.MapContainer;
 
@@ -29,13 +31,16 @@ import com.vaadin.ui.DragAndDropWrapper.DragStartMode;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.VerticalLayout;
 
+import fi.jasoft.dragdroplayouts.DDHorizontalLayout;
+import fi.jasoft.dragdroplayouts.DDVerticalLayout;
+
+@NonNullByDefault
 public class PivotUI extends GridLayout {
 
 	private final HorizontalLayout properties;
 	private BiBucketParameter<Item> p;
-	
+
 	private final List<PivotCriteria<Item, ?>> rowFnkt = new ArrayList<>();
 	private final List<PivotCriteria<Item, ?>> colFnkt = new ArrayList<>();
 
@@ -57,29 +62,35 @@ public class PivotUI extends GridLayout {
 			addComponents(renderer, rowDndWrapper);
 		}
 		{
-			Component aggregator = new Label("aggregator");
+			final Component aggregator = new Label("aggregator");
 			aggregator.setSizeUndefined();
 
-			HorizontalLayout cols = new HorizontalLayout();
-			cols.setCaption("cols");
+			final DDHorizontalLayout cols = new DDHorizontalLayout();
+			DropHandlerImplementation dropHandler = new DropHandlerImplementation(cols, false,
+					() -> pivotGrid$.setContainerDataSource(p, reducer), colFnkt);
+			cols.setDropHandler(dropHandler);
 			cols.setSpacing(true);
 
-			DragAndDropWrapper colDnDWrapper = new DragAndDropWrapper(cols);
-			colDnDWrapper.setDropHandler(new DropHandlerImplementation(cols, false,
-					() -> pivotGrid$.setContainerDataSource(p, reducer), colFnkt));
+			final DragAndDropWrapper colDnDWrapper = new DragAndDropWrapper(cols);
+			colDnDWrapper.setDropHandler(dropHandler);
+			// colDnDWrapper.setCaption("cols");
 			addComponents(aggregator, colDnDWrapper);
 		}
 
 		{
-			VerticalLayout rows = new VerticalLayout();
-			rows.setCaption("rows");
+			final DDVerticalLayout rows = new DDVerticalLayout();
+			final DropHandlerImplementation dropHandler = new DropHandlerImplementation(rows, true,
+					() -> pivotGrid$.setContainerDataSource(p, reducer), rowFnkt);
+			rows.setDropHandler(dropHandler);
 			rows.setSpacing(true);
 
+			final DragAndDropWrapper rowDnDWrapper = new DragAndDropWrapper(rows);
+			rowDnDWrapper.setDropHandler(dropHandler);
+			rowDnDWrapper.setWidth(150, Unit.PIXELS);
+			// rowDnDWrapper.setCaption("rows");
+			rowDnDWrapper.setHeight("100%");
+
 			pivotGrid$.setSizeFull();
-			DragAndDropWrapper rowDnDWrapper = new DragAndDropWrapper(rows);
-			rowDnDWrapper.setDropHandler(new DropHandlerImplementation(rows, true,
-					() -> pivotGrid$.setContainerDataSource(p, reducer), rowFnkt));
-			rowDnDWrapper.setWidth("250px");
 			addComponents(rowDnDWrapper, pivotGrid$);
 		}
 
@@ -88,17 +99,23 @@ public class PivotUI extends GridLayout {
 	}
 
 	@SuppressWarnings("null")
-	public void setContainerDataSource(Container c0) {
-		Map<Object, Class<?>> m0 = c0.getContainerPropertyIds().stream()
-				.collect(Collectors.toMap(Function.identity(), c0::getType));
+	public void setContainerDataSource(final Container origContainer) {
+		final Map<Object, Class<?>> m0 = origContainer.getContainerPropertyIds().stream()
+				.collect(Collectors.toMap(Function.identity(), origContainer::getType, (u, v) -> {
+					throw new IllegalStateException(String.format("Duplicate key %s", u));
+				}, LinkedHashMap::new));
 
-		Map<Object, Map<Object, Object>> m1 = c0.getItemIds().stream()
+		final Map<Object, Map<Object, Object>> m1 = origContainer.getItemIds().stream()
 				.collect(Collectors.toMap(Function.identity(), itemId -> {
-					Item item = c0.getItem(itemId);
+					Item item = origContainer.getItem(itemId);
 					return item.getItemPropertyIds().stream()
-							.collect(toMap(Function.identity(), p -> item.getItemProperty(p).getValue()));
-				}));
-		Container c = new MapContainer(m0, m1);
+							.collect(toMap(Function.identity(), p -> item.getItemProperty(p).getValue(), (u, v) -> {
+								throw new IllegalStateException(String.format("Duplicate key %s", u));
+							}, LinkedHashMap::new));
+				}, (u, v) -> {
+					throw new IllegalStateException(String.format("Duplicate key %s", u));
+				}, LinkedHashMap::new));
+		final Container c = new MapContainer(m0, m1);
 		p = new BiBucketParameter<>(c.getItemIds().stream().map(c::getItem).collect(toList()), rowFnkt, colFnkt);
 
 		Component[] labels = c.getContainerPropertyIds().stream().map(propertyId -> {

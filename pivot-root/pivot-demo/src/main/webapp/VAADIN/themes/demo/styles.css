@@ -13955,3 +13955,14 @@ div.v-layout.v-horizontal.v-widget {
 .demo .v-grid-tiny {
 	font-weight: normal;
 }
+
+.demo .v-gridlayout-slot > .v-ddwrapper {
+	border: 1px solid #d4d4d4;
+	padding: 4px;
+}
+
+.demo .v-gridlayout-slot > .v-ddwrapper .v-button {
+	line-height: 1.75;
+	height: inherit;
+	text-align: right;
+}

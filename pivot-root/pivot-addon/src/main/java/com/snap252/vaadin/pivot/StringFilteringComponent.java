@@ -2,13 +2,10 @@ package com.snap252.vaadin.pivot;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.vaadin.hene.popupbutton.PopupButton;
 
-import com.snap252.org.pivoting.PivotCriteria;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.AbstractComponent;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Slider;
 

@@ -343,12 +343,12 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 		}
 
 		public void writeGrid(final Grid g, Class<? super R> modelType, Consumer<Column> columnHandler) {
+//			g.setFrozenColumnCount(0);
 			for (int i = 0; i < g.getHeaderRowCount(); i++) {
 				g.removeHeaderRow(i);
 			}
 			g.setDefaultHeaderRow(null);
 
-			// g.setFrozenColumnCount(0);
 			g.setCellDescriptionGenerator(null);
 			g.setRowDescriptionGenerator(null);
 			g.addStyleName("pivot");
@@ -387,7 +387,7 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 				columnHandler.accept(c);
 			}
 
-			// g.setFrozenColumnCount(Math.min(2, g.getColumns().size()));
+//			g.setFrozenColumnCount(Math.min(2, g.getColumns().size()));
 		}
 
 		protected void doHeader(Grid g, Bucket<?> b, int depth) {

@@ -24,7 +24,7 @@
 			<activation>
 				<activeByDefault>false</activeByDefault>
 			</activation>
-			
+
 			<repositories>
 				<repository>
 					<id>vaadin-prereleases</id>
@@ -60,4 +60,10 @@
 		</profile>
 	</profiles>
 
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
 </project>

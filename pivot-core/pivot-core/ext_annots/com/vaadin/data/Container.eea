@@ -14,6 +14,9 @@ getContainerProperty
 getItem
  (Ljava/lang/Object;)Lcom/vaadin/data/Item;
  (L1java/lang/Object;)Lcom/vaadin/data/Item;
+getItemIds
+ ()Ljava/util/Collection<*>;
+ ()L1java/util/Collection<*1>;
 getType
  (Ljava/lang/Object;)Ljava/lang/Class<*>;
  (L1java/lang/Object;)L1java/lang/Class<*>;

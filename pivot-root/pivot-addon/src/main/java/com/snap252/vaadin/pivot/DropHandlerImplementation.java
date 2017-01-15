@@ -1,6 +1,8 @@
 package com.snap252.vaadin.pivot;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import com.vaadin.event.dd.DragAndDropEvent;
 import com.vaadin.event.dd.DropHandler;
@@ -23,15 +25,15 @@ abstract class DropHandlerImplementation<T> implements DropHandler {
 
 	private final AbstractOrderedLayout cols;
 	private final boolean vertical;
-	private final Runnable refresher;
-	private final List<? super T> pivotCriteriaList;
+	private final Consumer<List<T>> refresher;
+	private final List<T> pivotCriteriaList;
 
-	public DropHandlerImplementation(final AbstractOrderedLayout cols, final boolean vertical, final Runnable refresher,
-			final List<? super T> pivotCriteriaList) {
+	public DropHandlerImplementation(final AbstractOrderedLayout cols, final boolean vertical,
+			final Consumer<List<T>> refresher) {
 		this.cols = cols;
 		this.vertical = vertical;
 		this.refresher = refresher;
-		this.pivotCriteriaList = pivotCriteriaList;
+		this.pivotCriteriaList = new ArrayList<T>();
 	}
 
 	@Override
@@ -118,10 +120,10 @@ abstract class DropHandlerImplementation<T> implements DropHandler {
 		else
 			pivotCriteriaList.add(index, createFilter);
 
-		refresher.run();
+		refresher.accept(pivotCriteriaList);
 	}
 
 	protected final void refresh() {
-		refresher.run();
+		refresher.accept(pivotCriteriaList);
 	}
 }

@@ -1,13 +1,12 @@
 package com.snap252.vaadin.pivot;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.vaadin.hene.popupbutton.PopupButton;
 import org.vaadin.hene.popupbutton.PopupButton.PopupVisibilityEvent;
 import org.vaadin.hene.popupbutton.PopupButton.PopupVisibilityListener;
 
-import com.snap252.org.pivoting.PivotCriteria;
-import com.vaadin.data.Item;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.Alignment;
@@ -19,11 +18,11 @@ public class PivotCriteriaFilteringDnDHandler extends DropHandlerImplementation<
 
 	private final FilterFactory ff = new FilterFactory();
 
-	public PivotCriteriaFilteringDnDHandler(final AbstractOrderedLayout cols, final boolean vertical, final Runnable refresher,
-			final List<? super PivotCriteria<Item, ?>> pivotCriteriaList) {
-		super(cols, vertical, refresher, pivotCriteriaList);
+	public PivotCriteriaFilteringDnDHandler(final AbstractOrderedLayout cols, final boolean vertical,
+			final Consumer<List<FilteringComponent<?>>> refresher) {
+		super(cols, vertical, refresher);
 	}
-	
+
 	@Override
 	protected FilteringComponent<?> createNew(final Object data) {
 		return ff.createFilter((NameType) data);
@@ -32,7 +31,7 @@ public class PivotCriteriaFilteringDnDHandler extends DropHandlerImplementation<
 	@Override
 	protected AbstractComponent createUIComponent(final FilteringComponent<?> createFilter) {
 		final AbstractComponent component = createFilter.getComponent();
-		
+
 		final Button b;
 		if (component != null) {
 			final PopupButton popupButton = new PopupButton(createFilter.toString());

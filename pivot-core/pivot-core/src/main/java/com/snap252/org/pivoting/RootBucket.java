@@ -9,7 +9,7 @@ import org.eclipse.jdt.annotation.NonNull;
 public class RootBucket<V> extends SubBucket<V> {
 
 	public RootBucket(final String prefix, final List<V> values,
-			final List<PivotCriteria<V, ?>> partitionCriterionsAndSubCriterions) {
+			final List<? extends PivotCriteria<V, ?>> partitionCriterionsAndSubCriterions) {
 		super(prefix + "---root---", partitionCriterionsAndSubCriterions, null,
 				new NamedPivotCriteria<V, String>(_ignore -> "", "r") {
 					@Override

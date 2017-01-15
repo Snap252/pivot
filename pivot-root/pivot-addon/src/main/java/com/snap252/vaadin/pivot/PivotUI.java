@@ -4,9 +4,8 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collector;
@@ -21,7 +20,6 @@ import com.snap252.org.aggregators.MutableValue;
 import com.snap252.org.aggregators.NumberStatistics;
 import com.snap252.org.aggregators.PivotCollectors;
 import com.snap252.org.pivoting.BiBucketParameter;
-import com.snap252.org.pivoting.PivotCriteria;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.event.dd.DropHandler;
@@ -42,9 +40,6 @@ public class PivotUI extends GridLayout {
 	private final HorizontalLayout properties;
 	private BiBucketParameter<Item> p;
 
-	private final List<PivotCriteria<Item, ?>> rowFnkt = new ArrayList<>();
-	private final List<PivotCriteria<Item, ?>> colFnkt = new ArrayList<>();
-
 	@SuppressWarnings("null")
 	final Collector<Item, MutableValue<BigDecimal>, @Nullable NumberStatistics<BigDecimal>> reducer = PivotCollectors
 			.getReducer(item -> (BigDecimal) item.getItemProperty("wert").getValue(), new BigDecimalArithmetics());
@@ -64,20 +59,19 @@ public class PivotUI extends GridLayout {
 			addComponents(renderer, rowDndWrapper);
 		}
 		{
-			
-			final DDHorizontalLayout aggregator = new DDHorizontalLayout();
+
+			final DDVerticalLayout aggregator = new DDVerticalLayout();
+			aggregator.setSpacing(true);
 			final DragAndDropWrapper aggregatorDragAndDropWrapper = new DragAndDropWrapper(aggregator);
-			final DropHandler aggDopHandler = new PivotCriteriaFilteringDnDHandler(aggregator, false,
-					() -> {
-						System.err.println();
-					}, new ArrayList<PivotCriteria<Item, ?>>());
+			final DropHandler aggDopHandler = new PivotCriteriaFilteringDnDHandler(aggregator, true, i -> {
+				System.err.println(i);
+			});
 			aggregator.setDropHandler(aggDopHandler);
 			aggregatorDragAndDropWrapper.setDropHandler(aggDopHandler);
-			aggregator.setSizeUndefined();
 
 			final DDHorizontalLayout cols = new DDHorizontalLayout();
 			final DropHandler dropHandler = new PivotCriteriaFilteringDnDHandler(cols, false,
-					() -> pivotGrid$.setContainerDataSource(p, reducer), colFnkt);
+					colFnkts -> pivotGrid$.setContainerDataSource(p.setColFnkt(colFnkts), reducer));
 			cols.setDropHandler(dropHandler);
 			cols.setSpacing(true);
 
@@ -89,7 +83,7 @@ public class PivotUI extends GridLayout {
 		{
 			final DDVerticalLayout rows = new DDVerticalLayout();
 			final DropHandler dropHandler = new PivotCriteriaFilteringDnDHandler(rows, true,
-					() -> pivotGrid$.setContainerDataSource(p, reducer), rowFnkt);
+					rowFnkts -> pivotGrid$.setContainerDataSource(p.setRowFnkt(rowFnkts), reducer));
 			rows.setDropHandler(dropHandler);
 			rows.setSpacing(true);
 
@@ -124,7 +118,8 @@ public class PivotUI extends GridLayout {
 					throw new IllegalStateException(String.format("Duplicate key %s", u));
 				}, LinkedHashMap::new));
 		final Container c = new MapContainer(m0, m1);
-		p = new BiBucketParameter<>(c.getItemIds().stream().map(c::getItem).collect(toList()), rowFnkt, colFnkt);
+		p = new BiBucketParameter<>(c.getItemIds().stream().map(c::getItem).collect(toList()), Collections.emptyList(),
+				Collections.emptyList());
 
 		final Component[] labels = c.getContainerPropertyIds().stream().map(propertyId -> {
 			final Component button = new Button(propertyId.toString());

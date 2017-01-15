@@ -1,0 +1,4 @@
+class com/vaadin/ui/ComponentContainer
+addComponent
+ (Lcom/vaadin/ui/Component;)V
+ (L1com/vaadin/ui/Component;)V

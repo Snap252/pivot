@@ -1,0 +1,7 @@
+class com/vaadin/ui/DragAndDropWrapper
+DragAndDropWrapper
+ (Lcom/vaadin/ui/Component;)V
+ (L1com/vaadin/ui/Component;)V
+setDropHandler
+ (Lcom/vaadin/event/dd/DropHandler;)V
+ (L1com/vaadin/event/dd/DropHandler;)V

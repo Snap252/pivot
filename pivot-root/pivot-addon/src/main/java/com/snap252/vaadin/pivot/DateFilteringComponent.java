@@ -25,7 +25,6 @@ public class DateFilteringComponent extends AbstractFilteringComponent<String> {
 		c = new ComboBox("Rundung", Arrays.asList(Rounding.values()));
 		c.setNullSelectionItemId(Rounding.DAY);
 		c.setNullSelectionAllowed(false);
-		System.err.println(c.getContainerPropertyIds());
 
 		formLayout.addComponent(c);
 		formLayout.setWidth("400px");

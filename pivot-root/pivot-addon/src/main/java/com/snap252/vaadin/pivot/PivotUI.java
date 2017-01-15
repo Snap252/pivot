@@ -73,7 +73,6 @@ public class PivotUI extends GridLayout {
 
 			final DragAndDropWrapper colDnDWrapper = new DragAndDropWrapper(cols);
 			colDnDWrapper.setDropHandler(dropHandler);
-			// colDnDWrapper.setCaption("cols");
 			addComponents(aggregator, colDnDWrapper);
 		}
 
@@ -87,7 +86,6 @@ public class PivotUI extends GridLayout {
 			final DragAndDropWrapper rowDnDWrapper = new DragAndDropWrapper(rows);
 			rowDnDWrapper.setDropHandler(dropHandler);
 			rowDnDWrapper.setWidth(150, Unit.PIXELS);
-			// rowDnDWrapper.setCaption("rows");
 			rowDnDWrapper.setHeight("100%");
 
 			pivotGrid$.setSizeFull();

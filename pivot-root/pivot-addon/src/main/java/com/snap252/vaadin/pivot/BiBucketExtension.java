@@ -109,7 +109,12 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 		}
 
 		private final Map<Object, BucketItem> cache = new HashMap<>();
-		private final Object colProp = new Object();
+		private final Object colProp = new Object() {
+			@Override
+			public String toString() {
+				return "";
+			}
+		};
 
 		@SuppressWarnings("unchecked")
 		@Override
@@ -180,7 +185,7 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 			}
 
 			@Override
-			public boolean addItemProperty(Object id, Property property) throws UnsupportedOperationException {
+			public boolean addItemProperty(Object id, @SuppressWarnings("rawtypes") Property property) throws UnsupportedOperationException {
 				throw new UnsupportedOperationException();
 			}
 
@@ -336,6 +341,7 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 
 	public final class GridWriter<W, R> {
 
+		private static final String SUM_TEXT = "\u2211";
 		private Collector<RAW, W, R> collector;
 
 		private GridWriter(final Collector<RAW, W, R> collector) {
@@ -343,11 +349,12 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 		}
 
 		public void writeGrid(final Grid g, Class<? super R> modelType, Consumer<Column> columnHandler) {
-//			g.setFrozenColumnCount(0);
-			for (int i = 0; i < g.getHeaderRowCount(); i++) {
-				g.removeHeaderRow(i);
+			// g.setFrozenColumnCount(0);
+			for (int i = 1; i < g.getHeaderRowCount(); i++) {
+				if (g.getDefaultHeaderRow() != g.getHeaderRow(i))
+					g.removeHeaderRow(i);
 			}
-			g.setDefaultHeaderRow(null);
+			// g.setDefaultHeaderRow(null);
 
 			g.setCellDescriptionGenerator(null);
 			g.setRowDescriptionGenerator(null);
@@ -380,24 +387,20 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 						"<br/>");
 			});
 
-			for (Column c : g.getColumns()) {
-				if (c.getPropertyId() == bc.colProp) {
-					continue;
-				}
-				columnHandler.accept(c);
-			}
+			g.getColumns().stream().filter(c -> c.getPropertyId() != bc.colProp).forEach(columnHandler);
 
-//			g.setFrozenColumnCount(Math.min(2, g.getColumns().size()));
+			// g.setFrozenColumnCount(Math.min(2, g.getColumns().size()));
 		}
 
 		protected void doHeader(Grid g, Bucket<?> b, int depth) {
+			if (depth >= g.getHeaderRowCount()) {
+				g.appendHeaderRow();
+				assert depth < g.getHeaderRowCount();
+			}
+			HeaderRow headerRow = g.getHeaderRow(depth);
+
 			List<? extends Bucket<?>> children = b.getChildren();
 			if (children != null) {
-				if (depth >= g.getHeaderRowCount()) {
-					g.appendHeaderRow();
-					assert depth < g.getHeaderRowCount();
-				}
-				HeaderRow headerRow = g.getHeaderRow(depth);
 
 				Map<Bucket<?>, Object[]> l = new LinkedHashMap<>();
 				for (Bucket<?> x : children) {
@@ -430,12 +433,12 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 						join.setText(String.valueOf(oa.getKey().bucketValue));
 					}
 				});
-				headerRow.getCell(b).setText("\u2211" /*
-														 * + b.getBucketValue()
-														 */);
+				headerRow.getCell(b).setText(SUM_TEXT);
 				for (Bucket<?> child : children) {
 					doHeader(g, child, depth + 1);
 				}
+			} else if (depth == 0){
+				headerRow.getCell(b).setText(SUM_TEXT);
 			}
 		}
 	}

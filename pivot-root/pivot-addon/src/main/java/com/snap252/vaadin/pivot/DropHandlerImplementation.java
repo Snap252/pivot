@@ -119,7 +119,7 @@ final class DropHandlerImplementation implements DropHandler {
 			footer.setWidth("100%");
 			footer.setComponentAlignment(deleteButton, Alignment.BOTTOM_LEFT);
 			footer.setComponentAlignment(closeButton, Alignment.BOTTOM_RIGHT);
-			
+
 			final VerticalLayout verticalLayout = new VerticalLayout(component, footer);
 			popupButton.setContent(verticalLayout);
 			final PopupVisibilityListener listener = new PopupVisibilityListener() {

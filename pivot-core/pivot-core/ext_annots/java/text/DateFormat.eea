@@ -1,0 +1,4 @@
+class java/text/DateFormat
+parse
+ (Ljava/lang/String;)Ljava/util/Date;
+ (L1java/lang/String;)L1java/util/Date;

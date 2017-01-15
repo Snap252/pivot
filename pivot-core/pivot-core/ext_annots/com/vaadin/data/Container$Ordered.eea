@@ -1,0 +1,25 @@
+class com/vaadin/data/Container$Ordered
+addItemAfter
+ (Ljava/lang/Object;)Ljava/lang/Object;
+ (L1java/lang/Object;)L0java/lang/Object;
+addItemAfter
+ (Ljava/lang/Object;Ljava/lang/Object;)Lcom/vaadin/data/Item;
+ (L1java/lang/Object;L1java/lang/Object;)L0com/vaadin/data/Item;
+firstItemId
+ ()Ljava/lang/Object;
+ ()L0java/lang/Object;
+isFirstId
+ (Ljava/lang/Object;)Z
+ (L1java/lang/Object;)Z
+isLastId
+ (Ljava/lang/Object;)Z
+ (L1java/lang/Object;)Z
+lastItemId
+ ()Ljava/lang/Object;
+ ()L0java/lang/Object;
+nextItemId
+ (Ljava/lang/Object;)Ljava/lang/Object;
+ (L1java/lang/Object;)L0java/lang/Object;
+prevItemId
+ (Ljava/lang/Object;)Ljava/lang/Object;
+ (L1java/lang/Object;)L0java/lang/Object;

@@ -1,0 +1,10 @@
+class com/vaadin/data/Container$Indexed
+addItemAt
+ (ILjava/lang/Object;)Lcom/vaadin/data/Item;
+ (IL1java/lang/Object;)Lcom/vaadin/data/Item;
+getIdByIndex
+ (I)Ljava/lang/Object;
+ (I)L1java/lang/Object;
+indexOfId
+ (Ljava/lang/Object;)I
+ (L1java/lang/Object;)I

@@ -24,6 +24,7 @@ import com.snap252.org.pivoting.BiBucketParameter;
 import com.snap252.org.pivoting.PivotCriteria;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
+import com.vaadin.event.dd.DropHandler;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.DragAndDropWrapper;
@@ -52,34 +53,42 @@ public class PivotUI extends GridLayout {
 	public PivotUI() {
 		super(2, 3);
 		setSpacing(true);
-		PivotGrid pivotGrid$ = new PivotGrid();
+		final PivotGrid pivotGrid$ = new PivotGrid();
 		{
-			Component renderer = new Label("renderer");
+			final Component renderer = new Label("renderer");
 			renderer.setSizeUndefined();
 			properties = new HorizontalLayout();
 			properties.setCaption("properties");
 			properties.setSpacing(true);
-			DragAndDropWrapper rowDndWrapper = new DragAndDropWrapper(properties);
+			final DragAndDropWrapper rowDndWrapper = new DragAndDropWrapper(properties);
 			addComponents(renderer, rowDndWrapper);
 		}
 		{
-			final Component aggregator = new Label("aggregator");
+			
+			final DDHorizontalLayout aggregator = new DDHorizontalLayout();
+			final DragAndDropWrapper aggregatorDragAndDropWrapper = new DragAndDropWrapper(aggregator);
+			final DropHandler aggDopHandler = new PivotCriteriaFilteringDnDHandler(aggregator, false,
+					() -> {
+						System.err.println();
+					}, new ArrayList<PivotCriteria<Item, ?>>());
+			aggregator.setDropHandler(aggDopHandler);
+			aggregatorDragAndDropWrapper.setDropHandler(aggDopHandler);
 			aggregator.setSizeUndefined();
 
 			final DDHorizontalLayout cols = new DDHorizontalLayout();
-			DropHandlerImplementation dropHandler = new DropHandlerImplementation(cols, false,
+			final DropHandler dropHandler = new PivotCriteriaFilteringDnDHandler(cols, false,
 					() -> pivotGrid$.setContainerDataSource(p, reducer), colFnkt);
 			cols.setDropHandler(dropHandler);
 			cols.setSpacing(true);
 
 			final DragAndDropWrapper colDnDWrapper = new DragAndDropWrapper(cols);
 			colDnDWrapper.setDropHandler(dropHandler);
-			addComponents(aggregator, colDnDWrapper);
+			addComponents(aggregatorDragAndDropWrapper, colDnDWrapper);
 		}
 
 		{
 			final DDVerticalLayout rows = new DDVerticalLayout();
-			final DropHandlerImplementation dropHandler = new DropHandlerImplementation(rows, true,
+			final DropHandler dropHandler = new PivotCriteriaFilteringDnDHandler(rows, true,
 					() -> pivotGrid$.setContainerDataSource(p, reducer), rowFnkt);
 			rows.setDropHandler(dropHandler);
 			rows.setSpacing(true);
@@ -106,7 +115,7 @@ public class PivotUI extends GridLayout {
 
 		final Map<Object, Map<Object, Object>> m1 = origContainer.getItemIds().stream()
 				.collect(Collectors.toMap(Function.identity(), itemId -> {
-					Item item = origContainer.getItem(itemId);
+					final Item item = origContainer.getItem(itemId);
 					return item.getItemPropertyIds().stream()
 							.collect(toMap(Function.identity(), p -> item.getItemProperty(p).getValue(), (u, v) -> {
 								throw new IllegalStateException(String.format("Duplicate key %s", u));
@@ -117,10 +126,10 @@ public class PivotUI extends GridLayout {
 		final Container c = new MapContainer(m0, m1);
 		p = new BiBucketParameter<>(c.getItemIds().stream().map(c::getItem).collect(toList()), rowFnkt, colFnkt);
 
-		Component[] labels = c.getContainerPropertyIds().stream().map(propertyId -> {
-			Component button = new Button(propertyId.toString());
+		final Component[] labels = c.getContainerPropertyIds().stream().map(propertyId -> {
+			final Component button = new Button(propertyId.toString());
 			button.setEnabled(false);
-			DragAndDropWrapper wrapper = new DragAndDropWrapper(button);
+			final DragAndDropWrapper wrapper = new DragAndDropWrapper(button);
 			wrapper.setDragStartMode(DragStartMode.COMPONENT);
 			wrapper.setData(new NameType(propertyId.toString(), c.getType(propertyId)));
 			return wrapper;

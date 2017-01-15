@@ -3,7 +3,7 @@ package com.snap252.vaadin.pivot;
 import java.util.Date;
 
 public class FilterFactory {
-	FilteringComponent<?> createFilter(NameType n) {
+	FilteringComponent<?> createFilter(final NameType n) {
 
 		if (n.type == String.class)
 			return new StringFilteringComponent(n);

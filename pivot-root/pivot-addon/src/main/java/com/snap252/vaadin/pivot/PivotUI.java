@@ -44,6 +44,7 @@ public class PivotUI extends GridLayout {
 	private final List<PivotCriteria<Item, ?>> rowFnkt = new ArrayList<>();
 	private final List<PivotCriteria<Item, ?>> colFnkt = new ArrayList<>();
 
+	@SuppressWarnings("null")
 	final Collector<Item, MutableValue<BigDecimal>, @Nullable NumberStatistics<BigDecimal>> reducer = PivotCollectors
 			.getReducer(item -> (BigDecimal) item.getItemProperty("wert").getValue(), new BigDecimalArithmetics());
 

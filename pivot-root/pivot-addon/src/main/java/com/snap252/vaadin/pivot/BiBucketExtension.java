@@ -50,7 +50,6 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 		return new GridWriter<>(aggregator);
 	}
 
-	@NonNullByDefault({})
 	class BucketContainer<R, W> implements Indexed, Hierarchical {
 		private final Collector<RAW, W, R> collector;
 		private Class<? extends R> cellClass;
@@ -61,25 +60,25 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 		}
 
 		@Override
-		public Object nextItemId(Object itemId) {
+		public @Nullable Object nextItemId(Object itemId) {
 			assert false;
 			return null;
 		}
 
 		@Override
-		public Object prevItemId(Object itemId) {
+		public @Nullable Object prevItemId(Object itemId) {
 			assert false;
 			return null;
 		}
 
 		@Override
-		public Object firstItemId() {
+		public @Nullable Object firstItemId() {
 			assert false;
 			return null;
 		}
 
 		@Override
-		public Object lastItemId() {
+		public @Nullable Object lastItemId() {
 			assert false;
 			return null;
 		}
@@ -97,13 +96,14 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 		}
 
 		@Override
-		public Object addItemAfter(Object previousItemId) throws UnsupportedOperationException {
+		public @Nullable Object addItemAfter(Object previousItemId) throws UnsupportedOperationException {
 			assert false;
 			return null;
 		}
 
 		@Override
-		public Item addItemAfter(Object previousItemId, Object newItemId) throws UnsupportedOperationException {
+		public @Nullable Item addItemAfter(Object previousItemId, Object newItemId)
+				throws UnsupportedOperationException {
 			assert false;
 			return null;
 		}
@@ -116,7 +116,7 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 			}
 		};
 
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings({ "unchecked" })
 		@Override
 		public Item getItem(Object itemId) {
 			return cache.computeIfAbsent(itemId, x -> new BucketItem((Bucket<RAW>) x));
@@ -142,7 +142,7 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 				}
 
 				@Override
-				public void setValue(Object newValue) throws ReadOnlyException {
+				public void setValue(@Nullable Object newValue) throws ReadOnlyException {
 					throw new ReadOnlyException();
 				}
 
@@ -167,17 +167,18 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 				this.rowBucket = itemId;
 			}
 
-			private final Map<Object, CellProperty> cache = new HashMap<>();
+			private final Map<@NonNull Object, @NonNull CellProperty> cache = new HashMap<>();
 
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings({ "unchecked" })
 			@Override
-			public Property<?> getItemProperty(Object id) {
+			public @NonNull Property<?> getItemProperty(Object id) {
 				if (id == colProp) {
 					return new ObjectProperty<>(rowBucket.getBucketValue());
 				}
 				return cache.computeIfAbsent(id, x -> new CellProperty((Bucket<RAW>) x));
 			}
 
+			@SuppressWarnings("null")
 			@Override
 			public Collection<?> getItemPropertyIds() {
 				assert false;
@@ -185,7 +186,8 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 			}
 
 			@Override
-			public boolean addItemProperty(Object id, @SuppressWarnings("rawtypes") Property property) throws UnsupportedOperationException {
+			public boolean addItemProperty(Object id, @SuppressWarnings("rawtypes") Property property)
+					throws UnsupportedOperationException {
 				throw new UnsupportedOperationException();
 			}
 
@@ -209,7 +211,7 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 		}
 
 		@Override
-		public Property<?> getContainerProperty(Object itemId, Object propertyId) {
+		public @Nullable Property<?> getContainerProperty(Object itemId, Object propertyId) {
 			assert false;
 			return null;
 		}
@@ -249,7 +251,7 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 		}
 
 		@Override
-		public boolean addContainerProperty(Object propertyId, Class<?> type, Object defaultValue)
+		public boolean addContainerProperty(Object propertyId, Class<?> type, @Nullable Object defaultValue)
 				throws UnsupportedOperationException {
 			throw new UnsupportedOperationException();
 		}
@@ -270,6 +272,7 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 			return 0;
 		}
 
+		@SuppressWarnings("null")
 		@Override
 		public Object getIdByIndex(int index) {
 			assert false;
@@ -294,13 +297,13 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 		}
 
 		@Override
-		public Collection<?> getChildren(Object itemId) {
+		public @Nullable Collection<@NonNull ?> getChildren(Object itemId) {
 			Bucket<?> c = (Bucket<?>) itemId;
 			return c.getChildren();
 		}
 
 		@Override
-		public Object getParent(Object itemId) {
+		public @Nullable Object getParent(Object itemId) {
 			Bucket<?> r = (Bucket<?>) itemId;
 			return r.parent;
 		}
@@ -312,7 +315,7 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 		}
 
 		@Override
-		public boolean setParent(Object itemId, Object newParentId) throws UnsupportedOperationException {
+		public boolean setParent(Object itemId, @Nullable Object newParentId) throws UnsupportedOperationException {
 			throw new UnsupportedOperationException();
 		}
 
@@ -437,7 +440,7 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 				for (Bucket<?> child : children) {
 					doHeader(g, child, depth + 1);
 				}
-			} else if (depth == 0){
+			} else if (depth == 0) {
 				headerRow.getCell(b).setText(SUM_TEXT);
 			}
 		}

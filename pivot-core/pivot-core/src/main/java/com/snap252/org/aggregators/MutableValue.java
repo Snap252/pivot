@@ -1,8 +1,12 @@
 package com.snap252.org.aggregators;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
+@NonNullByDefault({})
 public final class MutableValue<N extends Number> {
+	@NonNull
 	private final Arithmetics<N> arithmetics;
 	private N sum;
 	private N sqrSum;
@@ -14,6 +18,7 @@ public final class MutableValue<N extends Number> {
 	@Nullable
 	private N max;
 
+	@NonNullByDefault
 	public MutableValue(final N n, final Arithmetics<N> arithmetics) {
 		this.arithmetics = arithmetics;
 		this.min = this.max = n;
@@ -23,11 +28,12 @@ public final class MutableValue<N extends Number> {
 	}
 
 	/* neutral element */
-	static <N extends Number> MutableValue<N> getNeutralElement(final Arithmetics<N> arithmetics) {
+	@NonNull
+	static <N extends Number> MutableValue<N> getNeutralElement(@NonNull final Arithmetics<N> arithmetics) {
 		return new MutableValue<N>(arithmetics);
 	}
 
-	private MutableValue(final Arithmetics<N> arithmetics) {
+	private MutableValue(final @NonNull Arithmetics<N> arithmetics) {
 		this.arithmetics = arithmetics;
 		this.sum = sqrSum = arithmetics.getNeutralAddElement();
 		this.min = this.max = null;
@@ -45,6 +51,7 @@ public final class MutableValue<N extends Number> {
 		return this;
 	}
 
+	@NonNull
 	MutableValue<N> merge(final MutableValue<N> other) {
 		assert other.arithmetics == this.arithmetics;
 		this.sum = arithmetics.add(sum, other.sum);
@@ -68,31 +75,26 @@ public final class MutableValue<N extends Number> {
 		int result = 1;
 		result = prime * result + ((arithmetics == null) ? 0 : arithmetics.hashCode());
 		result = prime * result + cnt;
-		@Nullable
-		final N max$ = max;
-		result = prime * result + ((max$ == null) ? 0 : max$.hashCode());
-		@Nullable
-		final N min$ = min;
-		result = prime * result + ((min$ == null) ? 0 : min$.hashCode());
-		result = prime * result + ((sqrSum == null) ? 0 : sqrSum.hashCode());
-		result = prime * result + ((sum == null) ? 0 : sum.hashCode());
+		result = prime * result + ((max != null) ? max.hashCode() : 0);
+		result = prime * result + ((min != null) ? min.hashCode() : 0);
+		result = prime * result + ((sqrSum != null) ? sqrSum.hashCode() : 0);
+		result = prime * result + ((sum != null) ? sum.hashCode() : 0);
 		return result;
 	}
 
 	@Override
-	public boolean equals(@Nullable final Object obj) {
+	public boolean equals(final @Nullable Object obj) {
 		if (this == obj)
 			return true;
 		if (obj == null)
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		final MutableValue<?> other = (MutableValue<?>) obj;
+		@SuppressWarnings("rawtypes")
+		final MutableValue other = (MutableValue) obj;
 
-		if (!arithmetics.equals(other.arithmetics)) {
+		if (!arithmetics.equals(other.arithmetics))
 			return false;
-		}
-
 		if (cnt != other.cnt)
 			return false;
 		@Nullable
@@ -109,9 +111,19 @@ public final class MutableValue<N extends Number> {
 				return false;
 		} else if (!min$.equals(other.min))
 			return false;
-		if (!sqrSum.equals(other.sqrSum))
+		@Nullable
+		final N sqrSum$ = sqrSum;
+		if (sqrSum$ == null) {
+			if (other.sqrSum != null)
+				return false;
+		} else if (!sqrSum$.equals(other.sqrSum))
 			return false;
-		if (!sum.equals(other.sum))
+		@Nullable
+		final N sum$ = sum;
+		if (sum$ == null) {
+			if (other.sum != null)
+				return false;
+		} else if (!sum$.equals(other.sum))
 			return false;
 		return true;
 	}
@@ -140,7 +152,10 @@ public final class MutableValue<N extends Number> {
 		}
 		assert arithmetics.compare(arithmetics.sqr(sum), sqrSum) >= 0 : arithmetics.sqr(sum) + " => " + sqrSum;
 
-		assert max != null && min != null;
-		return new NumberStatistics<N>(cnt, max, min, sum, sqrSum, arithmetics);
+		@SuppressWarnings("null")
+		final N max2 = max;
+		@SuppressWarnings("null")
+		final N min2 = min;
+		return new NumberStatistics<N>(cnt, max2, min2, sum, sqrSum, arithmetics);
 	}
 }

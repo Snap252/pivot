@@ -99,8 +99,8 @@ public class RandomDataGenerator {
 		// Collector<NumberStatistics<Double>, ?, NumberStatistics<Double>>
 		// reducer = NumberStatistics
 		// .getReducer((n1, n2) -> n1 + n2);
-		final Collector<Person, MutableValue<BigDecimal>, @Nullable NumberStatistics<BigDecimal>> reducer = PivotCollectors
-				.getBigDecimalReducer(p -> p.wert, new BigDecimalArithmetics());
+		final Collector<Person, @NonNull MutableValue<BigDecimal>, @Nullable NumberStatistics<BigDecimal>> reducer = PivotCollectors
+				.getNumberReducer(p -> p.wert, new BigDecimalArithmetics());
 
 		final BiConsumer<Writer, @Nullable NumberStatistics<BigDecimal>> cellWriter = (w, ns) -> {
 			if (ns == null) {

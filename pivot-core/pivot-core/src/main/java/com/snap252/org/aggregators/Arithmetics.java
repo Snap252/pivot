@@ -1,6 +1,9 @@
 package com.snap252.org.aggregators;
 
-interface Arithmetics<N extends Number> {
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
+@NonNullByDefault({})
+public interface Arithmetics<N extends Number> {
 
 	N getNeutralAddElement();
 

@@ -18,6 +18,7 @@ import org.vaadin.miki.mapcontainer.MapContainer;
 
 import com.snap252.org.aggregators.BigDecimalArithmetics;
 import com.snap252.org.aggregators.MutableValue;
+import com.snap252.org.aggregators.NullableArithmeticsWrapper;
 import com.snap252.org.aggregators.NumberStatistics;
 import com.snap252.org.aggregators.PivotCollectors;
 import com.snap252.org.pivoting.BiBucketParameter;
@@ -41,13 +42,14 @@ public class PivotUI extends GridLayout {
 	private final HorizontalLayout properties;
 	private BiBucketParameter<Item> p;
 
-	final Collector<Item, MutableValue<BigDecimal>, @Nullable NumberStatistics<BigDecimal>> reducer = PivotCollectors
-			.getBigDecimalReducer(this::apply, new BigDecimalArithmetics());
+	private final Collector<Item, MutableValue<@Nullable BigDecimal>, @Nullable NumberStatistics<@Nullable BigDecimal>> reducer = PivotCollectors
+			.<@NonNull Item, @Nullable BigDecimal>getNumberReducer(this::apply,
+					new NullableArithmeticsWrapper<>(new BigDecimalArithmetics()));
 
 	@Nullable
 	private FilteringComponent<?> valueProperty = null;
 
-	private BigDecimal apply(final Item item) {
+	private @Nullable BigDecimal apply(final Item item) {
 		if (valueProperty != null)
 			return (@NonNull BigDecimal) valueProperty.apply(item);
 		return null;

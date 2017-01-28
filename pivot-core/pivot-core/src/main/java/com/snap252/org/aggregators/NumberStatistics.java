@@ -2,6 +2,9 @@ package com.snap252.org.aggregators;
 
 import java.text.MessageFormat;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
+@NonNullByDefault({})
 public final class NumberStatistics<N extends Number> {
 	public final int cnt;
 	public final N max;

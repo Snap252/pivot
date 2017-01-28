@@ -3,7 +3,9 @@ package com.snap252.org.aggregators;
 import java.math.BigDecimal;
 import java.math.MathContext;
 
-public class BigDecimalArithmetics implements Arithmetics<BigDecimal> {
+import org.eclipse.jdt.annotation.NonNull;
+
+public class BigDecimalArithmetics implements Arithmetics<@NonNull BigDecimal> {
 
 	private final MathContext mathContext;
 

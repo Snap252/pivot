@@ -6,18 +6,22 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
 public class PivotCollectors {
 
-	public static <RawType, N extends Number> Collector<RawType, MutableValue<N>, @Nullable NumberStatistics<N>> getBigDecimalReducer(
-			final Function<RawType, N> extractorFunction, final Arithmetics<N> arithmetics) {
+	@NonNullByDefault({})
+	public static <@NonNull RawType, N extends Number> @NonNull Collector<RawType, @NonNull MutableValue<N>, @Nullable NumberStatistics<N>> getNumberReducer(
+			final Function<RawType, N> extractorFunction, @NonNull final Arithmetics<N> arithmetics) {
 
-		final Supplier<MutableValue<N>> supplier = () -> MutableValue.getNeutralElement(arithmetics);
-		final BiConsumer<MutableValue<N>, RawType> accumulator = (t, u) -> t.addSingle(extractorFunction.apply(u));
-		final BinaryOperator<MutableValue<N>> combiner = MutableValue::merge;
+		final Supplier<@NonNull MutableValue<N>> supplier = () -> MutableValue.getNeutralElement(arithmetics);
+		final BiConsumer<@NonNull MutableValue<N>, RawType> accumulator = (t, u) -> t
+				.addSingle(extractorFunction.apply(u));
+		final BinaryOperator<@NonNull MutableValue<N>> combiner = MutableValue::merge;
 
-		final Function<MutableValue<N>, @Nullable NumberStatistics<N>> finisher = MutableValue::createNumberStatistics;
+		final Function<@NonNull MutableValue<N>, @Nullable NumberStatistics<N>> finisher = MutableValue::createNumberStatistics;
 
 		return Collector.of(supplier, accumulator, combiner, finisher);
 	}

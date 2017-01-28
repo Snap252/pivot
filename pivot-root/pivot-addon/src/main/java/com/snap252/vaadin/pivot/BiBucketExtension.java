@@ -69,7 +69,7 @@ final class BiBucketExtension<@Nullable RAW> {
 			this.cellClass = cellClass;
 		}
 
-		protected void fireValueChange() {
+		private void fireValueChange() {
 			valueResetter.forEach(Runnable::run);
 
 			if (valueChangeListeners.isEmpty())

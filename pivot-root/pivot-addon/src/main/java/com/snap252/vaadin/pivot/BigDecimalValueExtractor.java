@@ -78,6 +78,7 @@ public class BigDecimalValueExtractor extends AbstractFilteringComponent<BigDeci
 
 	@Override
 	public void addValueChangeListener(final ValueChangeListener l) {
+		roundingEnabledCheckBox.addValueChangeListener(l);
 		slider.addValueChangeListener(l);
 	}
 

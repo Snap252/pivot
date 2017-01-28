@@ -1,0 +1,13 @@
+class com/vaadin/data/Property$ValueChangeNotifier
+addListener
+ (Lcom/vaadin/data/Property$ValueChangeListener;)V
+ (L1com/vaadin/data/Property$ValueChangeListener;)V
+addValueChangeListener
+ (Lcom/vaadin/data/Property$ValueChangeListener;)V
+ (L1com/vaadin/data/Property$ValueChangeListener;)V
+removeListener
+ (Lcom/vaadin/data/Property$ValueChangeListener;)V
+ (L1com/vaadin/data/Property$ValueChangeListener;)V
+removeValueChangeListener
+ (Lcom/vaadin/data/Property$ValueChangeListener;)V
+ (L1com/vaadin/data/Property$ValueChangeListener;)V

@@ -57,6 +57,7 @@ public class ValueGetterDnDHandler extends DropHandlerImplementation<FilteringCo
 					/* we need a this-context here */
 					popupButton.removePopupVisibilityListener(this);
 					popupButton.setCaption(createFilter.toString());
+					popupButton.addStyleName(createFilter.getButtonStyles());
 				}
 			};
 

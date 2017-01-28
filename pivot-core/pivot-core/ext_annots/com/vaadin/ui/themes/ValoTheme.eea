@@ -1,0 +1,37 @@
+class com/vaadin/ui/themes/ValoTheme
+BUTTON_BORDERLESS
+ Ljava/lang/String;
+ L1java/lang/String;
+BUTTON_BORDERLESS_COLORED
+ Ljava/lang/String;
+ L1java/lang/String;
+BUTTON_DANGER
+ Ljava/lang/String;
+ L1java/lang/String;
+BUTTON_FRIENDLY
+ Ljava/lang/String;
+ L1java/lang/String;
+BUTTON_ICON_ALIGN_RIGHT
+ Ljava/lang/String;
+ L1java/lang/String;
+BUTTON_ICON_ALIGN_TOP
+ Ljava/lang/String;
+ L1java/lang/String;
+BUTTON_LARGE
+ Ljava/lang/String;
+ L1java/lang/String;
+BUTTON_LINK
+ Ljava/lang/String;
+ L1java/lang/String;
+BUTTON_PRIMARY
+ Ljava/lang/String;
+ L1java/lang/String;
+BUTTON_QUIET
+ Ljava/lang/String;
+ L1java/lang/String;
+BUTTON_SMALL
+ Ljava/lang/String;
+ L1java/lang/String;
+BUTTON_TINY
+ Ljava/lang/String;
+ L1java/lang/String;

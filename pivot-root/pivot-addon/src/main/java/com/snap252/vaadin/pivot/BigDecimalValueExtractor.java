@@ -13,6 +13,7 @@ import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Slider;
+import com.vaadin.ui.themes.ValoTheme;
 
 @NonNullByDefault
 public class BigDecimalValueExtractor extends AbstractFilteringComponent<BigDecimal> {
@@ -83,10 +84,10 @@ public class BigDecimalValueExtractor extends AbstractFilteringComponent<BigDeci
 	}
 
 	@Override
-	public String toString() {
-		if (!roundingEnabled)
-			return super.toString();
-		return super.toString() + " (" + sliderValue + " Stellen )";
-	}
+	public String getButtonStyles() {
+		if (roundingEnabled)
+			return ValoTheme.BUTTON_FRIENDLY;
 
+		return super.getButtonStyles();
+	}
 }

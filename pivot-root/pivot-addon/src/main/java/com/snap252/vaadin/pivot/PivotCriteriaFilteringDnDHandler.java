@@ -57,6 +57,7 @@ public class PivotCriteriaFilteringDnDHandler extends DropHandlerImplementation<
 					/* we need a this-context here */
 					popupButton.removePopupVisibilityListener(this);
 					popupButton.setCaption(createFilter.toString());
+					popupButton.addStyleName(createFilter.getButtonStyles());
 				}
 			};
 

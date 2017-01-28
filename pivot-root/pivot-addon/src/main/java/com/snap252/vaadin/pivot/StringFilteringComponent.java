@@ -8,15 +8,16 @@ import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Slider;
+import com.vaadin.ui.themes.ValoTheme;
 
 @NonNullByDefault
 public class StringFilteringComponent extends AbstractFilteringComponent<String> {
-	private FormLayout comp;
-	private Slider slider;
+	private final FormLayout comp;
+	private final Slider slider;
 
-	public StringFilteringComponent(NameType nameType) {
+	public StringFilteringComponent(final NameType nameType) {
 		super(nameType);
-		FormLayout formLayout = new FormLayout();
+		final FormLayout formLayout = new FormLayout();
 		slider = new Slider(0, 10);
 		slider.setCaption("SubString");
 		formLayout.addComponent(slider);
@@ -30,9 +31,9 @@ public class StringFilteringComponent extends AbstractFilteringComponent<String>
 	}
 
 	@Override
-	public String apply(Item item) {
-		int sliderValue = slider.getValue().intValue();
-		String ret = super.apply(item);
+	public String apply(final Item item) {
+		final int sliderValue = slider.getValue().intValue();
+		final String ret = super.apply(item);
 		if (sliderValue > 0 && sliderValue < ret.length()) {
 			return ret.substring(0, sliderValue);
 		}
@@ -40,15 +41,23 @@ public class StringFilteringComponent extends AbstractFilteringComponent<String>
 	}
 
 	@Override
-	public void addValueChangeListener(ValueChangeListener l) {
+	public void addValueChangeListener(final ValueChangeListener l) {
 		slider.addValueChangeListener(l);
 	}
 
 	@Override
 	public @NonNull String toString() {
-		Double v = slider.getValue();
+		final Double v = slider.getValue();
 		if (v == null || v.intValue() == 0)
 			return super.toString();
 		return super.toString() + " (" + v.intValue() + ")";
+	}
+
+	@Override
+	public @NonNull String getButtonStyles() {
+		final Double v = slider.getValue();
+		if (v == null || v.intValue() == 0)
+			return super.getButtonStyles();
+		return ValoTheme.BUTTON_FRIENDLY;
 	}
 }

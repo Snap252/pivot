@@ -15,4 +15,8 @@ public interface FilteringComponent<T extends Comparable<T>> extends PivotCriter
 	abstract AbstractComponent getComponent();
 
 	abstract void addValueChangeListener(ValueChangeListener l);
+
+	default String getButtonStyles() {
+		return "";
+	}
 }

@@ -23,6 +23,9 @@ public abstract class Bucket<V> implements Predicate<@NonNull V> {
 	private final int level;
 
 	@Nullable
+	public Object internalValue;
+
+	@Nullable
 	public final Bucket<V> parent;
 
 	public final @Nullable String getStyleClass() {

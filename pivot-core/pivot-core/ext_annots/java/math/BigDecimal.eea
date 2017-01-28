@@ -29,12 +29,21 @@ multiply
 negate
  ()Ljava/math/BigDecimal;
  ()L1java/math/BigDecimal;
+round
+ (Ljava/math/MathContext;)Ljava/math/BigDecimal;
+ (Ljava/math/MathContext;)L1java/math/BigDecimal;
 scaleByPowerOfTen
  (I)Ljava/math/BigDecimal;
  (I)L1java/math/BigDecimal;
+setScale
+ (ILjava/math/RoundingMode;)Ljava/math/BigDecimal;
+ (ILjava/math/RoundingMode;)L1java/math/BigDecimal;
 subtract
  (Ljava/math/BigDecimal;)Ljava/math/BigDecimal;
  (L1java/math/BigDecimal;)L1java/math/BigDecimal;
 toPlainString
  ()Ljava/lang/String;
  ()L1java/lang/String;
+valueOf
+ (J)Ljava/math/BigDecimal;
+ (J)L1java/math/BigDecimal;

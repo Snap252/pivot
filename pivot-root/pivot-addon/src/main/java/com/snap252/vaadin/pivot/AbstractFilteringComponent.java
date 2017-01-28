@@ -11,7 +11,7 @@ public abstract class AbstractFilteringComponent<T extends Comparable<T>>
 	protected final NameType nameType;
 	protected final Object propertyId;
 
-	public AbstractFilteringComponent(NameType nameType) {
+	public AbstractFilteringComponent(final NameType nameType) {
 		this.nameType = nameType;
 		this.propertyId = nameType.propertyId;
 	}
@@ -21,9 +21,9 @@ public abstract class AbstractFilteringComponent<T extends Comparable<T>>
 		return nameType.propertyId.toString();
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "null" })
 	@Override
-	public T apply(Item item) {
+	public T apply(final Item item) {
 		return (T) item.getItemProperty(propertyId).getValue();
 	}
 }

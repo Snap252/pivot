@@ -11,6 +11,7 @@ import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.vaadin.miki.mapcontainer.MapContainer;
@@ -40,9 +41,17 @@ public class PivotUI extends GridLayout {
 	private final HorizontalLayout properties;
 	private BiBucketParameter<Item> p;
 
-	@SuppressWarnings("null")
 	final Collector<Item, MutableValue<BigDecimal>, @Nullable NumberStatistics<BigDecimal>> reducer = PivotCollectors
-			.getReducer(item -> (BigDecimal) item.getItemProperty("wert").getValue(), new BigDecimalArithmetics());
+			.getReducer(this::apply, new BigDecimalArithmetics());
+
+	@Nullable
+	private FilteringComponent<?> valueProperty = null;
+
+	private BigDecimal apply(final Item item) {
+		if (valueProperty != null)
+			return (@NonNull BigDecimal) valueProperty.apply(item);
+		return null;
+	}
 
 	@SuppressWarnings("null")
 	public PivotUI() {
@@ -63,9 +72,15 @@ public class PivotUI extends GridLayout {
 			final DDVerticalLayout aggregator = new DDVerticalLayout();
 			aggregator.setSpacing(true);
 			final DragAndDropWrapper aggregatorDragAndDropWrapper = new DragAndDropWrapper(aggregator);
-			final DropHandler aggDopHandler = new PivotCriteriaFilteringDnDHandler(aggregator, true, i -> {
-				System.err.println(i);
+			final DropHandler aggDopHandler = new ValueGetterDnDHandler(aggregator, true, i -> {
+				if (!i.isEmpty())
+					valueProperty = i.get(0);
+				else
+					valueProperty = null;
+
+				pivotGrid$.setContainerDataSource(p, reducer);
 			});
+
 			aggregator.setDropHandler(aggDopHandler);
 			aggregatorDragAndDropWrapper.setDropHandler(aggDopHandler);
 

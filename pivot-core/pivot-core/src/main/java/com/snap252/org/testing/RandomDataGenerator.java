@@ -46,6 +46,7 @@ public class RandomDataGenerator {
 	}
 
 	public static void main(final String[] args) throws Exception {
+		@SuppressWarnings("deprecation")
 		final BiBucketParameter<Person> parameter = new BiBucketParameter<Person>(createPersons(20000))
 				.setColFnkt(new NamedPivotCriteria<>(p -> p.birthday.getYear() + 1900, "GebDat(Jahr)"),
 						new NamedPivotCriteria<>(p -> p.birthday.getMonth() + 1, "GebDat(Monat)")
@@ -71,7 +72,8 @@ public class RandomDataGenerator {
 		return getAsStream(cnt,
 				r -> new Person(random(TestData.vorname), random(TestData.nachname), r.nextInt(60) + 10,
 						random(Geschl.values()), new BigDecimal(r.nextInt(10001)).scaleByPowerOfTen(-2),
-						new Date((RANDOM.nextInt(1200) - 750) * 86400000L))).collect(Collectors.toList());
+						r.nextInt(1793), new Date((RANDOM.nextInt(1200) - 750) * 86400000L)))
+								.collect(Collectors.toList());
 	}
 
 	protected static void write(final List<Person> personen, final BiBucket<Person> biBucket) {
@@ -131,14 +133,16 @@ public class RandomDataGenerator {
 		private final int alter;
 		private final BigDecimal wert;
 		private final Date birthday;
+		private final int wertGanzzahl;
 
 		public Person(final String vorname, final String nachname, final int alter, final Geschl g,
-				final BigDecimal wert, final Date birthday) {
+				final BigDecimal wert, final int wertGanzzahl, final Date birthday) {
 			this.vorname = vorname;
 			this.nachname = nachname;
 			this.alter = alter;
 			this.geschlecht = g;
 			this.wert = wert;
+			this.wertGanzzahl = wertGanzzahl;
 			this.birthday = birthday;
 		}
 
@@ -162,6 +166,10 @@ public class RandomDataGenerator {
 			return wert;
 		}
 
+		public int getWertGanzzahl() {
+			return wertGanzzahl;
+		}
+
 		public Date getGeburtstag() {
 			return birthday;
 		}
@@ -169,7 +177,8 @@ public class RandomDataGenerator {
 		@Override
 		public String toString() {
 			return "Person [vorname=" + vorname + ", nachname=" + nachname + ", geschlecht=" + geschlecht + ", alter="
-					+ alter + "]";
+					+ alter + ", wert=" + wert + ", birthday=" + birthday + ", wertGanzzahl=" + wertGanzzahl + "]";
 		}
+
 	}
 }

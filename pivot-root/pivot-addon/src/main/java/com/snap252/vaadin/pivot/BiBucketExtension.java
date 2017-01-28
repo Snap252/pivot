@@ -17,9 +17,9 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
-import com.snap252.org.pivoting.BiBucket;
 import com.snap252.org.pivoting.BiBucketParameter;
 import com.snap252.org.pivoting.Bucket;
+import com.snap252.org.pivoting.RootBucket;
 import com.snap252.vaadin.pivot.BiBucketExtension.BucketContainer.BucketItem.CellProperty;
 import com.vaadin.data.Container.Hierarchical;
 import com.vaadin.data.Container.Indexed;
@@ -37,9 +37,14 @@ import com.vaadin.ui.Grid.HeaderRow;
 import com.vaadin.ui.themes.ValoTheme;
 
 @NonNullByDefault
-final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
-	BiBucketExtension(BiBucketParameter<RAW> p) throws IllegalArgumentException {
-		super(p);
+final class BiBucketExtension<@Nullable RAW> {
+	private final RootBucket<RAW> rowBucket;
+	private final RootBucket<RAW> colBucket;
+
+	BiBucketExtension(final BiBucketParameter<RAW> p) throws IllegalArgumentException {
+		rowBucket = new RootBucket<>("row", p.values, p.rowFnkt);
+		colBucket = new RootBucket<>("col", p.values, p.colFnkt);
+
 		if (rowBucket.getSize(1) > 10000)
 			throw new IllegalArgumentException("too many rows: " + rowBucket.getSize(1));
 		if (colBucket.getSize(1) > 100)
@@ -52,21 +57,21 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 
 	class BucketContainer<R, W> implements Indexed, Hierarchical {
 		private final Collector<RAW, W, R> collector;
-		private Class<? extends R> cellClass;
+		private final Class<? extends R> cellClass;
 
-		public BucketContainer(Collector<RAW, W, R> collector, Class<? extends R> cellClass) {
+		public BucketContainer(final Collector<RAW, W, R> collector, final Class<? extends R> cellClass) {
 			this.collector = collector;
 			this.cellClass = cellClass;
 		}
 
 		@Override
-		public @Nullable Object nextItemId(Object itemId) {
+		public @Nullable Object nextItemId(final Object itemId) {
 			assert false;
 			return null;
 		}
 
 		@Override
-		public @Nullable Object prevItemId(Object itemId) {
+		public @Nullable Object prevItemId(final Object itemId) {
 			assert false;
 			return null;
 		}
@@ -84,25 +89,25 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 		}
 
 		@Override
-		public boolean isFirstId(Object itemId) {
+		public boolean isFirstId(final Object itemId) {
 			assert false;
 			return false;
 		}
 
 		@Override
-		public boolean isLastId(Object itemId) {
+		public boolean isLastId(final Object itemId) {
 			assert false;
 			return false;
 		}
 
 		@Override
-		public @Nullable Object addItemAfter(Object previousItemId) throws UnsupportedOperationException {
+		public @Nullable Object addItemAfter(final Object previousItemId) throws UnsupportedOperationException {
 			assert false;
 			return null;
 		}
 
 		@Override
-		public @Nullable Item addItemAfter(Object previousItemId, Object newItemId)
+		public @Nullable Item addItemAfter(final Object previousItemId, final Object newItemId)
 				throws UnsupportedOperationException {
 			assert false;
 			return null;
@@ -118,7 +123,7 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 
 		@SuppressWarnings({ "unchecked" })
 		@Override
-		public Item getItem(Object itemId) {
+		public Item getItem(final Object itemId) {
 			return cache.computeIfAbsent(itemId, x -> new BucketItem((Bucket<RAW>) x));
 		}
 
@@ -128,10 +133,10 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 				private final Bucket<RAW> c;
 				private final R v;
 
-				public CellProperty(Bucket<RAW> colBucket) {
+				public CellProperty(final Bucket<RAW> colBucket) {
 					c = colBucket;
 					assert rowBucket != c;
-					R ret = rowBucket.filterOwnValues(c).collect(collector);
+					final R ret = rowBucket.filterOwnValues(c).collect(collector);
 					this.v = ret;
 
 				}
@@ -142,7 +147,7 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 				}
 
 				@Override
-				public void setValue(@Nullable Object newValue) throws ReadOnlyException {
+				public void setValue(@Nullable final Object newValue) throws ReadOnlyException {
 					throw new ReadOnlyException();
 				}
 
@@ -157,13 +162,13 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 				}
 
 				@Override
-				public void setReadOnly(boolean newStatus) {
+				public void setReadOnly(final boolean newStatus) {
 				}
 			}
 
 			private final Bucket<RAW> rowBucket;
 
-			public BucketItem(Bucket<RAW> itemId) {
+			public BucketItem(final Bucket<RAW> itemId) {
 				this.rowBucket = itemId;
 			}
 
@@ -171,7 +176,7 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 
 			@SuppressWarnings({ "unchecked" })
 			@Override
-			public @NonNull Property<?> getItemProperty(Object id) {
+			public @NonNull Property<?> getItemProperty(final Object id) {
 				if (id == colProp) {
 					return new ObjectProperty<>(rowBucket.getBucketValue());
 				}
@@ -186,13 +191,13 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 			}
 
 			@Override
-			public boolean addItemProperty(Object id, @SuppressWarnings("rawtypes") Property property)
+			public boolean addItemProperty(final Object id, @SuppressWarnings("rawtypes") final Property property)
 					throws UnsupportedOperationException {
 				throw new UnsupportedOperationException();
 			}
 
 			@Override
-			public boolean removeItemProperty(Object id) throws UnsupportedOperationException {
+			public boolean removeItemProperty(final Object id) throws UnsupportedOperationException {
 				throw new UnsupportedOperationException();
 			}
 
@@ -200,7 +205,7 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 
 		@Override
 		public Collection<?> getContainerPropertyIds() {
-			List<Object> collect = colBucket.stream().collect(toList());
+			final List<Object> collect = colBucket.stream().collect(toList());
 			collect.add(0, colProp);
 			return collect;
 		}
@@ -211,13 +216,13 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 		}
 
 		@Override
-		public @Nullable Property<?> getContainerProperty(Object itemId, Object propertyId) {
+		public @Nullable Property<?> getContainerProperty(final Object itemId, final Object propertyId) {
 			assert false;
 			return null;
 		}
 
 		@Override
-		public Class<?> getType(Object propertyId) {
+		public Class<?> getType(final Object propertyId) {
 			return cellClass;
 		}
 
@@ -229,14 +234,14 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 		}
 
 		@Override
-		public boolean containsId(Object itemId) {
+		public boolean containsId(final Object itemId) {
 			return true;
 			// assert false;
 			// return false;
 		}
 
 		@Override
-		public Item addItem(Object itemId) throws UnsupportedOperationException {
+		public Item addItem(final Object itemId) throws UnsupportedOperationException {
 			throw new UnsupportedOperationException();
 		}
 
@@ -246,18 +251,18 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 		}
 
 		@Override
-		public boolean removeItem(Object itemId) throws UnsupportedOperationException {
+		public boolean removeItem(final Object itemId) throws UnsupportedOperationException {
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
-		public boolean addContainerProperty(Object propertyId, Class<?> type, @Nullable Object defaultValue)
-				throws UnsupportedOperationException {
+		public boolean addContainerProperty(final Object propertyId, final Class<?> type,
+				@Nullable final Object defaultValue) throws UnsupportedOperationException {
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
-		public boolean removeContainerProperty(Object propertyId) throws UnsupportedOperationException {
+		public boolean removeContainerProperty(final Object propertyId) throws UnsupportedOperationException {
 			throw new UnsupportedOperationException();
 		}
 
@@ -267,44 +272,44 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 		}
 
 		@Override
-		public int indexOfId(Object itemId) {
+		public int indexOfId(final Object itemId) {
 			assert false;
 			return 0;
 		}
 
 		@SuppressWarnings("null")
 		@Override
-		public Object getIdByIndex(int index) {
+		public Object getIdByIndex(final int index) {
 			assert false;
 			return null;
 		}
 
 		@Override
-		public List<?> getItemIds(int startIndex, int numberOfItems) {
+		public List<?> getItemIds(final int startIndex, final int numberOfItems) {
 			return rowBucket.stream().skip(startIndex).limit(numberOfItems).collect(toList());
 			// assert false;
 			// return null;
 		}
 
 		@Override
-		public Object addItemAt(int index) throws UnsupportedOperationException {
+		public Object addItemAt(final int index) throws UnsupportedOperationException {
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
-		public Item addItemAt(int index, Object newItemId) throws UnsupportedOperationException {
+		public Item addItemAt(final int index, final Object newItemId) throws UnsupportedOperationException {
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
-		public @Nullable Collection<@NonNull ?> getChildren(Object itemId) {
-			Bucket<?> c = (Bucket<?>) itemId;
+		public @Nullable Collection<@NonNull ?> getChildren(final Object itemId) {
+			final Bucket<?> c = (Bucket<?>) itemId;
 			return c.getChildren();
 		}
 
 		@Override
-		public @Nullable Object getParent(Object itemId) {
-			Bucket<?> r = (Bucket<?>) itemId;
+		public @Nullable Object getParent(final Object itemId) {
+			final Bucket<?> r = (Bucket<?>) itemId;
 			return r.parent;
 		}
 
@@ -315,29 +320,30 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 		}
 
 		@Override
-		public boolean setParent(Object itemId, @Nullable Object newParentId) throws UnsupportedOperationException {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public boolean areChildrenAllowed(Object itemId) {
-			assert false;
-			return false;
-		}
-
-		@Override
-		public boolean setChildrenAllowed(Object itemId, boolean areChildrenAllowed)
+		public boolean setParent(final Object itemId, @Nullable final Object newParentId)
 				throws UnsupportedOperationException {
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
-		public boolean isRoot(Object itemId) {
+		public boolean areChildrenAllowed(final Object itemId) {
+			assert false;
+			return false;
+		}
+
+		@Override
+		public boolean setChildrenAllowed(final Object itemId, final boolean areChildrenAllowed)
+				throws UnsupportedOperationException {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean isRoot(final Object itemId) {
 			return itemId == rowBucket;
 		}
 
 		@Override
-		public boolean hasChildren(Object itemId) {
+		public boolean hasChildren(final Object itemId) {
 			return ((Bucket<?>) itemId).getChildren() != null;
 		}
 	}
@@ -345,13 +351,13 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 	public final class GridWriter<W, R> {
 
 		private static final String SUM_TEXT = "\u2211";
-		private Collector<RAW, W, R> collector;
+		private final Collector<RAW, W, R> collector;
 
 		private GridWriter(final Collector<RAW, W, R> collector) {
 			this.collector = collector;
 		}
 
-		public void writeGrid(final Grid g, Class<? super R> modelType, Consumer<Column> columnHandler) {
+		public void writeGrid(final Grid g, final Class<? super R> modelType, final Consumer<Column> columnHandler) {
 			// g.setFrozenColumnCount(0);
 			for (int i = 1; i < g.getHeaderRowCount(); i++) {
 				if (g.getDefaultHeaderRow() != g.getHeaderRow(i))
@@ -366,7 +372,8 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 			g.removeAllColumns();
 
 			@SuppressWarnings("unchecked")
-			BiBucketExtension<RAW>.BucketContainer<R, W> bc = new BucketContainer<>(collector, (Class<R>) modelType);
+			final BiBucketExtension<RAW>.BucketContainer<R, W> bc = new BucketContainer<>(collector,
+					(Class<R>) modelType);
 			g.setContainerDataSource(bc);
 			doHeader(g, colBucket, 0);
 
@@ -382,8 +389,8 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 				}
 
 				@SuppressWarnings({ "unchecked", "rawtypes" })
-				BucketContainer<R, W>.BucketItem.CellProperty cellProperty = (CellProperty) cell.getProperty();
-				R rawValue = cellProperty.getValue();
+				final BucketContainer<R, W>.BucketItem.CellProperty cellProperty = (CellProperty) cell.getProperty();
+				final R rawValue = cellProperty.getValue();
 				if (rawValue == null)
 					return null;
 				return rawValue.toString().replace("; ", "<br/>").replace("NumberStatistics [", "").replace("]",
@@ -391,23 +398,21 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 			});
 
 			g.getColumns().stream().filter(c -> c.getPropertyId() != bc.colProp).forEach(columnHandler);
-
-			// g.setFrozenColumnCount(Math.min(2, g.getColumns().size()));
 		}
 
-		protected void doHeader(Grid g, Bucket<?> b, int depth) {
+		protected void doHeader(final Grid g, final Bucket<?> b, final int depth) {
 			if (depth >= g.getHeaderRowCount()) {
 				g.appendHeaderRow();
 				assert depth < g.getHeaderRowCount();
 			}
-			HeaderRow headerRow = g.getHeaderRow(depth);
+			final HeaderRow headerRow = g.getHeaderRow(depth);
 
-			List<? extends Bucket<?>> children = b.getChildren();
+			final List<? extends Bucket<?>> children = b.getChildren();
 			if (children != null) {
 
-				Map<Bucket<?>, Object[]> l = new LinkedHashMap<>();
-				for (Bucket<?> x : children) {
-					Object @NonNull [] array = x.stream().toArray();
+				final Map<Bucket<?>, Object[]> l = new LinkedHashMap<>();
+				for (final Bucket<?> x : children) {
+					final Object @NonNull [] array = x.stream().toArray();
 					l.put(x, array);
 				}
 
@@ -415,14 +420,15 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 					final HeaderCell join;
 					if (oa.getValue().length > 1) {
 						join = headerRow.join(oa.getValue());
-						Button collapser = new Button(String.valueOf(oa.getKey().bucketValue), FontAwesome.CARET_DOWN);
+						final Button collapser = new Button(String.valueOf(oa.getKey().bucketValue),
+								FontAwesome.CARET_DOWN);
 						collapser.addStyleName(ValoTheme.BUTTON_BORDERLESS);
 						collapser.addStyleName("pivot-grid-expander");
 						collapser.addClickListener(new ClickListener() {
 							private boolean collapsed;
 
 							@Override
-							public void buttonClick(ClickEvent event) {
+							public void buttonClick(final ClickEvent event) {
 								collapsed = !collapsed;
 								event.getButton().setIcon(collapsed ? FontAwesome.CARET_RIGHT : FontAwesome.CARET_DOWN);
 								Stream.of(oa.getValue()).skip(1).map(g::getColumn).forEach(c -> c.setHidden(collapsed));
@@ -437,7 +443,7 @@ final class BiBucketExtension<@Nullable RAW> extends BiBucket<RAW> {
 					}
 				});
 				headerRow.getCell(b).setText(SUM_TEXT);
-				for (Bucket<?> child : children) {
+				for (final Bucket<?> child : children) {
 					doHeader(g, child, depth + 1);
 				}
 			} else if (depth == 0) {

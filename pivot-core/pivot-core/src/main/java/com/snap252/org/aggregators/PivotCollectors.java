@@ -10,7 +10,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 public class PivotCollectors {
 
-	public static <RawType, N extends Number> Collector<RawType, MutableValue<N>, @Nullable NumberStatistics<N>> getReducer(
+	public static <RawType, N extends Number> Collector<RawType, MutableValue<N>, @Nullable NumberStatistics<N>> getBigDecimalReducer(
 			final Function<RawType, N> extractorFunction, final Arithmetics<N> arithmetics) {
 
 		final Supplier<MutableValue<N>> supplier = () -> MutableValue.getNeutralElement(arithmetics);

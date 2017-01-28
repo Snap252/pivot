@@ -100,7 +100,7 @@ public class RandomDataGenerator {
 		// reducer = NumberStatistics
 		// .getReducer((n1, n2) -> n1 + n2);
 		final Collector<Person, MutableValue<BigDecimal>, @Nullable NumberStatistics<BigDecimal>> reducer = PivotCollectors
-				.getReducer(p -> p.wert, new BigDecimalArithmetics());
+				.getBigDecimalReducer(p -> p.wert, new BigDecimalArithmetics());
 
 		final BiConsumer<Writer, @Nullable NumberStatistics<BigDecimal>> cellWriter = (w, ns) -> {
 			if (ns == null) {

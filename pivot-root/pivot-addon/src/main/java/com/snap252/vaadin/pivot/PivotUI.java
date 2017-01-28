@@ -42,7 +42,7 @@ public class PivotUI extends GridLayout {
 	private BiBucketParameter<Item> p;
 
 	final Collector<Item, MutableValue<BigDecimal>, @Nullable NumberStatistics<BigDecimal>> reducer = PivotCollectors
-			.getReducer(this::apply, new BigDecimalArithmetics());
+			.getBigDecimalReducer(this::apply, new BigDecimalArithmetics());
 
 	@Nullable
 	private FilteringComponent<?> valueProperty = null;

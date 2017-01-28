@@ -21,16 +21,17 @@ public class PivotGrid extends TreeGrid {
 	}
 
 	@SuppressWarnings("null")
-	public <@Nullable T> void setContainerDataSource(final BiBucketParameter<T> bucketParams,
+	public <@Nullable T> @Nullable Runnable setContainerDataSource(final BiBucketParameter<T> bucketParams,
 			final Collector<T, MutableValue<BigDecimal>, @Nullable NumberStatistics<BigDecimal>> c) {
 		try {
 			setComponentError(null);
-			new BiBucketExtension<>(bucketParams).createGridWriter(c).writeGrid(this, NumberStatistics.class,
+			return new BiBucketExtension<>(bucketParams).createGridWriter(c).writeGrid(this, NumberStatistics.class,
 					column -> column.setRenderer(new StatisticsRenderer("---", this)));
 		} catch (final IllegalArgumentException e) {
 			removeAllColumns();
 			setContainerDataSource(new IndexedContainer());
 			setComponentError(new UserError(e.getMessage()));
+			return null;
 		}
 	}
 }

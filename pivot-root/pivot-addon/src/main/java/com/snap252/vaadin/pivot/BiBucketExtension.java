@@ -6,6 +6,7 @@ import static java.util.stream.Collectors.toList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,7 @@ import com.vaadin.data.Container.Hierarchical;
 import com.vaadin.data.Container.Indexed;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
+import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
@@ -57,11 +59,34 @@ final class BiBucketExtension<@Nullable RAW> {
 
 	class BucketContainer<R, W> implements Indexed, Hierarchical {
 		private final Collector<RAW, W, R> collector;
+		private final Collection<ValueChangeListener> valueChangeListeners = new HashSet<>();
+		private final Collection<Runnable> valueResetter = new HashSet<>();
+
 		private final Class<? extends R> cellClass;
 
 		public BucketContainer(final Collector<RAW, W, R> collector, final Class<? extends R> cellClass) {
 			this.collector = collector;
 			this.cellClass = cellClass;
+		}
+
+		protected void fireValueChange() {
+			valueResetter.forEach(Runnable::run);
+
+			if (valueChangeListeners.isEmpty())
+				return;
+
+			final Property.ValueChangeEvent event = new Property.ValueChangeEvent() {
+
+				@Override
+				public @Nullable Property<?> getProperty() {
+					assert false;
+					return null;
+				}
+			};
+
+			for (final Property.ValueChangeListener valueChangeListener : valueChangeListeners) {
+				valueChangeListener.valueChange(event);
+			}
 		}
 
 		@Override
@@ -128,22 +153,27 @@ final class BiBucketExtension<@Nullable RAW> {
 		}
 
 		class BucketItem implements Item {
-			class CellProperty implements Property<R> {
+			class CellProperty implements Property<R>, Property.ValueChangeNotifier {
 
 				private final Bucket<RAW> c;
-				private final R v;
+				@Nullable
+				private R v;
 
 				public CellProperty(final Bucket<RAW> colBucket) {
 					c = colBucket;
 					assert rowBucket != c;
-					final R ret = rowBucket.filterOwnValues(c).collect(collector);
-					this.v = ret;
-
+					valueResetter.add(() -> v = null);
 				}
 
 				@Override
 				public R getValue() {
-					return v;
+					if (v != null)
+						return v;
+					else {
+						final R newValue = rowBucket.filterOwnValues(c).collect(collector);
+						v = newValue;
+						return newValue;
+					}
 				}
 
 				@Override
@@ -163,6 +193,27 @@ final class BiBucketExtension<@Nullable RAW> {
 
 				@Override
 				public void setReadOnly(final boolean newStatus) {
+				}
+
+				@Override
+				public void addValueChangeListener(final com.vaadin.data.Property.ValueChangeListener listener) {
+					valueChangeListeners.add(listener);
+				}
+
+				@Override
+				public void addListener(final com.vaadin.data.Property.ValueChangeListener listener) {
+					addValueChangeListener(listener);
+
+				}
+
+				@Override
+				public void removeValueChangeListener(final com.vaadin.data.Property.ValueChangeListener listener) {
+					valueChangeListeners.remove(listener);
+				}
+
+				@Override
+				public void removeListener(final com.vaadin.data.Property.ValueChangeListener listener) {
+					removeValueChangeListener(listener);
 				}
 			}
 
@@ -357,7 +408,8 @@ final class BiBucketExtension<@Nullable RAW> {
 			this.collector = collector;
 		}
 
-		public void writeGrid(final Grid g, final Class<? super R> modelType, final Consumer<Column> columnHandler) {
+		public Runnable writeGrid(final Grid g, final Class<? super R> modelType,
+				final Consumer<Column> columnHandler) {
 			// g.setFrozenColumnCount(0);
 			for (int i = 1; i < g.getHeaderRowCount(); i++) {
 				if (g.getDefaultHeaderRow() != g.getHeaderRow(i))
@@ -398,6 +450,7 @@ final class BiBucketExtension<@Nullable RAW> {
 			});
 
 			g.getColumns().stream().filter(c -> c.getPropertyId() != bc.colProp).forEach(columnHandler);
+			return bc::fireValueChange;
 		}
 
 		protected void doHeader(final Grid g, final Bucket<?> b, final int depth) {

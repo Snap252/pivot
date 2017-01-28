@@ -48,6 +48,8 @@ public class PivotUI extends GridLayout {
 
 	@Nullable
 	private FilteringComponent<?> valueProperty = null;
+	
+	private @Nullable Runnable propertyRefresher;
 
 	private @Nullable BigDecimal apply(final Item item) {
 		if (valueProperty != null)
@@ -80,7 +82,10 @@ public class PivotUI extends GridLayout {
 				else
 					valueProperty = null;
 
-				pivotGrid$.setContainerDataSource(p, reducer);
+				if (propertyRefresher != null)
+					propertyRefresher.run();
+				// propertyRefresher = pivotGrid$.setContainerDataSource(p,
+				// reducer);
 			});
 
 			aggregator.setDropHandler(aggDopHandler);
@@ -88,7 +93,7 @@ public class PivotUI extends GridLayout {
 
 			final DDHorizontalLayout cols = new DDHorizontalLayout();
 			final DropHandler dropHandler = new PivotCriteriaFilteringDnDHandler(cols, false,
-					colFnkts -> pivotGrid$.setContainerDataSource(p.setColFnkt(colFnkts), reducer));
+					colFnkts -> propertyRefresher = pivotGrid$.setContainerDataSource(p.setColFnkt(colFnkts), reducer));
 			cols.setDropHandler(dropHandler);
 			cols.setSpacing(true);
 
@@ -100,7 +105,7 @@ public class PivotUI extends GridLayout {
 		{
 			final DDVerticalLayout rows = new DDVerticalLayout();
 			final DropHandler dropHandler = new PivotCriteriaFilteringDnDHandler(rows, true,
-					rowFnkts -> pivotGrid$.setContainerDataSource(p.setRowFnkt(rowFnkts), reducer));
+					rowFnkts -> propertyRefresher = pivotGrid$.setContainerDataSource(p.setRowFnkt(rowFnkts), reducer));
 			rows.setDropHandler(dropHandler);
 			rows.setSpacing(true);
 

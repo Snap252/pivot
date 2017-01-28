@@ -14,10 +14,10 @@ import elemental.json.JsonValue;
 @SuppressWarnings("rawtypes")
 public class StatisticsRenderer extends AbstractRenderer<NumberStatistics> {
 
-	private DecimalFormat decimalFormat;
-	private Component c;
+	private final DecimalFormat decimalFormat;
+	private final Component c;
 
-	public StatisticsRenderer(String nullRepresentation, Component c) {
+	public StatisticsRenderer(final String nullRepresentation, final Component c) {
 		super(NumberStatistics.class, nullRepresentation);
 		this.c = c;
 		decimalFormat = new DecimalFormat("########################0.0");
@@ -25,16 +25,18 @@ public class StatisticsRenderer extends AbstractRenderer<NumberStatistics> {
 
 	@SuppressWarnings("null")
 	@Override
-	public JsonValue encode(NumberStatistics value) {
+	public JsonValue encode(final NumberStatistics value) {
 		if (value == null)
 			return encode(null, ClientNS.class);
 
 		return encode(new ClientNS(toString(value.sum), toString(value.max)), ClientNS.class);
 	}
 
-	private String toString(Number n) {
+	private String toString(final Number n) {
+		if (n == null)
+			return "";
 		if (n instanceof BigDecimal) {
-			BigDecimal bigDecimal = (BigDecimal) n;
+			final BigDecimal bigDecimal = (BigDecimal) n;
 			decimalFormat.setMinimumFractionDigits(bigDecimal.scale());
 			decimalFormat.setDecimalFormatSymbols(DecimalFormatSymbols.getInstance(c.getLocale()));
 			return decimalFormat.format(bigDecimal);

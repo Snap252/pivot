@@ -9,7 +9,6 @@ import org.vaadin.hene.popupbutton.PopupButton.PopupVisibilityEvent;
 import org.vaadin.hene.popupbutton.PopupButton.PopupVisibilityListener;
 
 import com.snap252.vaadin.pivot.DropHandlerImplementation;
-import com.snap252.vaadin.pivot.FilteringComponent;
 import com.snap252.vaadin.pivot.NameType;
 import com.vaadin.event.dd.DragAndDropEvent;
 import com.vaadin.ui.AbstractComponent;
@@ -19,22 +18,22 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
 
-public class ValueGetterDnDHandler extends DropHandlerImplementation<FilteringComponent<?>> {
+public class ValueGetterDnDHandler extends DropHandlerImplementation<FilteringRenderingComponent<?>> {
 
 	private final ValueFactory valueFactory = new ValueFactory();
 
 	public ValueGetterDnDHandler(final AbstractOrderedLayout cols, final boolean vertical,
-			final Consumer<List<FilteringComponent<?>>> refresher) {
+			final Consumer<List<FilteringRenderingComponent<?>>> refresher) {
 		super(cols, vertical, refresher);
 	}
 
 	@Override
-	protected FilteringComponent<?> createNew(final Object data) {
+	protected FilteringRenderingComponent<?> createNew(final Object data) {
 		return valueFactory.createFilter((NameType) data);
 	}
 
 	@Override
-	protected AbstractComponent createUIComponent(final FilteringComponent<?> createFilter) {
+	protected AbstractComponent createUIComponent(final FilteringRenderingComponent<?> createFilter) {
 		final AbstractComponent component = createFilter.getComponent();
 
 		final Button b;

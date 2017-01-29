@@ -5,7 +5,6 @@ import java.math.RoundingMode;
 
 import org.eclipse.jdt.annotation.NonNull;
 
-import com.snap252.vaadin.pivot.AbstractFilteringComponent;
 import com.snap252.vaadin.pivot.NameType;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -16,7 +15,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Slider;
 import com.vaadin.ui.themes.ValoTheme;
 
-public class BigDecimalValueExtractor extends AbstractFilteringComponent<BigDecimal> {
+public class BigDecimalValueExtractor extends AbstractValueGetterRenderingComponent<BigDecimal> {
 	private final FormLayout comp;
 	private final Slider slider;
 	private final CheckBox roundingEnabledCheckBox;

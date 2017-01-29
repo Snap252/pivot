@@ -15,6 +15,8 @@ public interface Arithmetics<N extends Number> {
 
 	N mul(N n1, N n2);
 
+	N div(N n1, N n2);
+
 	default N sqr(final N n) {
 		final N ret = mul(n, n);
 		assert ret == null || ret.equals(mul(negate(n), negate(n))) : n;
@@ -51,5 +53,7 @@ public interface Arithmetics<N extends Number> {
 	default N max(final N n1, final N n2) {
 		return compare(n1, n2) >= 0 ? n1 : n2;
 	};
+
+	public N toN(int n);
 
 }

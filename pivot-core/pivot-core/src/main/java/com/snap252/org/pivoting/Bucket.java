@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
@@ -93,5 +94,19 @@ public abstract class Bucket<V> implements Predicate<@NonNull V> {
 	public <W> CopyBucket<V, W> createBucketWithNewValues(final Collection<V> newValuesBase,
 			final Collector<V, W, W> collectorWithoutFinisher, final Collector<W, W, W> collectorWithoutTransformer) {
 		return new CopyBucket<>(this, newValuesBase, collectorWithoutFinisher, collectorWithoutTransformer, null);
+	}
+
+	public final Bucket<V> getParentOrSelf() {
+		return parent != null ? parent : this;
+	}
+
+	public final Bucket<V> getRoot() {
+		Bucket<V> current = this;
+		for (; Objects.requireNonNull(current).parent != null; current = current.parent) {
+
+		}
+		assert this.parent == null ? current == this : current != this;
+		assert current.parent == null;
+		return current;
 	}
 }

@@ -30,6 +30,11 @@ public class BigDecimalArithmetics implements Arithmetics<@NonNull BigDecimal> {
 	}
 
 	@Override
+	public BigDecimal div(final BigDecimal n1, final BigDecimal n2) {
+		return n1.divide(n2, mathContext);
+	}
+
+	@Override
 	public BigDecimal part(final BigDecimal n1, final int n2) throws ArithmeticException {
 		return n1.divide(new BigDecimal(n2), mathContext);
 	}
@@ -69,4 +74,8 @@ public class BigDecimalArithmetics implements Arithmetics<@NonNull BigDecimal> {
 		return n1.max(n2);
 	}
 
+	@Override
+	public BigDecimal toN(final int n) {
+		return new BigDecimal(n);
+	}
 }

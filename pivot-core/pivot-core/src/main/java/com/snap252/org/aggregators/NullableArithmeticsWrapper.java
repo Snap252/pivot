@@ -28,9 +28,18 @@ public class NullableArithmeticsWrapper<@Nullable N extends Number> implements A
 	@Override
 	public N mul(@Nullable final N n1, @Nullable final N n2) {
 		if (n1 == null)
-			return n2;
+			return null;
 		if (n2 == null)
-			return n1;
+			return null;
+		return wrapped.mul(n1, n2);
+	}
+
+	@Override
+	public N div(@Nullable final N n1, @Nullable final N n2) {
+		if (n1 == null)
+			return null;
+		if (n2 == null)
+			return null;
 		return wrapped.mul(n1, n2);
 	}
 
@@ -59,6 +68,11 @@ public class NullableArithmeticsWrapper<@Nullable N extends Number> implements A
 			return -1;
 
 		return wrapped.compare(n1, n2);
+	}
+
+	@Override
+	public @NonNull N toN(final int n) {
+		return wrapped.toN(n);
 	}
 
 }

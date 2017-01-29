@@ -4,15 +4,18 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.Arrays;
+import java.util.function.Function;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 import com.snap252.org.aggregators.Arithmetics;
 import com.snap252.org.aggregators.BigDecimalArithmetics;
 import com.snap252.org.aggregators.NumberStatistics;
 import com.snap252.vaadin.pivot.NameType;
-import com.snap252.vaadin.pivot.client.WhatToRender;
-import com.snap252.vaadin.pivot.renderer.StatisticsRenderer;
+import com.snap252.vaadin.pivot.PivotCellReference;
+import com.snap252.vaadin.pivot.renderer.BigDecimalRenderer;
+import com.snap252.vaadin.pivot.renderer.WhatToRender;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.Validator.InvalidValueException;
@@ -23,7 +26,6 @@ import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Slider;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.renderers.Renderer;
 import com.vaadin.ui.themes.ValoTheme;
 
 public class BigDecimalValueExtractor extends AbstractNumberValueGetterRenderingComponent<BigDecimal> {
@@ -37,6 +39,8 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 	private final ComboBox howToRenderComboBox = new ComboBox("Anzeige", Arrays.asList(WhatToRender.values()));
 
 	private final TextField numberFormatTextField = new TextField("Format", "0.00##");
+
+	private final CheckBox relativeCheckBox = new CheckBox("Relativ", false);
 
 	private WhatToRender whatToRender = WhatToRender.sum;
 
@@ -82,7 +86,7 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 			}
 
 		});
-		formLayout.addComponents(howToRenderComboBox, numberFormatTextField);
+		formLayout.addComponents(howToRenderComboBox, numberFormatTextField, relativeCheckBox);
 	}
 
 	@Override
@@ -113,12 +117,14 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 	public void addValueChangeListener(final ValueChangeListener l) {
 		roundingEnabledCheckBox.addValueChangeListener(l);
 		slider.addValueChangeListener(l);
+		relativeCheckBox.addValueChangeListener(l);
 	}
 
 	@Override
 	public void addRendererChangeListener(final ValueChangeListener l) {
 		howToRenderComboBox.addValueChangeListener(l);
 		numberFormatTextField.addValueChangeListener(l);
+		relativeCheckBox.addValueChangeListener(l);
 	}
 
 	@Override
@@ -134,17 +140,51 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 		return new BigDecimalArithmetics();
 	}
 
-	@Override
-	public Class<?> getModelType() {
-		return NumberStatistics.class;
-	}
+	// @Override
+	// public RendererConverter<NumberStatistics<BigDecimal>, BigDecimal>
+	// createRenderer() {
+	// final StatisticsRenderer statisticsRenderer = new
+	// StatisticsRenderer("---");
+	// assert whatToRender != null;
+	// final String value = numberFormatTextField.getValue();
+	// assert value != null;
+	//// statisticsRenderer.setWhatToRender(whatToRender).setFormat(value);
+	// new BigDecimalValueExtractor(nameType)
+	//
+	// new RendererConverter<>(new StatisticsRenderer(),
+	// whatToRender::getValue);
+	// }
 
 	@Override
-	public Renderer<?> createRenderer() {
-		final StatisticsRenderer statisticsRenderer = new StatisticsRenderer("---");
-		assert whatToRender != null;
-		final String value = numberFormatTextField.getValue();
-		assert value != null;
-		return statisticsRenderer.setWhatToRender(whatToRender).setFormat(value);
+	public RendererConverter<BigDecimal, ? extends NumberStatistics<BigDecimal>> createRendererConverter() {
+		final BigDecimalRenderer renderer = new BigDecimalRenderer("---");
+		final String numberFormat = numberFormatTextField.getValue();
+		assert numberFormat != null;
+		renderer.setFormat(numberFormat);
+
+		final Function<@Nullable NumberStatistics<BigDecimal>, @Nullable BigDecimal> singleExtractor = t -> t == null ? null
+				: whatToRender.getValue(t);
+
+		final Arithmetics<BigDecimal> createArithmetics = createArithmetics();
+		final Function<PivotCellReference<@Nullable NumberStatistics<BigDecimal>>, @Nullable BigDecimal> f = (
+				final PivotCellReference<@Nullable NumberStatistics<BigDecimal>> x) -> {
+
+			final NumberStatistics<BigDecimal> ownValue = x.getValue();
+			if (ownValue == null)
+				return null;
+
+			final BigDecimal ownSum = singleExtractor.apply(ownValue);
+			final PivotCellReference<@Nullable NumberStatistics<BigDecimal>> parentReference = x.ofParentRow();
+			assert parentReference != null;
+			final NumberStatistics<BigDecimal> parentValue = parentReference.getValue();
+			assert parentValue != null;
+			final BigDecimal parentSum = singleExtractor.apply(parentValue);
+
+			return createArithmetics.div(ownSum, parentSum);
+		};
+		if (relativeCheckBox.getValue())
+			return new RendererConverter<>(renderer, f, BigDecimal.class);
+
+		return new RendererConverter<>(renderer, x -> singleExtractor.apply(x.getValue()), BigDecimal.class);
 	}
 }

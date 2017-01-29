@@ -1,0 +1,7 @@
+class com/vaadin/data/util/converter/Converter
+getModelType
+ ()Ljava/lang/Class<TMODEL;>;
+ ()L1java/lang/Class<TMODEL;>;
+getPresentationType
+ ()Ljava/lang/Class<TPRESENTATION;>;
+ ()L1java/lang/Class<TPRESENTATION;>;

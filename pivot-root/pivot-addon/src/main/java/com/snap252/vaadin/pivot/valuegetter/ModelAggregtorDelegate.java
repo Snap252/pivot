@@ -5,20 +5,19 @@ import java.util.stream.Collector;
 import org.eclipse.jdt.annotation.NonNull;
 
 import com.vaadin.data.Item;
-import com.vaadin.ui.renderers.Renderer;
 import com.vaadin.ui.renderers.TextRenderer;
+
 public final class ModelAggregtorDelegate implements ModelAggregtor<Object> {
 	private ModelAggregtor<?> delegate;
 
 	public boolean setDelegate(final ModelAggregtor<?> delegate) {
-		assert delegate != null;
 		if (this.delegate == delegate)
 			return false;
 
-		this.delegate = delegate;
+		this.delegate = delegate == null ? new DummyAggregator() : delegate;
 		return true;
 	}
-	
+
 	public ModelAggregtor<?> getDelegate() {
 		return delegate;
 	}
@@ -30,11 +29,6 @@ public final class ModelAggregtorDelegate implements ModelAggregtor<Object> {
 	private static class DummyAggregator implements ModelAggregtor<String> {
 
 		@Override
-		public Class<Object> getModelType() {
-			return Object.class;
-		}
-
-		@Override
 		public Collector<@NonNull Item, ?, String> getAggregator() {
 			return Collector.of(() -> {
 				return "";
@@ -44,8 +38,8 @@ public final class ModelAggregtorDelegate implements ModelAggregtor<Object> {
 
 		@SuppressWarnings("null")
 		@Override
-		public Renderer<String> createRenderer() {
-			return new TextRenderer();
+		public RendererConverter<String, String> createRendererConverter() {
+			return new RendererConverter<String, String>(new TextRenderer(), x -> x.getValue(), String.class);
 		}
 	}
 
@@ -55,18 +49,13 @@ public final class ModelAggregtorDelegate implements ModelAggregtor<Object> {
 	}
 
 	@Override
-	public Class<?> getModelType() {
-		return delegate.getModelType();
-	}
-
-	@Override
 	public Collector<Item, ?, ?> getAggregator() {
 		return delegate.getAggregator();
 	}
 
 	@Override
-	public Renderer<?> createRenderer() {
-		return delegate.createRenderer();
+	public RendererConverter<?, ?> createRendererConverter() {
+		return delegate.createRendererConverter();
 	}
 
 }

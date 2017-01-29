@@ -1,5 +1,7 @@
 package com.snap252.vaadin.pivot.client;
 
+import java.math.BigDecimal;
+
 import com.google.gwt.i18n.client.CurrencyList;
 import com.google.gwt.i18n.client.constants.NumberConstants;
 import com.snap252.org.aggregators.NumberStatistics;
@@ -18,8 +20,8 @@ import com.vaadin.shared.ui.Connect;
  * @since 7.4
  * @author Vaadin Ltd
  */
-@Connect(com.snap252.vaadin.pivot.renderer.StatisticsRenderer.class)
-public class ClientStatisticsRendererConnector extends AbstractRendererConnector<ClientBigDecimalNumberStatistics> {
+@Connect(com.snap252.vaadin.pivot.renderer.BigDecimalRenderer.class)
+public class ClientStatisticsRendererConnector extends AbstractRendererConnector<BigDecimal> {
 	// no implementation needed
 
 	public ClientStatisticsRendererConnector() {
@@ -28,7 +30,6 @@ public class ClientStatisticsRendererConnector extends AbstractRendererConnector
 			@Override
 			public void onStateChanged(final StateChangeEvent stateChangeEvent) {
 				final ClientStatisticsRenderer ret = getRenderer();
-				ret.setWhatToRender(getState().toRender);
 				ret.setNumberFormat(new LocalizedNumberFormat(getState().numberFormat));
 			}
 		});
@@ -147,7 +148,6 @@ public class ClientStatisticsRendererConnector extends AbstractRendererConnector
 	@Override
 	public ClientStatisticsRenderer getRenderer() {
 		final ClientStatisticsRenderer ret = (ClientStatisticsRenderer) super.getRenderer();
-		ret.setWhatToRender(getState().toRender);
 		ret.setNumberFormat(new LocalizedNumberFormat(getState().numberFormat));
 		return ret;
 	}

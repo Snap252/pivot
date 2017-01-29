@@ -8,37 +8,23 @@ import com.google.gwt.i18n.client.NumberFormat;
 import com.vaadin.client.renderers.Renderer;
 import com.vaadin.client.widget.grid.RendererCellReference;
 
-public class ClientStatisticsRenderer implements Renderer<ClientBigDecimalNumberStatistics> {
+public class ClientStatisticsRenderer implements Renderer<BigDecimal> {
 
-	private WhatToRender whatToRender;
 
 	@Override
-	public void render(final RendererCellReference cell, final ClientBigDecimalNumberStatistics stats) {
+	public void render(final RendererCellReference cell, final BigDecimal value) {
 		final TableCellElement element = cell.getElement();
 		element.getStyle().setTextAlign(TextAlign.RIGHT);
 
-		if (stats == null) {
+		if (value == null) {
 			handleNull(element);
 			return;
 		}
+		element.setInnerText(getText(value));
 	}
 
-	protected String getText(final ClientBigDecimalNumberStatistics text) {
-		switch (whatToRender) {
-		case avg:
-			return format(text.avg);
-		case cnt:
-			return text.cnt + "";
-		case max:
-			return format(text.max);
-		case min:
-			return format(text.min);
-		case sum:
-			return format(text.sum);
-		default:
-			assert false;
-			return "no value";
-		}
+	protected String getText(final BigDecimal value) {
+		return format(value);
 	}
 
 	public void setNumberFormat(final NumberFormat nf) {
@@ -53,9 +39,5 @@ public class ClientStatisticsRenderer implements Renderer<ClientBigDecimalNumber
 
 	protected void handleNull(final TableCellElement element) {
 		element.setInnerText(null);
-	}
-
-	public void setWhatToRender(final WhatToRender toRender) {
-		this.whatToRender = toRender;
 	}
 }

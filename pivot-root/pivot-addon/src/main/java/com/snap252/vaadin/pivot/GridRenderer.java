@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collector;
 import java.util.stream.Stream;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -63,7 +64,7 @@ final class GridRenderer {
 			this.aggregatorDelegator.setDelegate(modelAggregator);
 			fireValueChange();
 		}
-		
+
 		public ModelAggregtor<?> getModelAggregator() {
 			return this.aggregatorDelegator.getDelegate();
 		}
@@ -71,12 +72,12 @@ final class GridRenderer {
 		public void updateRenderer(final Grid g) {
 
 			g.getColumns().stream().filter(c -> c.getPropertyId() != colProp).forEach(col -> {
-				col.setRenderer(aggregatorDelegator.createRenderer());
+				aggregatorDelegator.createRendererConverter().setToColumn(col);
 			});
 			/*
 			 * hack for https://vaadin.com/forum#!/thread/9319379
 			 */
-//			g.setCellStyleGenerator(g.getCellStyleGenerator());
+			// g.setCellStyleGenerator(g.getCellStyleGenerator());
 		}
 
 		private final Object colProp = new Object() {
@@ -167,44 +168,49 @@ final class GridRenderer {
 
 			@SuppressWarnings({ "unchecked" })
 			@Override
-			public Item getItem(final Object itemId) {
+			public BucketItem getItem(final Object itemId) {
 				return cache.computeIfAbsent(itemId, x -> new BucketItem((Bucket<Item>) x));
 			}
 
 			class BucketItem implements Item {
-				class CellProperty implements Property<@Nullable Object>, Property.ValueChangeNotifier {
+				class CellProperty implements Property<PivotCellReference<?>>, Property.ValueChangeNotifier {
 
-					private final Bucket<Item> c;
+					private final Bucket<Item> colBucket;
 					@Nullable
-					private Object v;
+					private PivotCellReference<?> v;
 					private final List<Item> filterOwnValues;
+					private final Class<PivotCellReference<?>> clazz;
 
 					public CellProperty(final Bucket<Item> colBucket) {
-						c = colBucket;
-						assert rowBucket != c;
+						this.colBucket = colBucket;
+						assert rowBucket != colBucket;
 						valueResetter.add(() -> v = null);
-						filterOwnValues = rowBucket.filterOwnValues(c).collect(toList());
+						filterOwnValues = rowBucket.filterOwnValues(colBucket).collect(toList());
+						this.clazz = PivotCellReference.cast(PivotCellReference.class);
 					}
 
 					@Override
-					public @Nullable Object getValue() {
+					public PivotCellReference<?> getValue() {
 						if (v != null)
 							return v;
 						else {
-							final Object newValue = filterOwnValues.stream().collect(aggregatorDelegator.getAggregator());
+							final Collector<Item, ?, ?> aggregator = aggregatorDelegator.getAggregator();
+							final Object newValue0 = filterOwnValues.stream().collect(aggregator);
+							final PivotCellReference<@Nullable ?> newValue = new PivotCellReference<@Nullable Object>(
+									newValue0, rowBucket, colBucket, BucketContainer.this);
 							v = newValue;
 							return newValue;
 						}
 					}
 
 					@Override
-					public void setValue(@Nullable final Object newValue) throws ReadOnlyException {
+					public void setValue(@Nullable final PivotCellReference<?> newValue) throws ReadOnlyException {
 						throw new ReadOnlyException();
 					}
 
 					@Override
-					public Class<?> getType() {
-						return aggregatorDelegator.getModelType();
+					public Class<PivotCellReference<?>> getType() {
+						return clazz;
 					}
 
 					@Override
@@ -289,13 +295,14 @@ final class GridRenderer {
 
 			@Override
 			public @Nullable Property<?> getContainerProperty(final Object itemId, final Object propertyId) {
-				assert false;
-				return null;
+				return getItem(itemId).getItemProperty(propertyId);
 			}
+
+			private final Class<?> pivotCellReferenceClazz = PivotCellReference.class;
 
 			@Override
 			public Class<?> getType(final Object propertyId) {
-				return aggregatorDelegator.getModelType();
+				return pivotCellReferenceClazz;
 			}
 
 			@Override
@@ -518,6 +525,6 @@ final class GridRenderer {
 				headerRow.getCell(b).setText(SUM_TEXT);
 			}
 		}
-	}
 
+	}
 }

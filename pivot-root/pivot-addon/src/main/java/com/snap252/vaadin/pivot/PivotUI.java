@@ -64,11 +64,8 @@ public class PivotUI extends GridLayout {
 			aggregator.setSpacing(true);
 			final DragAndDropWrapper aggregatorDragAndDropWrapper = new DragAndDropWrapper(aggregator);
 			final DropHandler aggDopHandler = new ValueGetterDnDHandler(aggregator, true, i -> {
-				FilteringRenderingComponent<?, ?> valueProperty;
-				if (!i.isEmpty())
-					valueProperty = i.get(0);
-				else
-					valueProperty = null;
+				final FilteringRenderingComponent<?, ?> valueProperty = !i.isEmpty() ? i.get(0) : null;
+				
 				if (gridWriter != null)
 					gridWriter.setModelAggregator(valueProperty);
 			}, () -> {

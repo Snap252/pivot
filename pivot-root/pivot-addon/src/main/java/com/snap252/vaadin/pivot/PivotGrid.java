@@ -25,7 +25,7 @@ public class PivotGrid extends TreeGrid {
 			final Collector<T, MutableValue<BigDecimal>, @Nullable NumberStatistics<BigDecimal>> c) {
 		try {
 			setComponentError(null);
-			return new BiBucketExtension<>(bucketParams).createGridWriter(c).writeGrid(this, NumberStatistics.class,
+			return new GridRenderer<>(bucketParams).createGridWriter(c).writeGrid(this, NumberStatistics.class,
 					column -> column.setRenderer(new StatisticsRenderer("---", this)));
 		} catch (final IllegalArgumentException e) {
 			removeAllColumns();

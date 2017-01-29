@@ -21,7 +21,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import com.snap252.org.pivoting.BiBucketParameter;
 import com.snap252.org.pivoting.Bucket;
 import com.snap252.org.pivoting.RootBucket;
-import com.snap252.vaadin.pivot.BiBucketExtension.BucketContainer.BucketItem.CellProperty;
+import com.snap252.vaadin.pivot.GridRenderer.BucketContainer.BucketItem.CellProperty;
 import com.vaadin.data.Container.Hierarchical;
 import com.vaadin.data.Container.Indexed;
 import com.vaadin.data.Item;
@@ -39,11 +39,11 @@ import com.vaadin.ui.Grid.HeaderRow;
 import com.vaadin.ui.themes.ValoTheme;
 
 @NonNullByDefault
-final class BiBucketExtension<@Nullable RAW> {
+final class GridRenderer<@Nullable RAW> {
 	private final RootBucket<RAW> rowBucket;
 	private final RootBucket<RAW> colBucket;
 
-	BiBucketExtension(final BiBucketParameter<RAW> p) throws IllegalArgumentException {
+	GridRenderer(final BiBucketParameter<RAW> p) throws IllegalArgumentException {
 		rowBucket = new RootBucket<>("row", p.values, p.rowFnkt);
 		colBucket = new RootBucket<>("col", p.values, p.colFnkt);
 
@@ -426,7 +426,7 @@ final class BiBucketExtension<@Nullable RAW> {
 			g.removeAllColumns();
 
 			@SuppressWarnings("unchecked")
-			final BiBucketExtension<RAW>.BucketContainer<R, W> bc = new BucketContainer<>(collector,
+			final GridRenderer<RAW>.BucketContainer<R, W> bc = new BucketContainer<>(collector,
 					(Class<R>) modelType);
 			g.setContainerDataSource(bc);
 			doHeader(g, colBucket, 0);

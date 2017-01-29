@@ -158,11 +158,13 @@ final class BiBucketExtension<@Nullable RAW> {
 				private final Bucket<RAW> c;
 				@Nullable
 				private R v;
+				private final List<RAW> filterOwnValues;
 
 				public CellProperty(final Bucket<RAW> colBucket) {
 					c = colBucket;
 					assert rowBucket != c;
 					valueResetter.add(() -> v = null);
+					filterOwnValues = rowBucket.filterOwnValues(c).collect(toList());
 				}
 
 				@Override
@@ -170,7 +172,7 @@ final class BiBucketExtension<@Nullable RAW> {
 					if (v != null)
 						return v;
 					else {
-						final R newValue = rowBucket.filterOwnValues(c).collect(collector);
+						final R newValue = filterOwnValues.stream().collect(collector);
 						v = newValue;
 						return newValue;
 					}

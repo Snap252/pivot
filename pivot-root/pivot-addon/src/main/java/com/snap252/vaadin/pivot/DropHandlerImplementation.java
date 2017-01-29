@@ -36,12 +36,15 @@ abstract class DropHandlerImplementation<T> implements DropHandler {
 		this.pivotCriteriaList = new ArrayList<T>();
 	}
 
+	protected boolean accept(final DragAndDropEvent event) {
+		return true;
+	}
 	@Override
 	public AcceptCriterion getAcceptCriterion() {
 		return new ServerSideCriterion() {
 			@Override
 			public boolean accept(final DragAndDropEvent event) {
-				return true;
+				return DropHandlerImplementation.this.accept(event);
 			}
 		};
 	}

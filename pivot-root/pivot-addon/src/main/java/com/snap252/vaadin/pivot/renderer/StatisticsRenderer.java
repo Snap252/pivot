@@ -6,6 +6,8 @@ import java.text.DecimalFormatSymbols;
 
 import com.snap252.org.aggregators.NumberStatistics;
 import com.snap252.vaadin.pivot.client.ClientNS;
+import com.snap252.vaadin.pivot.client.ClientRendererSharedState;
+import com.snap252.vaadin.pivot.client.WhatToRender;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Grid.AbstractRenderer;
 
@@ -21,6 +23,21 @@ public class StatisticsRenderer extends AbstractRenderer<NumberStatistics> {
 		super(NumberStatistics.class, nullRepresentation);
 		this.c = c;
 		decimalFormat = new DecimalFormat("########################0.0");
+		setWhatToRender(WhatToRender.min);
+	}
+
+	public void setWhatToRender(final WhatToRender toRender) {
+		getState(true).toRender = toRender;
+	}
+
+	@Override
+	protected ClientRendererSharedState getState() {
+		return (ClientRendererSharedState) super.getState();
+	}
+
+	@Override
+	protected ClientRendererSharedState getState(final boolean markAsDirty) {
+		return (ClientRendererSharedState) super.getState(markAsDirty);
 	}
 
 	@SuppressWarnings("null")
@@ -29,12 +46,15 @@ public class StatisticsRenderer extends AbstractRenderer<NumberStatistics> {
 		if (value == null)
 			return encode(null, ClientNS.class);
 
-		return encode(new ClientNS(toString(value.sum), toString(value.max)), ClientNS.class);
+		return encode(
+				new ClientNS(toString(value.sum), toString(value.max), toString(value.min), toString(value.avg())),
+				ClientNS.class);
 	}
 
 	private String toString(final Number n) {
 		if (n == null)
-			return "";
+			return null;
+					
 		if (n instanceof BigDecimal) {
 			final BigDecimal bigDecimal = (BigDecimal) n;
 			decimalFormat.setMinimumFractionDigits(bigDecimal.scale());

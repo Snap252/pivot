@@ -1,6 +1,8 @@
 package com.snap252.vaadin.pivot.client;
 
 import com.snap252.org.aggregators.NumberStatistics;
+import com.vaadin.client.communication.StateChangeEvent;
+import com.vaadin.client.communication.StateChangeEvent.StateChangeHandler;
 import com.vaadin.client.connectors.AbstractRendererConnector;
 import com.vaadin.shared.ui.Connect;
 
@@ -17,9 +19,26 @@ import com.vaadin.shared.ui.Connect;
 @Connect(com.snap252.vaadin.pivot.renderer.StatisticsRenderer.class)
 public class ClientStatisticsRendererConnector extends AbstractRendererConnector<ClientNS> {
 	// no implementation needed
+	
+	public ClientStatisticsRendererConnector() {
+		addStateChangeHandler(new StateChangeHandler() {
+			
+			@Override
+			public void onStateChanged(final StateChangeEvent stateChangeEvent) {
+				getRenderer().setWhatToRender(getState().toRender);
+			}
+		});
+	}
 
 	@Override
 	public ClientStatisticsRenderer getRenderer() {
-		return (ClientStatisticsRenderer) super.getRenderer();
+		final ClientStatisticsRenderer ret = (ClientStatisticsRenderer) super.getRenderer();
+		ret.setWhatToRender(getState().toRender);
+		return ret;
+	}
+
+	@Override
+	public ClientRendererSharedState getState() {
+		return (ClientRendererSharedState) super.getState();
 	}
 }

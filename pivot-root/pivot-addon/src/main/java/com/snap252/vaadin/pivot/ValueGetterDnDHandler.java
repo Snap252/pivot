@@ -7,6 +7,7 @@ import org.vaadin.hene.popupbutton.PopupButton;
 import org.vaadin.hene.popupbutton.PopupButton.PopupVisibilityEvent;
 import org.vaadin.hene.popupbutton.PopupButton.PopupVisibilityListener;
 
+import com.vaadin.event.dd.DragAndDropEvent;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.Alignment;
@@ -69,5 +70,14 @@ public class ValueGetterDnDHandler extends DropHandlerImplementation<FilteringCo
 		} else
 			b = new Button(createFilter.toString());
 		return b;
+	}
+	
+	@Override
+	protected boolean accept(final DragAndDropEvent event) {
+		final AbstractComponent sourceComponent = (AbstractComponent) event.getTransferable().getSourceComponent();
+		final Object data = sourceComponent.getData();
+		assert data instanceof NameType;
+		final NameType dataNamed = (NameType) data;
+		return Number.class.isAssignableFrom(dataNamed.type);
 	}
 }

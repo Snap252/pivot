@@ -4,7 +4,9 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
+@NonNullByDefault
 public class BigDecimalArithmetics implements Arithmetics<@NonNull BigDecimal> {
 
 	private final MathContext mathContext;

@@ -18,22 +18,22 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
 
-public class ValueGetterDnDHandler extends DropHandlerImplementation<FilteringRenderingComponent<?>> {
+public class ValueGetterDnDHandler extends DropHandlerImplementation<FilteringRenderingComponent<?, ?>> {
 
 	private final ValueFactory valueFactory = new ValueFactory();
 
 	public ValueGetterDnDHandler(final AbstractOrderedLayout cols, final boolean vertical,
-			final Consumer<List<FilteringRenderingComponent<?>>> refresher) {
+			final Consumer<List<FilteringRenderingComponent<?, ?>>> refresher) {
 		super(cols, vertical, refresher);
 	}
 
 	@Override
-	protected FilteringRenderingComponent<?> createNew(final Object data) {
+	protected FilteringRenderingComponent<?, ?> createNew(final Object data) {
 		return valueFactory.createFilter((NameType) data);
 	}
 
 	@Override
-	protected AbstractComponent createUIComponent(final FilteringRenderingComponent<?> createFilter) {
+	protected AbstractComponent createUIComponent(final FilteringRenderingComponent<?, ?> createFilter) {
 		final AbstractComponent component = createFilter.getComponent();
 
 		final Button b;

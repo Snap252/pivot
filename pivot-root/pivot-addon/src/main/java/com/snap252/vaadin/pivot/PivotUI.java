@@ -3,25 +3,19 @@ package com.snap252.vaadin.pivot;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
-import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.vaadin.miki.mapcontainer.MapContainer;
 
-import com.snap252.org.aggregators.BigDecimalArithmetics;
-import com.snap252.org.aggregators.MutableValue;
-import com.snap252.org.aggregators.NullableArithmeticsWrapper;
-import com.snap252.org.aggregators.NumberStatistics;
-import com.snap252.org.aggregators.PivotCollectors;
 import com.snap252.org.pivoting.BiBucketParameter;
+import com.snap252.vaadin.pivot.GridRenderer.GridWriter;
+import com.snap252.vaadin.pivot.valuegetter.FilteringRenderingComponent;
 import com.snap252.vaadin.pivot.valuegetter.ValueGetterDnDHandler;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
@@ -43,20 +37,13 @@ public class PivotUI extends GridLayout {
 	private final HorizontalLayout properties;
 	private BiBucketParameter<Item> p;
 
-	private final Collector<Item, MutableValue<@Nullable BigDecimal>, @Nullable NumberStatistics<@Nullable BigDecimal>> reducer = PivotCollectors
-			.<@NonNull Item, @Nullable BigDecimal>getNumberReducer(this::apply,
-					new NullableArithmeticsWrapper<>(new BigDecimalArithmetics()));
+	// private final Collector<Item, MutableValue<@Nullable BigDecimal>,
+	// @Nullable NumberStatistics<@Nullable BigDecimal>> reducer =
+	// PivotCollectors
+	// .<@NonNull Item, @Nullable BigDecimal>getNumberReducer(this::apply,
+	// new NullableArithmeticsWrapper<>(new BigDecimalArithmetics()));
 
-	@Nullable
-	private FilteringComponent<?> valueProperty = null;
-	
-	private @Nullable Runnable propertyRefresher;
-
-	private @Nullable BigDecimal apply(final Item item) {
-		if (valueProperty != null)
-			return (@NonNull BigDecimal) valueProperty.apply(item);
-		return null;
-	}
+	private @Nullable GridWriter<?, ?> gridWriter;
 
 	@SuppressWarnings("null")
 	public PivotUI() {
@@ -78,15 +65,14 @@ public class PivotUI extends GridLayout {
 			aggregator.setSpacing(true);
 			final DragAndDropWrapper aggregatorDragAndDropWrapper = new DragAndDropWrapper(aggregator);
 			final DropHandler aggDopHandler = new ValueGetterDnDHandler(aggregator, true, i -> {
+				FilteringRenderingComponent<?, ?> valueProperty;
 				if (!i.isEmpty())
 					valueProperty = i.get(0);
 				else
 					valueProperty = null;
 
-				if (propertyRefresher != null)
-					propertyRefresher.run();
-				// propertyRefresher = pivotGrid$.setContainerDataSource(p,
-				// reducer);
+				if (gridWriter != null)
+					gridWriter.setFrc(valueProperty, pivotGrid$);
 			});
 
 			aggregator.setDropHandler(aggDopHandler);
@@ -94,7 +80,7 @@ public class PivotUI extends GridLayout {
 
 			final DDHorizontalLayout cols = new DDHorizontalLayout();
 			final DropHandler dropHandler = new PivotCriteriaFilteringDnDHandler(cols, false,
-					colFnkts -> propertyRefresher = pivotGrid$.setContainerDataSource(p.setColFnkt(colFnkts), reducer));
+					colFnkts -> gridWriter = pivotGrid$.setContainerDataSource(p.setColFnkt(colFnkts)));
 			cols.setDropHandler(dropHandler);
 			cols.setSpacing(true);
 
@@ -106,7 +92,7 @@ public class PivotUI extends GridLayout {
 		{
 			final DDVerticalLayout rows = new DDVerticalLayout();
 			final DropHandler dropHandler = new PivotCriteriaFilteringDnDHandler(rows, true,
-					rowFnkts -> propertyRefresher = pivotGrid$.setContainerDataSource(p.setRowFnkt(rowFnkts), reducer));
+					rowFnkts -> gridWriter = pivotGrid$.setContainerDataSource(p.setRowFnkt(rowFnkts)));
 			rows.setDropHandler(dropHandler);
 			rows.setSpacing(true);
 

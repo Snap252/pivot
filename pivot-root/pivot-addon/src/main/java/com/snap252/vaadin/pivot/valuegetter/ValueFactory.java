@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import com.snap252.vaadin.pivot.NameType;
 
 public class ValueFactory {
-	protected FilteringRenderingComponent<?> createFilter(final NameType n) {
+	protected FilteringRenderingComponent<?, ?> createFilter(final NameType n) {
 		if (BigDecimal.class.isAssignableFrom(n.type))
 			return new BigDecimalValueExtractor(n);
 		if (Integer.class.isAssignableFrom(n.type))

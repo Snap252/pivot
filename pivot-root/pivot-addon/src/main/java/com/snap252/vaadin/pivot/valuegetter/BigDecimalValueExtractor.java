@@ -5,7 +5,11 @@ import java.math.RoundingMode;
 
 import org.eclipse.jdt.annotation.NonNull;
 
+import com.snap252.org.aggregators.Arithmetics;
+import com.snap252.org.aggregators.BigDecimalArithmetics;
+import com.snap252.org.aggregators.NumberStatistics;
 import com.snap252.vaadin.pivot.NameType;
+import com.snap252.vaadin.pivot.renderer.StatisticsRenderer;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.AbstractComponent;
@@ -13,9 +17,10 @@ import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Slider;
+import com.vaadin.ui.renderers.Renderer;
 import com.vaadin.ui.themes.ValoTheme;
 
-public class BigDecimalValueExtractor extends AbstractValueGetterRenderingComponent<BigDecimal> {
+public class BigDecimalValueExtractor extends AbstractNumberValueGetterRenderingComponent<BigDecimal> {
 	private final FormLayout comp;
 	private final Slider slider;
 	private final CheckBox roundingEnabledCheckBox;
@@ -88,5 +93,20 @@ public class BigDecimalValueExtractor extends AbstractValueGetterRenderingCompon
 			return ValoTheme.BUTTON_FRIENDLY;
 
 		return super.getButtonStyles();
+	}
+
+	@Override
+	protected final Arithmetics<BigDecimal> createArithmetics() {
+		return new BigDecimalArithmetics();
+	}
+
+	@Override
+	public Class<?> getModelType() {
+		return NumberStatistics.class;
+	}
+
+	@Override
+	public Renderer<?> createRenderer() {
+		return new StatisticsRenderer("---");
 	}
 }

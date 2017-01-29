@@ -57,16 +57,26 @@ final class GridRenderer {
 
 	public final class GridWriter<W, R> {
 
-		private final ModelAggregtorDelegate frc = new ModelAggregtorDelegate();
+		private final ModelAggregtorDelegate aggregatorDelegator = new ModelAggregtorDelegate();
 
-		public void setFrc(final ModelAggregtor<?> frc, final Grid g) {
-			if (!this.frc.setDelegate(frc))
-				return;
+		public void setModelAggregator(final ModelAggregtor<?> modelAggregator) {
+			this.aggregatorDelegator.setDelegate(modelAggregator);
+			fireValueChange();
+		}
+		
+		public ModelAggregtor<?> getModelAggregator() {
+			return this.aggregatorDelegator.getDelegate();
+		}
+
+		public void updateRenderer(final Grid g) {
 
 			g.getColumns().stream().filter(c -> c.getPropertyId() != colProp).forEach(col -> {
-				col.setRenderer(frc.createRenderer());
+				col.setRenderer(aggregatorDelegator.createRenderer());
 			});
-			fireValueChange();
+			/*
+			 * hack for https://vaadin.com/forum#!/thread/9319379
+			 */
+//			g.setCellStyleGenerator(g.getCellStyleGenerator());
 		}
 
 		private final Object colProp = new Object() {
@@ -181,7 +191,7 @@ final class GridRenderer {
 						if (v != null)
 							return v;
 						else {
-							final Object newValue = filterOwnValues.stream().collect(frc.getAggregator());
+							final Object newValue = filterOwnValues.stream().collect(aggregatorDelegator.getAggregator());
 							v = newValue;
 							return newValue;
 						}
@@ -194,7 +204,7 @@ final class GridRenderer {
 
 					@Override
 					public Class<?> getType() {
-						return frc.getModelType();
+						return aggregatorDelegator.getModelType();
 					}
 
 					@Override
@@ -285,7 +295,7 @@ final class GridRenderer {
 
 			@Override
 			public Class<?> getType(final Object propertyId) {
-				return frc.getModelType();
+				return aggregatorDelegator.getModelType();
 			}
 
 			@Override

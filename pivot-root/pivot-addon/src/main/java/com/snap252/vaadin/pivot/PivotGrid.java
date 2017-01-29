@@ -17,12 +17,17 @@ public class PivotGrid extends TreeGrid {
 		setPrimaryStyleName("v-grid-tiny");
 	}
 
-	public @Nullable <@Nullable T> GridWriter<?, ?> setContainerDataSource(final BiBucketParameter<Item> bucketParams) {
+	public @Nullable <@Nullable T> GridWriter<?, ?> setContainerDataSource(final BiBucketParameter<Item> bucketParams,
+			@Nullable final GridWriter<?, ?> oldGridWriter) {
 		try {
 			setComponentError(null);
 			final GridRenderer gridRenderer = new GridRenderer(bucketParams);
 			final GridRenderer.GridWriter<Object, Object> gridWriter = gridRenderer.createGridWriter();
 			gridWriter.writeGrid(this);
+			if (oldGridWriter != null) {
+//				gridWriter.setModelAggregator(oldGridWriter.getModelAggregator());
+//				gridWriter.updateRenderer(this);
+			}
 			return gridWriter;
 		} catch (final IllegalArgumentException e) {
 			removeAllColumns();

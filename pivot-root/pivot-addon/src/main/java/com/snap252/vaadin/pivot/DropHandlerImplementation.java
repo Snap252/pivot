@@ -128,10 +128,10 @@ public abstract class DropHandlerImplementation<T> implements DropHandler {
 		else
 			pivotCriteriaList.add(index, createFilter);
 
-		refresher.accept(pivotCriteriaList);
+		refresh();
 	}
 
-	protected final void refresh() {
+	protected void refresh() {
 		refresher.accept(pivotCriteriaList);
 	}
 }

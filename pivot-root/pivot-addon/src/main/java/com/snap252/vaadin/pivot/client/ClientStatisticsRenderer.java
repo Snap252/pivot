@@ -7,7 +7,7 @@ import com.vaadin.client.widget.grid.RendererCellReference;
 
 public class ClientStatisticsRenderer implements Renderer<ClientNS> {
 
-	private WhatToRender toRender;
+	private WhatToRender whatToRender;
 
 	@Override
 	public void render(final RendererCellReference cell, final ClientNS text) {
@@ -23,9 +23,11 @@ public class ClientStatisticsRenderer implements Renderer<ClientNS> {
 	}
 
 	protected String getKind(final ClientNS text) {
-		switch (toRender) {
+		switch (whatToRender) {
 		case avg:
 			return text.avg;
+		case cnt:
+			return text.cnt;
 		case max:
 			return text.max;
 		case min:
@@ -43,6 +45,6 @@ public class ClientStatisticsRenderer implements Renderer<ClientNS> {
 	}
 
 	public void setWhatToRender(final WhatToRender toRender) {
-		this.toRender = toRender;
+		this.whatToRender = toRender;
 	}
 }

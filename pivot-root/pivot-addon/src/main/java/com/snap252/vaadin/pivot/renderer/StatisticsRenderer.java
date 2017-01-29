@@ -3,6 +3,8 @@ package com.snap252.vaadin.pivot.renderer;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 import com.snap252.org.aggregators.NumberStatistics;
 import com.snap252.vaadin.pivot.client.ClientNS;
 import com.snap252.vaadin.pivot.client.ClientRendererSharedState;
@@ -29,8 +31,14 @@ public class StatisticsRenderer extends AbstractRenderer<NumberStatistics> {
 		setWhatToRender(WhatToRender.min);
 	}
 
-	public void setWhatToRender(final WhatToRender toRender) {
-		getState(true).toRender = toRender;
+	@NonNullByDefault
+	public StatisticsRenderer setWhatToRender(final WhatToRender toRender) {
+		final ClientRendererSharedState state = getState(false);
+		if (state.toRender == toRender)
+			return this;
+		state.toRender = toRender;
+		markAsDirty();
+		return this;
 	}
 
 	@Override
@@ -49,9 +57,8 @@ public class StatisticsRenderer extends AbstractRenderer<NumberStatistics> {
 		if (value == null)
 			return encode(null, ClientNS.class);
 
-		return encode(
-				new ClientNS(toString(value.sum), toString(value.max), toString(value.min), toString(value.avg())),
-				ClientNS.class);
+		return encode(new ClientNS(toString(value.sum), toString(value.max), toString(value.min), toString(value.avg()),
+				toString(value.cnt)), ClientNS.class);
 	}
 
 	private String toString(final Number n) {

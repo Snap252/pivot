@@ -70,9 +70,11 @@ public class PivotUI extends GridLayout {
 					valueProperty = i.get(0);
 				else
 					valueProperty = null;
-
 				if (gridWriter != null)
-					gridWriter.setFrc(valueProperty, pivotGrid$);
+					gridWriter.setModelAggregator(valueProperty);
+			}, () -> {
+				if (gridWriter != null)
+					gridWriter.updateRenderer(pivotGrid$);
 			});
 
 			aggregator.setDropHandler(aggDopHandler);
@@ -80,7 +82,7 @@ public class PivotUI extends GridLayout {
 
 			final DDHorizontalLayout cols = new DDHorizontalLayout();
 			final DropHandler dropHandler = new PivotCriteriaFilteringDnDHandler(cols, false,
-					colFnkts -> gridWriter = pivotGrid$.setContainerDataSource(p.setColFnkt(colFnkts)));
+					colFnkts -> gridWriter = pivotGrid$.setContainerDataSource(p.setColFnkt(colFnkts), gridWriter));
 			cols.setDropHandler(dropHandler);
 			cols.setSpacing(true);
 
@@ -92,7 +94,7 @@ public class PivotUI extends GridLayout {
 		{
 			final DDVerticalLayout rows = new DDVerticalLayout();
 			final DropHandler dropHandler = new PivotCriteriaFilteringDnDHandler(rows, true,
-					rowFnkts -> gridWriter = pivotGrid$.setContainerDataSource(p.setRowFnkt(rowFnkts)));
+					rowFnkts -> gridWriter = pivotGrid$.setContainerDataSource(p.setRowFnkt(rowFnkts), gridWriter));
 			rows.setDropHandler(dropHandler);
 			rows.setSpacing(true);
 

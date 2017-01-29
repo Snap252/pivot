@@ -8,7 +8,7 @@ import com.vaadin.data.Item;
 import com.vaadin.ui.renderers.Renderer;
 import com.vaadin.ui.renderers.TextRenderer;
 
-public class ModelAggregtorDelegate implements ModelAggregtor<Object> {
+public final class ModelAggregtorDelegate implements ModelAggregtor<Object> {
 	private ModelAggregtor<?> delegate;
 
 	public boolean setDelegate(final ModelAggregtor<?> delegate) {
@@ -17,6 +17,10 @@ public class ModelAggregtorDelegate implements ModelAggregtor<Object> {
 
 		this.delegate = delegate;
 		return true;
+	}
+	
+	public ModelAggregtor<?> getDelegate() {
+		return delegate;
 	}
 
 	public ModelAggregtorDelegate() {

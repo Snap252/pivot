@@ -2,6 +2,7 @@ package com.snap252.vaadin.pivot.valuegetter;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Arrays;
 
 import org.eclipse.jdt.annotation.NonNull;
 
@@ -9,11 +10,13 @@ import com.snap252.org.aggregators.Arithmetics;
 import com.snap252.org.aggregators.BigDecimalArithmetics;
 import com.snap252.org.aggregators.NumberStatistics;
 import com.snap252.vaadin.pivot.NameType;
+import com.snap252.vaadin.pivot.client.WhatToRender;
 import com.snap252.vaadin.pivot.renderer.StatisticsRenderer;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Slider;
@@ -28,7 +31,10 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 
 	private boolean roundingEnabled;
 	private int sliderValue;
+	private final ComboBox howToRenderComboBox;
+	private WhatToRender whatToRender = WhatToRender.sum;
 
+	@SuppressWarnings("null")
 	public BigDecimalValueExtractor(final NameType nameType) {
 		super(nameType);
 		roundingEnabledCheckBox = new CheckBox("Rundung", false);
@@ -55,6 +61,14 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 			this.sliderValue = sliderValue;
 			this.sliderValueLabel.setValue(Integer.toString(sliderValue));
 		});
+
+		howToRenderComboBox = new ComboBox("Anzeige", Arrays.asList(WhatToRender.values()));
+		howToRenderComboBox.setNullSelectionAllowed(false);
+
+		howToRenderComboBox.addValueChangeListener(_ignore -> {
+			this.whatToRender = (WhatToRender) _ignore.getProperty().getValue();
+		});
+		formLayout.addComponent(howToRenderComboBox);
 	}
 
 	@Override
@@ -88,6 +102,11 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 	}
 
 	@Override
+	public void addRendererChangeListener(final ValueChangeListener l) {
+		howToRenderComboBox.addValueChangeListener(l);
+	}
+
+	@Override
 	public String getButtonStyles() {
 		if (roundingEnabled)
 			return ValoTheme.BUTTON_FRIENDLY;
@@ -107,6 +126,8 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 
 	@Override
 	public Renderer<?> createRenderer() {
-		return new StatisticsRenderer("---");
+		final StatisticsRenderer statisticsRenderer = new StatisticsRenderer("---");
+		assert whatToRender != null;
+		return statisticsRenderer.setWhatToRender(whatToRender);
 	}
 }

@@ -21,10 +21,12 @@ import com.vaadin.ui.VerticalLayout;
 public class ValueGetterDnDHandler extends DropHandlerImplementation<FilteringRenderingComponent<?, ?>> {
 
 	private final ValueFactory valueFactory = new ValueFactory();
+	private final Runnable upateRenderer;
 
 	public ValueGetterDnDHandler(final AbstractOrderedLayout cols, final boolean vertical,
-			final Consumer<List<FilteringRenderingComponent<?, ?>>> refresher) {
+			final Consumer<List<FilteringRenderingComponent<?, ?>>> refresher, final Runnable upateRenderer) {
 		super(cols, vertical, refresher);
+		this.upateRenderer = upateRenderer;
 	}
 
 	@Override
@@ -54,25 +56,51 @@ public class ValueGetterDnDHandler extends DropHandlerImplementation<FilteringRe
 
 			final VerticalLayout verticalLayout = new VerticalLayout(component, footer);
 			popupButton.setContent(verticalLayout);
-			final PopupVisibilityListener listener = new PopupVisibilityListener() {
-				@Override
-				public void popupVisibilityChange(final PopupVisibilityEvent _ignore2) {
-					refresh();
-					/* we need a this-context here */
-					popupButton.removePopupVisibilityListener(this);
-					popupButton.setCaption(createFilter.toString());
-					popupButton.addStyleName(createFilter.getButtonStyles());
-				}
-			};
+			{
+				final PopupVisibilityListener listener = new PopupVisibilityListener() {
+					@Override
+					public void popupVisibilityChange(final PopupVisibilityEvent _ignore2) {
+						refresh();
+						/* we need a this-context here */
+						popupButton.removePopupVisibilityListener(this);
+						popupButton.setCaption(createFilter.toString());
+						popupButton.addStyleName(createFilter.getButtonStyles());
+					}
+				};
 
-			createFilter.addValueChangeListener(_ignore -> {
-				popupButton.removePopupVisibilityListener(listener);
-				popupButton.addPopupVisibilityListener(listener);
-			});
+				createFilter.addValueChangeListener(_ignore -> {
+					popupButton.removePopupVisibilityListener(listener);
+					popupButton.addPopupVisibilityListener(listener);
+				});
+			}
+
+			{
+				final PopupVisibilityListener listener = new PopupVisibilityListener() {
+					@Override
+					public void popupVisibilityChange(final PopupVisibilityEvent _ignore2) {
+						upateRenderer.run();
+						/* we need a this-context here */
+						popupButton.removePopupVisibilityListener(this);
+						popupButton.setCaption(createFilter.toString());
+						popupButton.addStyleName(createFilter.getButtonStyles());
+					}
+				};
+
+				createFilter.addRendererChangeListener(_ignore -> {
+					popupButton.removePopupVisibilityListener(listener);
+					popupButton.addPopupVisibilityListener(listener);
+				});
+			}
 			b = popupButton;
 		} else
 			b = new Button(createFilter.toString());
 		return b;
+	}
+
+	@Override
+	protected void refresh() {
+		super.refresh();
+		upateRenderer.run();
 	}
 
 	@Override

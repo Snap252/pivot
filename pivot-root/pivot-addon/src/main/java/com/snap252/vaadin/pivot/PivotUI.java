@@ -1,7 +1,6 @@
 package com.snap252.vaadin.pivot;
 
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -121,10 +120,9 @@ public class PivotUI extends GridLayout {
 		final Map<Object, Map<Object, Object>> m1 = origContainer.getItemIds().stream()
 				.collect(Collectors.toMap(Function.identity(), itemId -> {
 					final Item item = origContainer.getItem(itemId);
-					return item.getItemPropertyIds().stream()
-							.collect(toMap(Function.identity(), p -> item.getItemProperty(p).getValue(), (u, v) -> {
-								throw new IllegalStateException(String.format("Duplicate key %s", u));
-							}, LinkedHashMap::new));
+					final LinkedHashMap<Object, Object> v = new LinkedHashMap<>();
+					item.getItemPropertyIds().forEach(p -> v.put(p, item.getItemProperty(p).getValue()));
+					return v;
 				}, (u, v) -> {
 					throw new IllegalStateException(String.format("Duplicate key %s", u));
 				}, LinkedHashMap::new));

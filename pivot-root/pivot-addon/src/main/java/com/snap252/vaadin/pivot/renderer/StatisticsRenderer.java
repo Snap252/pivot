@@ -2,11 +2,12 @@ package com.snap252.vaadin.pivot.renderer;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.snap252.org.aggregators.NumberStatistics;
-import com.snap252.vaadin.pivot.client.ClientNS;
+import com.snap252.vaadin.pivot.client.ClientBigDecimalNumberStatistics;
 import com.snap252.vaadin.pivot.client.ClientRendererSharedState;
 import com.snap252.vaadin.pivot.client.WhatToRender;
 import com.vaadin.ui.Grid.AbstractRenderer;
@@ -28,7 +29,6 @@ public class StatisticsRenderer extends AbstractRenderer<NumberStatistics> {
 	public StatisticsRenderer(final String nullRepresentation) {
 		super(NumberStatistics.class, nullRepresentation);
 		decimalFormat = new DecimalFormat("########################0.0");
-		setWhatToRender(WhatToRender.min);
 	}
 
 	@NonNullByDefault
@@ -37,6 +37,16 @@ public class StatisticsRenderer extends AbstractRenderer<NumberStatistics> {
 		if (state.toRender == toRender)
 			return this;
 		state.toRender = toRender;
+		markAsDirty();
+		return this;
+	}
+
+	@NonNullByDefault
+	public StatisticsRenderer setFormat(final String numberFormat) {
+		final ClientRendererSharedState state = getState(false);
+		if (Objects.equals(state.numberFormat, numberFormat))
+			return this;
+		state.numberFormat = numberFormat;
 		markAsDirty();
 		return this;
 	}
@@ -53,26 +63,12 @@ public class StatisticsRenderer extends AbstractRenderer<NumberStatistics> {
 
 	@SuppressWarnings("null")
 	@Override
-	public JsonValue encode(final NumberStatistics value) {
-		if (value == null)
-			return encode(null, ClientNS.class);
-
-		return encode(new ClientNS(toString(value.sum), toString(value.max), toString(value.min), toString(value.avg()),
-				toString(value.cnt)), ClientNS.class);
-	}
-
-	private String toString(final Number n) {
-		if (n == null)
-			return null;
-
-		if (n instanceof BigDecimal) {
-			final BigDecimal bigDecimal = (BigDecimal) n;
-			decimalFormat.setMinimumFractionDigits(bigDecimal.scale());
-			// decimalFormat.setDecimalFormatSymbols(DecimalFormatSymbols.getInstance(c.getLocale()));
-			return decimalFormat.format(bigDecimal);
-			// return bigDecimal.toPlainString();
-		}
-		return n.toString();
+	public JsonValue encode(final NumberStatistics value0) {
+		if (value0 == null)
+			return encode(null, ClientBigDecimalNumberStatistics.class);
+		final NumberStatistics<BigDecimal> value = value0;
+		return encode(new ClientBigDecimalNumberStatistics(value.sum, value.max, value.min, value.avg(), value.cnt),
+				ClientBigDecimalNumberStatistics.class);
 	}
 
 }

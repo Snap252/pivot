@@ -1,5 +1,6 @@
 package com.snap252.vaadin.pivot.client;
 
+import com.google.gwt.i18n.client.NumberFormat;
 import com.snap252.org.aggregators.NumberStatistics;
 import com.vaadin.client.communication.StateChangeEvent;
 import com.vaadin.client.communication.StateChangeEvent.StateChangeHandler;
@@ -17,15 +18,17 @@ import com.vaadin.shared.ui.Connect;
  * @author Vaadin Ltd
  */
 @Connect(com.snap252.vaadin.pivot.renderer.StatisticsRenderer.class)
-public class ClientStatisticsRendererConnector extends AbstractRendererConnector<ClientNS> {
+public class ClientStatisticsRendererConnector extends AbstractRendererConnector<ClientBigDecimalNumberStatistics> {
 	// no implementation needed
-	
+
 	public ClientStatisticsRendererConnector() {
 		addStateChangeHandler(new StateChangeHandler() {
-			
+
 			@Override
 			public void onStateChanged(final StateChangeEvent stateChangeEvent) {
-				getRenderer().setWhatToRender(getState().toRender);
+				final ClientStatisticsRenderer ret = getRenderer();
+				ret.setWhatToRender(getState().toRender);
+				ret.setNumberFormat(NumberFormat.getFormat(getState().numberFormat));
 			}
 		});
 	}
@@ -34,6 +37,7 @@ public class ClientStatisticsRendererConnector extends AbstractRendererConnector
 	public ClientStatisticsRenderer getRenderer() {
 		final ClientStatisticsRenderer ret = (ClientStatisticsRenderer) super.getRenderer();
 		ret.setWhatToRender(getState().toRender);
+		ret.setNumberFormat(NumberFormat.getFormat(getState().numberFormat));
 		return ret;
 	}
 

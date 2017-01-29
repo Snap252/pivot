@@ -1,16 +1,19 @@
 package com.snap252.vaadin.pivot.client;
 
+import java.math.BigDecimal;
+
 import com.google.gwt.dom.client.Style.TextAlign;
 import com.google.gwt.dom.client.TableCellElement;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.vaadin.client.renderers.Renderer;
 import com.vaadin.client.widget.grid.RendererCellReference;
 
-public class ClientStatisticsRenderer implements Renderer<ClientNS> {
+public class ClientStatisticsRenderer implements Renderer<ClientBigDecimalNumberStatistics> {
 
 	private WhatToRender whatToRender;
 
 	@Override
-	public void render(final RendererCellReference cell, final ClientNS text) {
+	public void render(final RendererCellReference cell, final ClientBigDecimalNumberStatistics text) {
 		final TableCellElement element = cell.getElement();
 		element.getStyle().setTextAlign(TextAlign.RIGHT);
 
@@ -22,22 +25,30 @@ public class ClientStatisticsRenderer implements Renderer<ClientNS> {
 		element.setInnerText(getKind(text));
 	}
 
-	protected String getKind(final ClientNS text) {
+	protected String getKind(final ClientBigDecimalNumberStatistics text) {
 		switch (whatToRender) {
 		case avg:
-			return text.avg;
+			return format(text.avg);
 		case cnt:
-			return text.cnt;
+			return text.cnt + "";
 		case max:
-			return text.max;
+			return format(text.max);
 		case min:
-			return text.min;
+			return format(text.min);
 		case sum:
-			return text.sum;
+			return format(text.sum);
 		default:
-			return "k.a.";
-
+			assert false;
+			return "no value";
 		}
+	}
+	
+	public void setNumberFormat(final NumberFormat nf) {
+		this.nf = nf;
+	}
+	private NumberFormat nf;
+	private String format(final BigDecimal bd){
+		return nf.format(bd);
 	}
 
 	protected void handleNull(final TableCellElement element) {

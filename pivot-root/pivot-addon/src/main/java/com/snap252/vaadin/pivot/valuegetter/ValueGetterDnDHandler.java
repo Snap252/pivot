@@ -107,7 +107,9 @@ public class ValueGetterDnDHandler extends DropHandlerImplementation<FilteringRe
 	protected boolean accept(final DragAndDropEvent event) {
 		final AbstractComponent sourceComponent = (AbstractComponent) event.getTransferable().getSourceComponent();
 		final Object data = sourceComponent.getData();
-		assert data instanceof NameType;
+		if (!(data instanceof NameType))
+			return false;
+		
 		final NameType dataNamed = (NameType) data;
 		return Number.class.isAssignableFrom(dataNamed.type);
 	}

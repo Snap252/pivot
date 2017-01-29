@@ -20,6 +20,7 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Slider;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.renderers.Renderer;
 import com.vaadin.ui.themes.ValoTheme;
 
@@ -31,7 +32,10 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 
 	private boolean roundingEnabled;
 	private int sliderValue;
-	private final ComboBox howToRenderComboBox;
+	private final ComboBox howToRenderComboBox = new ComboBox("Anzeige", Arrays.asList(WhatToRender.values()));
+
+	private final TextField numberFormatTextField = new TextField("Format", "0000.0000");
+
 	private WhatToRender whatToRender = WhatToRender.sum;
 
 	@SuppressWarnings("null")
@@ -62,13 +66,13 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 			this.sliderValueLabel.setValue(Integer.toString(sliderValue));
 		});
 
-		howToRenderComboBox = new ComboBox("Anzeige", Arrays.asList(WhatToRender.values()));
 		howToRenderComboBox.setNullSelectionAllowed(false);
+		howToRenderComboBox.setValue(WhatToRender.sum);
 
 		howToRenderComboBox.addValueChangeListener(_ignore -> {
 			this.whatToRender = (WhatToRender) _ignore.getProperty().getValue();
 		});
-		formLayout.addComponent(howToRenderComboBox);
+		formLayout.addComponents(howToRenderComboBox, numberFormatTextField);
 	}
 
 	@Override
@@ -104,6 +108,7 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 	@Override
 	public void addRendererChangeListener(final ValueChangeListener l) {
 		howToRenderComboBox.addValueChangeListener(l);
+		numberFormatTextField.addValueChangeListener(l);
 	}
 
 	@Override
@@ -128,6 +133,8 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 	public Renderer<?> createRenderer() {
 		final StatisticsRenderer statisticsRenderer = new StatisticsRenderer("---");
 		assert whatToRender != null;
-		return statisticsRenderer.setWhatToRender(whatToRender);
+		final String value = numberFormatTextField.getValue();
+		assert value != null;
+		return statisticsRenderer.setWhatToRender(whatToRender).setFormat(value);
 	}
 }

@@ -72,8 +72,9 @@ public class RandomDataGenerator {
 		return getAsStream(cnt,
 				r -> new Person(random(TestData.vorname), random(TestData.nachname), r.nextInt(60) + 10,
 						random(Geschl.values()), new BigDecimal(r.nextInt(10001)).scaleByPowerOfTen(-2),
-						r.nextInt(1793), new Date((RANDOM.nextInt(1200) - 750) * 86400000L)))
-								.collect(Collectors.toList());
+						r.nextInt(1793), new BigDecimal(r.nextInt(10001) - 10001 / 2).scaleByPowerOfTen(-2),
+						r.nextBoolean() ? null : new BigDecimal(r.nextInt(10001) - 10001 / 2).scaleByPowerOfTen(-2),
+						new Date((RANDOM.nextInt(1200) - 750) * 86400000L))).collect(Collectors.toList());
 	}
 
 	protected static void write(final List<Person> personen, final BiBucket<Person> biBucket) {
@@ -134,16 +135,29 @@ public class RandomDataGenerator {
 		private final BigDecimal wert;
 		private final Date birthday;
 		private final int wertGanzzahl;
+		private final BigDecimal wertNeg;
+		private final @Nullable BigDecimal wertNullable;
 
 		public Person(final String vorname, final String nachname, final int alter, final Geschl g,
-				final BigDecimal wert, final int wertGanzzahl, final Date birthday) {
+				final BigDecimal wert, final int wertGanzzahl, final BigDecimal wertNeg,
+				@Nullable final BigDecimal wertNullable, final Date birthday) {
 			this.vorname = vorname;
 			this.nachname = nachname;
 			this.alter = alter;
 			this.geschlecht = g;
 			this.wert = wert;
 			this.wertGanzzahl = wertGanzzahl;
+			this.wertNeg = wertNeg;
+			this.wertNullable = wertNullable;
 			this.birthday = birthday;
+		}
+
+		public BigDecimal getWertNeg() {
+			return wertNeg;
+		}
+
+		public @Nullable BigDecimal getWertNullable() {
+			return wertNullable;
 		}
 
 		public String getVorname() {

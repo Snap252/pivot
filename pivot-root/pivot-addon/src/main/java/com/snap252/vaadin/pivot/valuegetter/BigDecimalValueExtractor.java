@@ -2,6 +2,7 @@ package com.snap252.vaadin.pivot.valuegetter;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.Arrays;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -14,6 +15,7 @@ import com.snap252.vaadin.pivot.client.WhatToRender;
 import com.snap252.vaadin.pivot.renderer.StatisticsRenderer;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
@@ -34,7 +36,7 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 	private int sliderValue;
 	private final ComboBox howToRenderComboBox = new ComboBox("Anzeige", Arrays.asList(WhatToRender.values()));
 
-	private final TextField numberFormatTextField = new TextField("Format", "0000.0000");
+	private final TextField numberFormatTextField = new TextField("Format", "0.00##");
 
 	private WhatToRender whatToRender = WhatToRender.sum;
 
@@ -71,6 +73,14 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 
 		howToRenderComboBox.addValueChangeListener(_ignore -> {
 			this.whatToRender = (WhatToRender) _ignore.getProperty().getValue();
+		});
+		numberFormatTextField.addValidator(value -> {
+			try {
+				new DecimalFormat((String) value);
+			} catch (final Exception e) {
+				throw new InvalidValueException(e.getMessage());
+			}
+
 		});
 		formLayout.addComponents(howToRenderComboBox, numberFormatTextField);
 	}

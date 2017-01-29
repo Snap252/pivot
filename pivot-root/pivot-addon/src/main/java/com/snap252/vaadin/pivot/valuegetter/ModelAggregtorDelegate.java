@@ -7,11 +7,11 @@ import org.eclipse.jdt.annotation.NonNull;
 import com.vaadin.data.Item;
 import com.vaadin.ui.renderers.Renderer;
 import com.vaadin.ui.renderers.TextRenderer;
-
 public final class ModelAggregtorDelegate implements ModelAggregtor<Object> {
 	private ModelAggregtor<?> delegate;
 
 	public boolean setDelegate(final ModelAggregtor<?> delegate) {
+		assert delegate != null;
 		if (this.delegate == delegate)
 			return false;
 

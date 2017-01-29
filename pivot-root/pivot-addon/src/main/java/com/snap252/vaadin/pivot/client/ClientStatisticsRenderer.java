@@ -13,19 +13,17 @@ public class ClientStatisticsRenderer implements Renderer<ClientBigDecimalNumber
 	private WhatToRender whatToRender;
 
 	@Override
-	public void render(final RendererCellReference cell, final ClientBigDecimalNumberStatistics text) {
+	public void render(final RendererCellReference cell, final ClientBigDecimalNumberStatistics stats) {
 		final TableCellElement element = cell.getElement();
 		element.getStyle().setTextAlign(TextAlign.RIGHT);
 
-		if (text == null) {
+		if (stats == null) {
 			handleNull(element);
 			return;
 		}
-
-		element.setInnerText(getKind(text));
 	}
 
-	protected String getKind(final ClientBigDecimalNumberStatistics text) {
+	protected String getText(final ClientBigDecimalNumberStatistics text) {
 		switch (whatToRender) {
 		case avg:
 			return format(text.avg);
@@ -42,12 +40,14 @@ public class ClientStatisticsRenderer implements Renderer<ClientBigDecimalNumber
 			return "no value";
 		}
 	}
-	
+
 	public void setNumberFormat(final NumberFormat nf) {
 		this.nf = nf;
 	}
+
 	private NumberFormat nf;
-	private String format(final BigDecimal bd){
+
+	private String format(final BigDecimal bd) {
 		return nf.format(bd);
 	}
 

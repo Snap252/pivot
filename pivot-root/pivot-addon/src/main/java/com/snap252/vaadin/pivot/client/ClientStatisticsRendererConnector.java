@@ -1,6 +1,7 @@
 package com.snap252.vaadin.pivot.client;
 
-import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.i18n.client.CurrencyList;
+import com.google.gwt.i18n.client.constants.NumberConstants;
 import com.snap252.org.aggregators.NumberStatistics;
 import com.vaadin.client.communication.StateChangeEvent;
 import com.vaadin.client.communication.StateChangeEvent.StateChangeHandler;
@@ -28,16 +29,126 @@ public class ClientStatisticsRendererConnector extends AbstractRendererConnector
 			public void onStateChanged(final StateChangeEvent stateChangeEvent) {
 				final ClientStatisticsRenderer ret = getRenderer();
 				ret.setWhatToRender(getState().toRender);
-				ret.setNumberFormat(NumberFormat.getFormat(getState().numberFormat));
+				ret.setNumberFormat(new LocalizedNumberFormat(getState().numberFormat));
 			}
 		});
+	}
+
+	static class LocalizedNumberFormat extends com.google.gwt.i18n.client.NumberFormat {
+		protected LocalizedNumberFormat(final String pattern) {
+			super(new MyNumberConstants(defaultNumberConstants), pattern, CurrencyList.get().getDefault(), true);
+		}
+
+		static class MyNumberConstants implements NumberConstants {
+			private final NumberConstants nc;
+
+			MyNumberConstants(final NumberConstants nc) {
+				this.nc = nc;
+			}
+
+			@Override
+			public String notANumber() {
+				return nc.notANumber();
+			}
+
+			@Override
+			public String currencyPattern() {
+				return nc.currencyPattern();
+			}
+
+			@Override
+			public String decimalPattern() {
+				return nc.decimalPattern();
+			}
+
+			@Override
+			public String decimalSeparator() {
+				return ",";
+			}
+
+			@Override
+			public String defCurrencyCode() {
+				return nc.defCurrencyCode();
+			}
+
+			@Override
+			public String exponentialSymbol() {
+				return nc.exponentialSymbol();
+			}
+
+			@Override
+			public String globalCurrencyPattern() {
+				return nc.globalCurrencyPattern();
+			}
+
+			@Override
+			public String groupingSeparator() {
+				return nc.groupingSeparator();
+			}
+
+			@Override
+			public String infinity() {
+				return nc.infinity();
+			}
+
+			@Override
+			public String minusSign() {
+				return nc.minusSign();
+			}
+
+			@Override
+			public String monetaryGroupingSeparator() {
+				return nc.monetaryGroupingSeparator();
+			}
+
+			@Override
+			public String monetarySeparator() {
+				return nc.monetarySeparator();
+			}
+
+			@Override
+			public String percent() {
+				return nc.percent();
+			}
+
+			@Override
+			public String percentPattern() {
+				return nc.percentPattern();
+			}
+
+			@Override
+			public String perMill() {
+				return nc.perMill();
+			}
+
+			@Override
+			public String plusSign() {
+				return nc.plusSign();
+			}
+
+			@Override
+			public String scientificPattern() {
+				return nc.scientificPattern();
+			}
+
+			@Override
+			public String simpleCurrencyPattern() {
+				return nc.simpleCurrencyPattern();
+			}
+
+			@Override
+			public String zeroDigit() {
+				return nc.zeroDigit();
+			}
+
+		}
 	}
 
 	@Override
 	public ClientStatisticsRenderer getRenderer() {
 		final ClientStatisticsRenderer ret = (ClientStatisticsRenderer) super.getRenderer();
 		ret.setWhatToRender(getState().toRender);
-		ret.setNumberFormat(NumberFormat.getFormat(getState().numberFormat));
+		ret.setNumberFormat(new LocalizedNumberFormat(getState().numberFormat));
 		return ret;
 	}
 

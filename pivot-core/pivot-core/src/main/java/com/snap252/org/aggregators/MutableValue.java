@@ -150,7 +150,9 @@ public final class MutableValue<N extends Number> {
 		if (cnt == 0) {
 			return null;
 		}
-		assert arithmetics.compare(arithmetics.sqr(sum), sqrSum) >= 0 : arithmetics.sqr(sum) + " => " + sqrSum;
+		// FIXME:
+		// assert arithmetics.compare(arithmetics.sqr(sum), sqrSum) >= 0 :
+		// arithmetics.sqr(sum) + " => " + sqrSum;
 
 		@SuppressWarnings("null")
 		final N max2 = max;

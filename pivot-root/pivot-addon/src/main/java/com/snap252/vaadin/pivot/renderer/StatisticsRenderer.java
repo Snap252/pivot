@@ -1,7 +1,6 @@
 package com.snap252.vaadin.pivot.renderer;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -24,11 +23,8 @@ import elemental.json.JsonValue;
 @SuppressWarnings("rawtypes")
 public class StatisticsRenderer extends AbstractRenderer<NumberStatistics> {
 
-	private final DecimalFormat decimalFormat;
-
 	public StatisticsRenderer(final String nullRepresentation) {
 		super(NumberStatistics.class, nullRepresentation);
-		decimalFormat = new DecimalFormat("########################0.0");
 	}
 
 	@NonNullByDefault

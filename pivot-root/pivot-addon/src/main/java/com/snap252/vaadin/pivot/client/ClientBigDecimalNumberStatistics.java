@@ -5,8 +5,6 @@ import java.math.BigDecimal;
 
 public final class ClientBigDecimalNumberStatistics implements Serializable {
 
-	public BigDecimal bd = BigDecimal.ONE;
-	
 	public BigDecimal sum;
 	public BigDecimal max;
 	public BigDecimal min;

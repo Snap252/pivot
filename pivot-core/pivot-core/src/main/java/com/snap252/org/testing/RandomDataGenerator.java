@@ -71,8 +71,9 @@ public class RandomDataGenerator {
 	public static List<Person> createPersons(final int cnt) {
 		return getAsStream(cnt,
 				r -> new Person(random(TestData.vorname), random(TestData.nachname), r.nextInt(60) + 10,
-						random(Geschl.values()), new BigDecimal(r.nextInt(10001)).scaleByPowerOfTen(-2),
-						r.nextInt(1793), new BigDecimal(r.nextInt(10001) - 10001 / 2).scaleByPowerOfTen(-2),
+						random(Geschl.values()), random(Abteilung.values()),
+						new BigDecimal(r.nextInt(10001)).scaleByPowerOfTen(-2), r.nextInt(1793),
+						new BigDecimal(r.nextInt(10001) - 10001 / 2).scaleByPowerOfTen(-2),
 						r.nextBoolean() ? null : new BigDecimal(r.nextInt(10001) - 10001 / 2).scaleByPowerOfTen(-2),
 						new Date((RANDOM.nextInt(1200) - 750) * 86400000L))).collect(Collectors.toList());
 	}
@@ -127,6 +128,10 @@ public class RandomDataGenerator {
 		m, w, unbekannt
 	}
 
+	public enum Abteilung {
+		A, B, C, D, E, F, G, H, I
+	}
+
 	public static class Person {
 		private final String vorname;
 		private final String nachname;
@@ -137,14 +142,16 @@ public class RandomDataGenerator {
 		private final int wertGanzzahl;
 		private final BigDecimal wertNeg;
 		private final @Nullable BigDecimal wertNullable;
+		private final Abteilung abteilung;
 
-		public Person(final String vorname, final String nachname, final int alter, final Geschl g,
+		public Person(final String vorname, final String nachname, final int alter, final Geschl g, final Abteilung abt,
 				final BigDecimal wert, final int wertGanzzahl, final BigDecimal wertNeg,
 				@Nullable final BigDecimal wertNullable, final Date birthday) {
 			this.vorname = vorname;
 			this.nachname = nachname;
 			this.alter = alter;
 			this.geschlecht = g;
+			this.abteilung = abt;
 			this.wert = wert;
 			this.wertGanzzahl = wertGanzzahl;
 			this.wertNeg = wertNeg;
@@ -154,6 +161,10 @@ public class RandomDataGenerator {
 
 		public BigDecimal getWertNeg() {
 			return wertNeg;
+		}
+
+		public Abteilung getAbteilung() {
+			return abteilung;
 		}
 
 		public @Nullable BigDecimal getWertNullable() {

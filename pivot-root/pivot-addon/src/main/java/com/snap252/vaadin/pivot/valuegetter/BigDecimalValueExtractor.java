@@ -1,4 +1,4 @@
-package com.snap252.vaadin.pivot;
+package com.snap252.vaadin.pivot.valuegetter;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -6,6 +6,8 @@ import java.math.RoundingMode;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
+import com.snap252.vaadin.pivot.AbstractFilteringComponent;
+import com.snap252.vaadin.pivot.NameType;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.AbstractComponent;

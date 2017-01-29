@@ -1,9 +1,10 @@
-package com.snap252.vaadin.pivot;
+package com.snap252.vaadin.pivot.valuegetter;
 
 import java.math.BigDecimal;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
+import com.snap252.vaadin.pivot.NameType;
 import com.vaadin.data.Item;
 
 @NonNullByDefault

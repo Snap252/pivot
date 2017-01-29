@@ -22,6 +22,7 @@ import com.snap252.org.aggregators.NullableArithmeticsWrapper;
 import com.snap252.org.aggregators.NumberStatistics;
 import com.snap252.org.aggregators.PivotCollectors;
 import com.snap252.org.pivoting.BiBucketParameter;
+import com.snap252.vaadin.pivot.valuegetter.ValueGetterDnDHandler;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.event.dd.DropHandler;

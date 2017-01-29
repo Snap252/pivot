@@ -1,4 +1,4 @@
-package com.snap252.vaadin.pivot;
+package com.snap252.vaadin.pivot.valuegetter;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -7,6 +7,9 @@ import org.vaadin.hene.popupbutton.PopupButton;
 import org.vaadin.hene.popupbutton.PopupButton.PopupVisibilityEvent;
 import org.vaadin.hene.popupbutton.PopupButton.PopupVisibilityListener;
 
+import com.snap252.vaadin.pivot.DropHandlerImplementation;
+import com.snap252.vaadin.pivot.FilteringComponent;
+import com.snap252.vaadin.pivot.NameType;
 import com.vaadin.event.dd.DragAndDropEvent;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.AbstractOrderedLayout;

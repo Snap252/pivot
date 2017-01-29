@@ -3,11 +3,11 @@ package com.snap252.vaadin.pivot;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 @NonNullByDefault
-class NameType {
+public class NameType {
 	public final Object propertyId;
 	public final Class<?> type;
 
-	public NameType(Object propertyId, Class<?> type) {
+	public NameType(final Object propertyId, final Class<?> type) {
 		this.propertyId = propertyId;
 		this.type = type;
 	}

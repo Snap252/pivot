@@ -21,7 +21,7 @@ import com.vaadin.ui.DragAndDropWrapper.WrapperTargetDetails;
 import fi.jasoft.dragdroplayouts.DDHorizontalLayout.HorizontalLayoutTargetDetails;
 import fi.jasoft.dragdroplayouts.DDVerticalLayout.VerticalLayoutTargetDetails;
 
-abstract class DropHandlerImplementation<T> implements DropHandler {
+public abstract class DropHandlerImplementation<T> implements DropHandler {
 
 	private final AbstractOrderedLayout cols;
 	private final boolean vertical;

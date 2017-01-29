@@ -14,6 +14,12 @@ import com.vaadin.ui.Grid.AbstractRenderer;
 import elemental.json.JsonValue;
 
 @SuppressWarnings("rawtypes")
+/**
+ * For client Side see
+ * @see {com.snap252.vaadin.pivot.client.ClientStatisticsRendererConnector}
+ * @author Snap252
+ *
+ */
 public class StatisticsRenderer extends AbstractRenderer<NumberStatistics> {
 
 	private final DecimalFormat decimalFormat;

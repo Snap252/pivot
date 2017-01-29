@@ -1,6 +1,9 @@
-package com.snap252.vaadin.pivot;
+package com.snap252.vaadin.pivot.valuegetter;
 
 import java.math.BigDecimal;
+
+import com.snap252.vaadin.pivot.FilteringComponent;
+import com.snap252.vaadin.pivot.NameType;
 
 public class ValueFactory {
 	FilteringComponent<?> createFilter(final NameType n) {

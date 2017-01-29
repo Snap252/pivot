@@ -1,0 +1,4 @@
+class com/vaadin/event/dd/acceptcriteria/AcceptCriterion
+accept
+ (Lcom/vaadin/event/dd/DragAndDropEvent;)Z
+ (L1com/vaadin/event/dd/DragAndDropEvent;)Z

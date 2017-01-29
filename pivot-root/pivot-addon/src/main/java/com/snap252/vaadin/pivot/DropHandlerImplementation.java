@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 import com.vaadin.event.dd.DragAndDropEvent;
 import com.vaadin.event.dd.DropHandler;
 import com.vaadin.event.dd.TargetDetails;
@@ -21,6 +23,7 @@ import com.vaadin.ui.DragAndDropWrapper.WrapperTargetDetails;
 import fi.jasoft.dragdroplayouts.DDHorizontalLayout.HorizontalLayoutTargetDetails;
 import fi.jasoft.dragdroplayouts.DDVerticalLayout.VerticalLayoutTargetDetails;
 
+@NonNullByDefault
 public abstract class DropHandlerImplementation<T> implements DropHandler {
 
 	private final AbstractOrderedLayout cols;
@@ -36,6 +39,7 @@ public abstract class DropHandlerImplementation<T> implements DropHandler {
 		this.pivotCriteriaList = new ArrayList<T>();
 	}
 
+	
 	protected boolean accept(final DragAndDropEvent event) {
 		return true;
 	}
@@ -89,6 +93,7 @@ public abstract class DropHandlerImplementation<T> implements DropHandler {
 		final T data2 = (T) childButton.getData();
 		final DropHandlerImplementation<T> pivotCriteriaList2 = (DropHandlerImplementation<T>) sourceComponent
 				.getData();
+		assert pivotCriteriaList2 != null;
 		removeFromList(sourceComponent, data2, pivotCriteriaList2);
 		return data2;
 	}

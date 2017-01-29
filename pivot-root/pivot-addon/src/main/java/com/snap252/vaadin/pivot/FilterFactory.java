@@ -2,6 +2,9 @@ package com.snap252.vaadin.pivot;
 
 import java.util.Date;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
+@NonNullByDefault
 public class FilterFactory {
 	FilteringComponent<?> createFilter(final NameType n) {
 
@@ -12,12 +15,11 @@ public class FilterFactory {
 			return new DateFilteringComponent(n);
 		if (Number.class.isAssignableFrom(n.type))
 			return new NumberFilteringComponent<>(n);
-		
+
 		if (n.type.isEnum())
 			return new EnumFilteringComponent<>(n);
 
-		assert false : n.type;
-		return null;
+		throw new AssertionError(n.type);
 	}
 
 }

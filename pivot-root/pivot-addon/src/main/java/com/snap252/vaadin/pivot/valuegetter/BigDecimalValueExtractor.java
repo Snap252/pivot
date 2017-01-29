@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.snap252.vaadin.pivot.AbstractFilteringComponent;
 import com.snap252.vaadin.pivot.NameType;
@@ -17,7 +16,6 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Slider;
 import com.vaadin.ui.themes.ValoTheme;
 
-@NonNullByDefault
 public class BigDecimalValueExtractor extends AbstractFilteringComponent<BigDecimal> {
 	private final FormLayout comp;
 	private final Slider slider;

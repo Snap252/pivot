@@ -1,8 +1,10 @@
 package com.snap252.vaadin.pivot;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.vaadin.hene.popupbutton.PopupButton;
 import org.vaadin.hene.popupbutton.PopupButton.PopupVisibilityEvent;
 import org.vaadin.hene.popupbutton.PopupButton.PopupVisibilityListener;
@@ -13,10 +15,10 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
-
+@NonNullByDefault
 public class PivotCriteriaFilteringDnDHandler extends DropHandlerImplementation<FilteringComponent<?>> {
 
-	private final FilterFactory ff = new FilterFactory();
+	private final FilterFactory filterFactory = new FilterFactory();
 
 	public PivotCriteriaFilteringDnDHandler(final AbstractOrderedLayout cols, final boolean vertical,
 			final Consumer<List<FilteringComponent<?>>> refresher) {
@@ -25,7 +27,7 @@ public class PivotCriteriaFilteringDnDHandler extends DropHandlerImplementation<
 
 	@Override
 	protected FilteringComponent<?> createNew(final Object data) {
-		return ff.createFilter((NameType) data);
+		return filterFactory.createFilter((NameType) data);
 	}
 
 	@Override
@@ -36,7 +38,7 @@ public class PivotCriteriaFilteringDnDHandler extends DropHandlerImplementation<
 		if (component != null) {
 			final PopupButton popupButton = new PopupButton(createFilter.toString());
 			final Button deleteButton = new Button("Entfernen", evt -> {
-				removeFromList(popupButton.getParent(), createFilter, this);
+				removeFromList(Objects.requireNonNull(popupButton.getParent()), createFilter, this);
 				popupButton.setPopupVisible(false);
 				refresh();
 			});

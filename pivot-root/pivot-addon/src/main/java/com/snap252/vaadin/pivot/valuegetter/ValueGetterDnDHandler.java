@@ -1,6 +1,7 @@
 package com.snap252.vaadin.pivot.valuegetter;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 import org.vaadin.hene.popupbutton.PopupButton;
@@ -40,7 +41,7 @@ public class ValueGetterDnDHandler extends DropHandlerImplementation<FilteringCo
 		if (component != null) {
 			final PopupButton popupButton = new PopupButton(createFilter.toString());
 			final Button deleteButton = new Button("Entfernen", evt -> {
-				removeFromList(popupButton.getParent(), createFilter, this);
+				removeFromList(Objects.requireNonNull(popupButton.getParent()), createFilter, this);
 				popupButton.setPopupVisible(false);
 				refresh();
 			});
@@ -74,7 +75,7 @@ public class ValueGetterDnDHandler extends DropHandlerImplementation<FilteringCo
 			b = new Button(createFilter.toString());
 		return b;
 	}
-	
+
 	@Override
 	protected boolean accept(final DragAndDropEvent event) {
 		final AbstractComponent sourceComponent = (AbstractComponent) event.getTransferable().getSourceComponent();

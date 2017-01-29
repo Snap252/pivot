@@ -1,0 +1,4 @@
+class org/vaadin/hene/popupbutton/PopupButton$PopupVisibilityListener
+popupVisibilityChange
+ (Lorg/vaadin/hene/popupbutton/PopupButton$PopupVisibilityEvent;)V
+ (L1org/vaadin/hene/popupbutton/PopupButton$PopupVisibilityEvent;)V

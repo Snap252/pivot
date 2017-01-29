@@ -185,7 +185,8 @@ final class GridRenderer {
 						this.colBucket = colBucket;
 						assert rowBucket != colBucket;
 						valueResetter.add(() -> v = null);
-						filterOwnValues = rowBucket.filterOwnValues(colBucket).collect(toList());
+						// TODO: may work better if using parent bucket
+						filterOwnValues = rowBucket.getMerged(colBucket);
 						this.clazz = PivotCellReference.cast(PivotCellReference.class);
 					}
 
@@ -509,8 +510,8 @@ final class GridRenderer {
 								Stream.of(oa.getValue()).skip(1).map(g::getColumn).forEach(c -> c.setHidden(collapsed));
 							}
 						});
-						// join.setText("text");
-						join.setComponent(collapser);
+						join.setText(String.valueOf(oa.getKey().bucketValue));
+						// join.setComponent(collapser);
 					} else {
 						join = headerRow.getCell(oa.getValue()[0]);
 						assert join != null;

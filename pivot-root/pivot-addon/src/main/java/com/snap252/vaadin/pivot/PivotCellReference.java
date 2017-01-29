@@ -2,7 +2,6 @@ package com.snap252.vaadin.pivot;
 
 import java.util.Objects;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.snap252.org.pivoting.Bucket;
@@ -55,11 +54,11 @@ public class PivotCellReference<T> {
 	
 	@Override
 	public String toString() {
-		return "-";
+		return "---";
 	}
 
 	@SuppressWarnings("unchecked")
 	public static <T> Class<T> cast(final Class<?> c) {
-		return (@NonNull Class<T>) c;
+		return (Class<T>) c;
 	}
 }

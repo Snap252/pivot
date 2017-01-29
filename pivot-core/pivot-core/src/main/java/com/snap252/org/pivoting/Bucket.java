@@ -2,6 +2,7 @@ package com.snap252.org.pivoting;
 
 import static java.util.stream.Collectors.toList;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -72,8 +73,15 @@ public abstract class Bucket<V> implements Predicate<@NonNull V> {
 		return /* parent.test(v) && */bucketValue.equals(extractedValue);
 	}
 
+	@Deprecated
 	public final Stream<V> filterOwnValues(final Predicate<V> f) {
 		return values.stream().filter(f);
+	}
+
+	public List<V> getMerged(final Bucket<V> b) {
+		final List<V> ret = new ArrayList<>(values);
+		ret.retainAll(b.values);
+		return ret;
 	}
 
 	public abstract @Nullable List<? extends Bucket<V>> getChildren();

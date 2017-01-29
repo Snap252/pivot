@@ -16,7 +16,9 @@ public interface Arithmetics<N extends Number> {
 	N mul(N n1, N n2);
 
 	default N sqr(final N n) {
-		return mul(n, n);
+		final N ret = mul(n, n);
+		assert ret == null || ret.equals(mul(negate(n), negate(n))) : n;
+		return ret;
 	}
 
 	N part(N n1, int n2) throws ArithmeticException;

@@ -36,12 +36,6 @@ public class PivotUI extends GridLayout {
 	private final HorizontalLayout properties;
 	private BiBucketParameter<Item> p;
 
-	// private final Collector<Item, MutableValue<@Nullable BigDecimal>,
-	// @Nullable NumberStatistics<@Nullable BigDecimal>> reducer =
-	// PivotCollectors
-	// .<@NonNull Item, @Nullable BigDecimal>getNumberReducer(this::apply,
-	// new NullableArithmeticsWrapper<>(new BigDecimalArithmetics()));
-
 	private @Nullable GridWriter<?, ?> gridWriter;
 
 	@SuppressWarnings("null")

@@ -25,15 +25,15 @@ public class PivotGrid extends TreeGrid {
 			final GridRenderer.GridWriter<Object, Object> gridWriter = gridRenderer.createGridWriter();
 			gridWriter.writeGrid(this);
 			if (oldGridWriter != null) {
-//				gridWriter.setModelAggregator(oldGridWriter.getModelAggregator());
-//				gridWriter.updateRenderer(this);
+				gridWriter.setModelAggregator(oldGridWriter.getModelAggregator());
+				gridWriter.updateRenderer(this);
 			}
 			return gridWriter;
 		} catch (final IllegalArgumentException e) {
 			removeAllColumns();
 			setContainerDataSource(new IndexedContainer());
 			setComponentError(new UserError(e.getMessage()));
-			return null;
+			return oldGridWriter;
 		}
 	}
 }

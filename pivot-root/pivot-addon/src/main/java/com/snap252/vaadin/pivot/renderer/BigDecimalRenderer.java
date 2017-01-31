@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 
 import com.snap252.vaadin.pivot.client.ClientRendererSharedState;
 import com.vaadin.ui.Grid.AbstractRenderer;
@@ -12,15 +13,18 @@ import elemental.json.JsonValue;
 
 /**
  * For client Side see
- * 
+ *
  * @see {com.snap252.vaadin.pivot.client.ClientStatisticsRendererConnector}
  * @author Snap252
  *
  */
-public class BigDecimalRenderer extends AbstractRenderer<BigDecimal> {
+public class BigDecimalRenderer extends AbstractRenderer<@Nullable BigDecimal> {
 
+	@SuppressWarnings("null")
+	@NonNullByDefault
 	public BigDecimalRenderer(final String nullRepresentation) {
 		super(BigDecimal.class, nullRepresentation);
+		setNullRepresentation(nullRepresentation);
 	}
 
 	@NonNullByDefault
@@ -29,6 +33,15 @@ public class BigDecimalRenderer extends AbstractRenderer<BigDecimal> {
 		if (Objects.equals(state.numberFormat, numberFormat))
 			return this;
 		state.numberFormat = numberFormat;
+		markAsDirty();
+		return this;
+	}
+
+	public BigDecimalRenderer setNullRepresentation(final String nullRepresentation) {
+		final ClientRendererSharedState state = getState(false);
+		if (Objects.equals(state.nullRepresentation, nullRepresentation))
+			return this;
+		state.nullRepresentation = nullRepresentation;
 		markAsDirty();
 		return this;
 	}
@@ -43,11 +56,9 @@ public class BigDecimalRenderer extends AbstractRenderer<BigDecimal> {
 		return (ClientRendererSharedState) super.getState(markAsDirty);
 	}
 
-	@SuppressWarnings("null")
 	@Override
-	public JsonValue encode(final BigDecimal value) {
-		if (value == null)
-			return encode(null, BigDecimal.class);
+	@NonNullByDefault
+	public JsonValue encode(final @Nullable BigDecimal value) {
 		return encode(value, BigDecimal.class);
 	}
 }

@@ -11,6 +11,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import com.snap252.org.aggregators.Arithmetics;
 import com.snap252.org.aggregators.BigDecimalArithmetics;
+import com.snap252.org.aggregators.NullableArithmeticsWrapper;
 import com.snap252.org.aggregators.NumberStatistics;
 import com.snap252.vaadin.pivot.NameType;
 import com.snap252.vaadin.pivot.PivotCellReference;
@@ -19,6 +20,7 @@ import com.snap252.vaadin.pivot.renderer.WhatToRender;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.Validator.InvalidValueException;
+import com.vaadin.data.validator.StringLengthValidator;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
@@ -39,6 +41,7 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 	private final ComboBox howToRenderComboBox = new ComboBox("Anzeige", Arrays.asList(WhatToRender.values()));
 
 	private final TextField numberFormatTextField = new TextField("Format", "0.00##");
+	private final TextField nullRepresentationTextField = new TextField("Leer-Repräsentation", (String) null);
 
 	private final CheckBox relativeCheckBox = new CheckBox("Relativ", false);
 
@@ -86,7 +89,11 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 			}
 
 		});
-		formLayout.addComponents(howToRenderComboBox, numberFormatTextField, relativeCheckBox);
+
+		nullRepresentationTextField.addValidator(new StringLengthValidator("Maximal 10 Zeichen erlaubt", 0, 10, true));
+
+		formLayout.addComponents(howToRenderComboBox, numberFormatTextField, nullRepresentationTextField,
+				relativeCheckBox);
 	}
 
 	@Override
@@ -115,15 +122,18 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 
 	@Override
 	public void addValueChangeListener(final ValueChangeListener l) {
+		howToRenderComboBox.addValueChangeListener(l);
 		roundingEnabledCheckBox.addValueChangeListener(l);
 		slider.addValueChangeListener(l);
 		relativeCheckBox.addValueChangeListener(l);
+		numberFormatTextField.addValueChangeListener(l);
 	}
 
 	@Override
 	public void addRendererChangeListener(final ValueChangeListener l) {
 		howToRenderComboBox.addValueChangeListener(l);
 		numberFormatTextField.addValueChangeListener(l);
+		nullRepresentationTextField.addValueChangeListener(l);
 		relativeCheckBox.addValueChangeListener(l);
 	}
 
@@ -161,11 +171,13 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 		final String numberFormat = numberFormatTextField.getValue();
 		assert numberFormat != null;
 		renderer.setFormat(numberFormat);
+		renderer.setNullRepresentation(nullRepresentationTextField.getValue());
 
-		final Function<@Nullable NumberStatistics<BigDecimal>, @Nullable BigDecimal> singleExtractor = t -> t == null ? null
-				: whatToRender.getValue(t);
+		final Function<@Nullable NumberStatistics<BigDecimal>, @Nullable BigDecimal> singleExtractor = t -> t == null
+				? null : whatToRender.getValue(t);
 
-		final Arithmetics<BigDecimal> createArithmetics = createArithmetics();
+		final Arithmetics<@Nullable BigDecimal> createArithmetics = new NullableArithmeticsWrapper<>(
+				createArithmetics());
 		final Function<PivotCellReference<@Nullable NumberStatistics<BigDecimal>>, @Nullable BigDecimal> f = (
 				final PivotCellReference<@Nullable NumberStatistics<BigDecimal>> x) -> {
 

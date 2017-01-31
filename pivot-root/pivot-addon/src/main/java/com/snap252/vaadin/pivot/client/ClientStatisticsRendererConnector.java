@@ -30,7 +30,9 @@ public class ClientStatisticsRendererConnector extends AbstractRendererConnector
 			@Override
 			public void onStateChanged(final StateChangeEvent stateChangeEvent) {
 				final ClientStatisticsRenderer ret = getRenderer();
-				ret.setNumberFormat(new LocalizedNumberFormat(getState().numberFormat));
+				ClientRendererSharedState state = getState();
+				ret.setNumberFormat(new LocalizedNumberFormat(state.numberFormat));
+				ret.setNullRepresentation(state.nullRepresentation);
 			}
 		});
 	}
@@ -148,7 +150,9 @@ public class ClientStatisticsRendererConnector extends AbstractRendererConnector
 	@Override
 	public ClientStatisticsRenderer getRenderer() {
 		final ClientStatisticsRenderer ret = (ClientStatisticsRenderer) super.getRenderer();
-		ret.setNumberFormat(new LocalizedNumberFormat(getState().numberFormat));
+		final ClientRendererSharedState state = getState();
+		ret.setNumberFormat(new LocalizedNumberFormat(state.numberFormat));
+		ret.setNullRepresentation(state.nullRepresentation);
 		return ret;
 	}
 

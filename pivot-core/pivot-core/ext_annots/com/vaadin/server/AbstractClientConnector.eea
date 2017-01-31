@@ -1,0 +1,7 @@
+class com/vaadin/server/AbstractClientConnector
+getState
+ ()Lcom/vaadin/shared/communication/SharedState;
+ ()L1com/vaadin/shared/communication/SharedState;
+getState
+ (Z)Lcom/vaadin/shared/communication/SharedState;
+ (Z)L1com/vaadin/shared/communication/SharedState;

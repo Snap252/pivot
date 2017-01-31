@@ -1,0 +1,4 @@
+class com/vaadin/ui/Grid$AbstractRenderer
+encode
+ <U:Ljava/lang/Object;>(TU;Ljava/lang/Class<TU;>;)Lelemental/json/JsonValue;
+ <U:Ljava/lang/Object;>(T0U;Ljava/lang/Class<TU;>;)L1elemental/json/JsonValue;

@@ -10,6 +10,7 @@ import com.vaadin.client.widget.grid.RendererCellReference;
 
 public class ClientStatisticsRenderer implements Renderer<BigDecimal> {
 
+	private String nullRepresentation = null;
 
 	@Override
 	public void render(final RendererCellReference cell, final BigDecimal value) {
@@ -30,6 +31,9 @@ public class ClientStatisticsRenderer implements Renderer<BigDecimal> {
 	public void setNumberFormat(final NumberFormat nf) {
 		this.nf = nf;
 	}
+	public void setNullRepresentation(final String nullRepresentation) {
+		this.nullRepresentation = nullRepresentation;
+	}
 
 	private NumberFormat nf;
 
@@ -38,6 +42,6 @@ public class ClientStatisticsRenderer implements Renderer<BigDecimal> {
 	}
 
 	protected void handleNull(final TableCellElement element) {
-		element.setInnerText(null);
+		element.setInnerText(nullRepresentation);
 	}
 }

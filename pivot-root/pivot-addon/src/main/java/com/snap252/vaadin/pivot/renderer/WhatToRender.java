@@ -30,7 +30,7 @@ public enum WhatToRender {
 			return n.sum;
 		}
 	},
-	cnt("Anzahl") {
+	cnt("Anzahl Datensätze") {
 		@Override
 		public <N extends Number> N getValue(final NumberStatistics<N> n) {
 			return n.toN(n.cnt);

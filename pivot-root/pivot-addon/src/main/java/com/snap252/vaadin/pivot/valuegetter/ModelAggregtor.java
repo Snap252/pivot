@@ -17,20 +17,21 @@ public interface ModelAggregtor<VALUE> {
 
 	public RendererConverter<?, ? extends VALUE> createRendererConverter();
 
-	class RendererConverter<T, VALUE> {
+	public static class RendererConverter<T, VALUE> {
 		private final Renderer<T> renderer;
 		private final Converter<T, PivotCellReference<@Nullable VALUE>> converter;
 
-		public RendererConverter(final Renderer<T> renderer, final Function<PivotCellReference<@Nullable VALUE>, @Nullable T> f,
-				 final Class<?> presentationType) {
+		public RendererConverter(final Renderer<T> renderer,
+				final Function<PivotCellReference<@Nullable VALUE>, @Nullable T> f, final Class<?> presentationType) {
 			this.renderer = renderer;
 
 			converter = new Converter<T, PivotCellReference<@Nullable VALUE>>() {
 
 				@SuppressWarnings("null")
 				@Override
-				public PivotCellReference<VALUE> convertToModel(final T value, final Class<? extends PivotCellReference<@Nullable VALUE>> targetType,
-						final Locale locale) throws com.vaadin.data.util.converter.Converter.ConversionException {
+				public PivotCellReference<VALUE> convertToModel(final T value,
+						final Class<? extends PivotCellReference<@Nullable VALUE>> targetType, final Locale locale)
+						throws com.vaadin.data.util.converter.Converter.ConversionException {
 					throw new AssertionError();
 				}
 
@@ -53,7 +54,8 @@ public interface ModelAggregtor<VALUE> {
 			};
 		}
 
-		public RendererConverter(final Renderer<T> renderer, final Converter<T, PivotCellReference<@Nullable VALUE>> converter) {
+		public RendererConverter(final Renderer<T> renderer,
+				final Converter<T, PivotCellReference<@Nullable VALUE>> converter) {
 			this.renderer = renderer;
 			this.converter = converter;
 		}

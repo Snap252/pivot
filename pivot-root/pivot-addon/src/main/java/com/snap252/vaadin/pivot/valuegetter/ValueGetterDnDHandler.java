@@ -18,24 +18,24 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
 
-public class ValueGetterDnDHandler extends DropHandlerImplementation<FilteringRenderingComponent<?, ?>> {
+public class ValueGetterDnDHandler extends DropHandlerImplementation<FilteringRenderingComponent<?>> {
 
 	private final ValueFactory valueFactory = new ValueFactory();
 	private final Runnable upateRenderer;
 
 	public ValueGetterDnDHandler(final AbstractOrderedLayout cols, final boolean vertical,
-			final Consumer<List<FilteringRenderingComponent<?, ?>>> refresher, final Runnable upateRenderer) {
+			final Consumer<List<FilteringRenderingComponent<?>>> refresher, final Runnable upateRenderer) {
 		super(cols, vertical, refresher);
 		this.upateRenderer = upateRenderer;
 	}
 
 	@Override
-	protected FilteringRenderingComponent<?, ?> createNew(final Object data) {
+	protected FilteringRenderingComponent<?> createNew(final Object data) {
 		return valueFactory.createFilter((NameType) data);
 	}
 
 	@Override
-	protected AbstractComponent createUIComponent(final FilteringRenderingComponent<?, ?> createFilter) {
+	protected AbstractComponent createUIComponent(final FilteringRenderingComponent<?> createFilter) {
 		final AbstractComponent component = createFilter.getComponent();
 
 		final Button b;
@@ -105,12 +105,13 @@ public class ValueGetterDnDHandler extends DropHandlerImplementation<FilteringRe
 
 	@Override
 	protected boolean accept(final DragAndDropEvent event) {
-		final AbstractComponent sourceComponent = (AbstractComponent) event.getTransferable().getSourceComponent();
-		final Object data = sourceComponent.getData();
-		if (!(data instanceof NameType))
-			return false;
-		
-		final NameType dataNamed = (NameType) data;
-		return Number.class.isAssignableFrom(dataNamed.type);
+//		final AbstractComponent sourceComponent = (AbstractComponent) event.getTransferable().getSourceComponent();
+//		final Object data = sourceComponent.getData();
+//		if (!(data instanceof NameType))
+//			return false;
+//
+//		final NameType dataNamed = (NameType) data;
+//		return Number.class.isAssignableFrom(dataNamed.type);
+		return true;
 	}
 }

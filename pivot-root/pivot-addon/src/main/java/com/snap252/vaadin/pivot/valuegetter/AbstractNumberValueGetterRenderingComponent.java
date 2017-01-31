@@ -15,7 +15,7 @@ import com.snap252.vaadin.pivot.NameType;
 import com.vaadin.data.Item;
 
 public abstract class AbstractNumberValueGetterRenderingComponent<T extends Number & Comparable<T>>
-		extends AbstractFilteringComponent<T> implements FilteringRenderingComponent<T, NumberStatistics<T>> {
+		extends AbstractFilteringComponent<T> implements FilteringRenderingComponent<NumberStatistics<T>> {
 
 	public AbstractNumberValueGetterRenderingComponent(final NameType nameType) {
 		super(nameType);

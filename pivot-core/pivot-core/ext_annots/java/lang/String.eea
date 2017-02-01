@@ -2,3 +2,6 @@ class java/lang/String
 substring
  (II)Ljava/lang/String;
  (II)L1java/lang/String;
+valueOf
+ (Ljava/lang/Object;)Ljava/lang/String;
+ (Ljava/lang/Object;)L1java/lang/String;

@@ -11,7 +11,7 @@ public interface UIConfigurable {
 	@Nullable
 	abstract AbstractComponent getComponent();
 
-	abstract void addValueChangeListener(ValueChangeListener l);
+	abstract void addValueChangeListener(ValueChangeListener valueChangeListener);
 
 	default String getButtonStyles() {
 		return "";

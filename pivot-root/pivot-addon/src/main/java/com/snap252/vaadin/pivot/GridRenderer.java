@@ -431,7 +431,6 @@ final class GridRenderer {
 		private static final String SUM_TEXT = "\u2211";
 
 		public void writeGrid(final Grid g) {
-			// g.setFrozenColumnCount(0);
 			for (int i = 0; i < g.getHeaderRowCount(); i++) {
 				g.removeHeaderRow(i);
 			}
@@ -476,15 +475,10 @@ final class GridRenderer {
 		}
 
 		protected void doHeader(final Grid g, final Bucket<?> b, final int depth) {
-			if (depth >= g.getHeaderRowCount()) {
-				g.appendHeaderRow();
-				assert depth < g.getHeaderRowCount();
-			}
-			final HeaderRow headerRow = g.getHeaderRow(depth);
 
 			final List<? extends Bucket<?>> children = b.getChildren();
 			if (children != null) {
-
+				final HeaderRow headerRow = getOrCreateHeaderRow(g, depth);
 				final Map<Bucket<?>, Object[]> l = new LinkedHashMap<>();
 				for (final Bucket<?> x : children) {
 					final Object @NonNull [] array = x.stream().toArray();
@@ -517,14 +511,23 @@ final class GridRenderer {
 						join.setText(String.valueOf(oa.getKey().bucketValue));
 					}
 				});
-				headerRow.getCell(b).setText(SUM_TEXT);
 				for (final Bucket<?> child : children) {
 					doHeader(g, child, depth + 1);
 				}
-			} else if (depth == 0) {
 				headerRow.getCell(b).setText(SUM_TEXT);
+			} else if (depth == 0) {
+				/*only rows exists*/
+				getOrCreateHeaderRow(g, depth).getCell(b).setText(SUM_TEXT);
 			}
 		}
 
+	}
+
+	private static HeaderRow getOrCreateHeaderRow(final Grid g, final int depth) {
+		if (depth >= g.getHeaderRowCount()) {
+			g.appendHeaderRow();
+			assert depth < g.getHeaderRowCount();
+		}
+		return g.getHeaderRow(depth);
 	}
 }

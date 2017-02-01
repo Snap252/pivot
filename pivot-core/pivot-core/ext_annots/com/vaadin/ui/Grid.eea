@@ -2,3 +2,6 @@ class com/vaadin/ui/Grid
 getColumns
  ()Ljava/util/List<Lcom/vaadin/ui/Grid$Column;>;
  ()Ljava/util/List<L1com/vaadin/ui/Grid$Column;>;
+getHeaderRow
+ (I)Lcom/vaadin/ui/Grid$HeaderRow;
+ (I)L1com/vaadin/ui/Grid$HeaderRow;

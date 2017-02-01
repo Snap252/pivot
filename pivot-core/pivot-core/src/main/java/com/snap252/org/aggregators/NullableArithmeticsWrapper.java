@@ -40,7 +40,7 @@ public class NullableArithmeticsWrapper<@Nullable N extends Number> implements A
 			return null;
 		if (n2 == null)
 			return null;
-		return wrapped.mul(n1, n2);
+		return wrapped.div(n1, n2);
 	}
 
 	@Override

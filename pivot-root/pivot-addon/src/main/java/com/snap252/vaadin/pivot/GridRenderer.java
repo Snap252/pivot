@@ -7,11 +7,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collector;
-import java.util.stream.Stream;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -28,14 +26,9 @@ import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.ObjectProperty;
-import com.vaadin.server.FontAwesome;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.HeaderCell;
 import com.vaadin.ui.Grid.HeaderRow;
-import com.vaadin.ui.themes.ValoTheme;
 
 @NonNullByDefault
 final class GridRenderer {
@@ -431,7 +424,7 @@ final class GridRenderer {
 		private static final String SUM_TEXT = "\u2211";
 
 		public void writeGrid(final Grid g) {
-			for (int i = 0; i < g.getHeaderRowCount(); i++) {
+			for (int i = g.getHeaderRowCount() - 1; i >= 0; i--) {
 				g.removeHeaderRow(i);
 			}
 			g.setDefaultHeaderRow(null);
@@ -475,49 +468,43 @@ final class GridRenderer {
 		}
 
 		protected void doHeader(final Grid g, final Bucket<?> b, final int depth) {
+			{
+				// final Button collapser = new
+				// Button(String.valueOf(oa.getKey().bucketValue),
+				// FontAwesome.CARET_DOWN);
+				// collapser.addStyleName(ValoTheme.BUTTON_BORDERLESS);
+				// collapser.addStyleName("pivot-grid-expander");
+				// collapser.addClickListener(new ClickListener() {
+				// private boolean collapsed;
+				//
+				// @Override
+				// public void buttonClick(final ClickEvent event) {
+				// collapsed = !collapsed;
+				// event.getButton().setIcon(collapsed ?
+				// FontAwesome.CARET_RIGHT : FontAwesome.CARET_DOWN);
+				// Stream.of(oa.getValue()).skip(1).map(g::getColumn).forEach(c
+				// -> c.setHidden(collapsed));
+				// }
+				// });
+				// join.setComponent(collapser);
 
-			final List<? extends Bucket<?>> children = b.getChildren();
-			if (children != null) {
 				final HeaderRow headerRow = getOrCreateHeaderRow(g, depth);
-				final Map<Bucket<?>, Object[]> l = new LinkedHashMap<>();
-				for (final Bucket<?> x : children) {
-					final Object @NonNull [] array = x.stream().toArray();
-					l.put(x, array);
-				}
-
-				l.entrySet().forEach(oa -> {
-					final HeaderCell join;
-					if (oa.getValue().length > 1) {
-						join = headerRow.join(oa.getValue());
-						final Button collapser = new Button(String.valueOf(oa.getKey().bucketValue),
-								FontAwesome.CARET_DOWN);
-						collapser.addStyleName(ValoTheme.BUTTON_BORDERLESS);
-						collapser.addStyleName("pivot-grid-expander");
-						collapser.addClickListener(new ClickListener() {
-							private boolean collapsed;
-
-							@Override
-							public void buttonClick(final ClickEvent event) {
-								collapsed = !collapsed;
-								event.getButton().setIcon(collapsed ? FontAwesome.CARET_RIGHT : FontAwesome.CARET_DOWN);
-								Stream.of(oa.getValue()).skip(1).map(g::getColumn).forEach(c -> c.setHidden(collapsed));
-							}
-						});
-						join.setText(String.valueOf(oa.getKey().bucketValue));
-						// join.setComponent(collapser);
-					} else {
-						join = headerRow.getCell(oa.getValue()[0]);
-						assert join != null;
-						join.setText(String.valueOf(oa.getKey().bucketValue));
+				final Object @NonNull [] children = b.stream().toArray();
+				final HeaderCell meAndMyChildren;
+				if (children.length > 1) {
+					meAndMyChildren = headerRow.join(children);
+					@Nullable
+					final List<? extends Bucket<?>> children$ = b.getChildren();
+					if (children$ != null) {
+						final int childDepth = depth + 1;
+						children$.forEach(c -> doHeader(g, c, childDepth));
+						final HeaderRow childRow = getOrCreateHeaderRow(g, childDepth);
+						childRow.getCell(b).setText(SUM_TEXT);
 					}
-				});
-				for (final Bucket<?> child : children) {
-					doHeader(g, child, depth + 1);
+				} else {
+					meAndMyChildren = headerRow.getCell(b);
 				}
-				headerRow.getCell(b).setText(SUM_TEXT);
-			} else if (depth == 0) {
-				/*only rows exists*/
-				getOrCreateHeaderRow(g, depth).getCell(b).setText(SUM_TEXT);
+				meAndMyChildren.setText(String.valueOf(b.bucketValue));
 			}
 		}
 

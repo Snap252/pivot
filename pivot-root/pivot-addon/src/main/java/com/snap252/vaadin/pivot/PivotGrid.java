@@ -9,6 +9,7 @@ import com.snap252.vaadin.pivot.GridRenderer.GridWriter;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.server.UserError;
+import com.vaadin.shared.ui.grid.ColumnResizeMode;
 
 @NonNullByDefault
 public class PivotGrid extends TreeGrid {
@@ -16,6 +17,7 @@ public class PivotGrid extends TreeGrid {
 	public PivotGrid() {
 		setPrimaryStyleName("v-grid-tiny");
 		setSelectionMode(SelectionMode.NONE);
+		setColumnResizeMode(ColumnResizeMode.SIMPLE);
 	}
 
 	public @Nullable <@Nullable T> GridWriter<?, ?> setContainerDataSource(final BiBucketParameter<Item> bucketParams,

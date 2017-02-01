@@ -72,8 +72,15 @@ final class GridRenderer {
 
 		public void updateRenderer(final Grid g) {
 
-			g.getColumns().stream().filter(c -> c.getPropertyId() != colProp).forEach(col -> {
-				aggregatorDelegator.createRendererConverter().setToColumn(col);
+			g.getColumns().forEach(col -> {
+				col.setResizable(false);
+				col.setSortable(false);
+				if (col.getPropertyId() != colProp) {
+					aggregatorDelegator.createRendererConverter().setToColumn(col);
+					col.setMinimumWidth(50);
+				} else
+					col.setMinimumWidth(170);
+
 			});
 			/*
 			 * hack for https://vaadin.com/forum#!/thread/9319379
@@ -473,6 +480,7 @@ final class GridRenderer {
 
 			// g.getColumns().stream().filter(c -> c.getPropertyId() !=
 			// bc.colProp).forEach(columnHandler);
+
 		}
 
 		protected void doHeader(final Grid g, final Bucket<?> b, final int depth) {

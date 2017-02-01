@@ -432,11 +432,10 @@ final class GridRenderer {
 
 		public void writeGrid(final Grid g) {
 			// g.setFrozenColumnCount(0);
-			for (int i = 1; i < g.getHeaderRowCount(); i++) {
-				if (g.getDefaultHeaderRow() != g.getHeaderRow(i))
-					g.removeHeaderRow(i);
+			for (int i = 0; i < g.getHeaderRowCount(); i++) {
+				g.removeHeaderRow(i);
 			}
-			// g.setDefaultHeaderRow(null);
+			g.setDefaultHeaderRow(null);
 
 			g.setCellDescriptionGenerator(null);
 			g.setRowDescriptionGenerator(null);

@@ -133,7 +133,7 @@ public class RandomDataGenerator {
 	}
 
 	public enum TripleEnum {
-		e1, e2, e3
+		V1, V2, V3
 	}
 
 	public enum Abteilung {

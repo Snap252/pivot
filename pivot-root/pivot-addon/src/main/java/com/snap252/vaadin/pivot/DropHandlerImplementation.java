@@ -9,8 +9,8 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import com.vaadin.event.dd.DragAndDropEvent;
 import com.vaadin.event.dd.DropHandler;
 import com.vaadin.event.dd.TargetDetails;
+import com.vaadin.event.dd.acceptcriteria.AcceptAll;
 import com.vaadin.event.dd.acceptcriteria.AcceptCriterion;
-import com.vaadin.event.dd.acceptcriteria.ServerSideCriterion;
 import com.vaadin.shared.ui.dd.HorizontalDropLocation;
 import com.vaadin.shared.ui.dd.VerticalDropLocation;
 import com.vaadin.ui.AbstractComponent;
@@ -39,18 +39,9 @@ public abstract class DropHandlerImplementation<T> implements DropHandler {
 		this.pivotCriteriaList = new ArrayList<T>();
 	}
 
-	
-	protected boolean accept(final DragAndDropEvent event) {
-		return true;
-	}
 	@Override
 	public AcceptCriterion getAcceptCriterion() {
-		return new ServerSideCriterion() {
-			@Override
-			public boolean accept(final DragAndDropEvent event) {
-				return DropHandlerImplementation.this.accept(event);
-			}
-		};
+		return AcceptAll.get();
 	}
 
 	@Override

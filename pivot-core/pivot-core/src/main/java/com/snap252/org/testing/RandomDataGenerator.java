@@ -77,7 +77,7 @@ public class RandomDataGenerator {
 						r.nextBoolean() ? null : new BigDecimal(r.nextInt(10001) - 10001 / 2).scaleByPowerOfTen(-2),
 						new Date((RANDOM.nextInt(1200) - 750) * 86400000L),
 						r.nextBoolean() ? null : String.valueOf(r.nextInt(80) + 40), random(TripleEnum.values()),
-						random(TripleEnum.values()), r.nextBoolean() ? null : random(TripleEnum.values())
+						random(TripleEnum.values()), random(TripleEnum.values())
 
 				)).collect(Collectors.toList());
 	}

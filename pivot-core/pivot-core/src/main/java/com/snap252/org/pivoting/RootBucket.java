@@ -10,13 +10,12 @@ public class RootBucket<V> extends SubBucket<V> {
 
 	public RootBucket(final String prefix, final List<V> values,
 			final List<? extends PivotCriteria<V, ?>> partitionCriterionsAndSubCriterions) {
-		super(prefix + "---root---", partitionCriterionsAndSubCriterions, null,
-				new NamedPivotCriteria<V, String>(_ignore -> "", "r") {
-					@Override
-					public @NonNull String getStyleClass() {
-						return "root";
-					}
-				}, values, 0);
+		super(prefix, partitionCriterionsAndSubCriterions, null, new NamedPivotCriteria<V, String>(_ignore -> "", "r") {
+			@Override
+			public @NonNull String getStyleClass() {
+				return "root";
+			}
+		}, values, 0);
 	}
 
 	@SafeVarargs

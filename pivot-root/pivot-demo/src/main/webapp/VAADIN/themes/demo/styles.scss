@@ -35,14 +35,36 @@ $darkgreen: darken($green, 30%);
 		.v-grid-tiny-header {
 			.v-button-pivot-grid-expander {
 				height: inherit;
+				padding-left: 0px;
 				&:focus:after {
 					box-shadow: none;
+				}
+				.v-button-wrap .v-icon {
+					font-size: 125%;
 				}
 			}
 		}
 	}
-	.pivot .row-header {
-		font-weight: bold;
+	.pivot {
+		.row-header {
+			font-weight: bold;
+		}
+		td.col-depth-0, th.depth-0 {
+			background-color: rgba(250, 220, 220, 0.4);
+			background-image: none;
+		}
+		td.col-depth-1, th.depth-1 {
+			background-color: rgba(220, 250, 220, 0.4);
+			background-image: none;
+		}
+		td.col-depth-2, th.depth-2 {
+			background-color: rgba(220, 220, 250, 0.4);
+			background-image: none;
+		}
+		td.col-depth-3, th.depth-3 {
+			background-color: rgba(220, 250, 250, 0.4);
+			background-image: none;
+		}
 	}
 
 	.v-tree-grid-expander {

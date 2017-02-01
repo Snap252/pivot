@@ -17,6 +17,10 @@ public class ObjectStatistics {
 			numberOfNonNullValues++;
 		}
 	}
+	
+	public int getDistinct(){
+		return distinctValues.size();
+	}
 
 	public ObjectStatistics mergeTo(final ObjectStatistics o2) {
 		numberOfValues += o2.numberOfValues;

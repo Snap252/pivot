@@ -1,0 +1,4 @@
+class com/vaadin/event/dd/acceptcriteria/AcceptAll
+get
+ ()Lcom/vaadin/event/dd/acceptcriteria/AcceptCriterion;
+ ()L1com/vaadin/event/dd/acceptcriteria/AcceptCriterion;

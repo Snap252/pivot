@@ -16,7 +16,6 @@ import com.snap252.org.aggregators.NumberStatistics;
 import com.snap252.vaadin.pivot.NameType;
 import com.snap252.vaadin.pivot.PivotCellReference;
 import com.snap252.vaadin.pivot.renderer.BigDecimalRenderer;
-import com.snap252.vaadin.pivot.renderer.WhatToRender;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.Validator.InvalidValueException;
@@ -38,14 +37,14 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 
 	private boolean roundingEnabled;
 	private int sliderValue;
-	private final ComboBox howToRenderComboBox = new ComboBox("Anzeige", Arrays.asList(WhatToRender.values()));
+	private final ComboBox howToRenderComboBox = new ComboBox("Anzeige", Arrays.asList(WhatOfNumberStatisticsToRender.values()));
 
 	private final TextField numberFormatTextField = new TextField("Format", "0.00##");
 	private final TextField nullRepresentationTextField = new TextField("Leer-Repräsentation", (String) null);
 
 	private final CheckBox relativeCheckBox = new CheckBox("Relativ", false);
 
-	private WhatToRender whatToRender = WhatToRender.sum;
+	private WhatOfNumberStatisticsToRender whatToRender = WhatOfNumberStatisticsToRender.sum;
 
 	@SuppressWarnings("null")
 	public BigDecimalValueExtractor(final NameType nameType) {
@@ -76,10 +75,10 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 		});
 
 		howToRenderComboBox.setNullSelectionAllowed(false);
-		howToRenderComboBox.setValue(WhatToRender.sum);
+		howToRenderComboBox.setValue(WhatOfNumberStatisticsToRender.sum);
 
 		howToRenderComboBox.addValueChangeListener(_ignore -> {
-			this.whatToRender = (WhatToRender) _ignore.getProperty().getValue();
+			this.whatToRender = (WhatOfNumberStatisticsToRender) _ignore.getProperty().getValue();
 		});
 		numberFormatTextField.addValidator(value -> {
 			try {
@@ -131,7 +130,7 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 
 	@Override
 	public void addRendererChangeListener(final ValueChangeListener l) {
-		howToRenderComboBox.addValueChangeListener(l);
+//		howToRenderComboBox.addValueChangeListener(l);
 		numberFormatTextField.addValueChangeListener(l);
 		nullRepresentationTextField.addValueChangeListener(l);
 		relativeCheckBox.addValueChangeListener(l);

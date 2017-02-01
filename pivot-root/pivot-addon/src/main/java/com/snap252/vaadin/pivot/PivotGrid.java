@@ -15,6 +15,7 @@ public class PivotGrid extends TreeGrid {
 
 	public PivotGrid() {
 		setPrimaryStyleName("v-grid-tiny");
+		setSelectionMode(SelectionMode.NONE);
 	}
 
 	public @Nullable <@Nullable T> GridWriter<?, ?> setContainerDataSource(final BiBucketParameter<Item> bucketParams,

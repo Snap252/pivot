@@ -10,7 +10,6 @@ import org.vaadin.hene.popupbutton.PopupButton.PopupVisibilityListener;
 
 import com.snap252.vaadin.pivot.DropHandlerImplementation;
 import com.snap252.vaadin.pivot.NameType;
-import com.vaadin.event.dd.DragAndDropEvent;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.Alignment;
@@ -101,17 +100,5 @@ public class ValueGetterDnDHandler extends DropHandlerImplementation<FilteringRe
 	protected void refresh() {
 		super.refresh();
 		upateRenderer.run();
-	}
-
-	@Override
-	protected boolean accept(final DragAndDropEvent event) {
-//		final AbstractComponent sourceComponent = (AbstractComponent) event.getTransferable().getSourceComponent();
-//		final Object data = sourceComponent.getData();
-//		if (!(data instanceof NameType))
-//			return false;
-//
-//		final NameType dataNamed = (NameType) data;
-//		return Number.class.isAssignableFrom(dataNamed.type);
-		return true;
 	}
 }

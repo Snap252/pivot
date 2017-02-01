@@ -89,7 +89,7 @@ public class SubBucket<V> extends Bucket<V> {
 		@Nullable
 		final List<@NonNull Bucket<V>> children$ = children;
 		if (children$ != null)
-			return Stream.concat(Stream.of(this), children$.stream().flatMap(Bucket::stream));
+			return Stream.concat(children$.stream().flatMap(Bucket::stream), Stream.of(this));
 		else
 			return Stream.of(this);
 	}

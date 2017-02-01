@@ -1,11 +1,8 @@
-package com.snap252.vaadin.pivot.renderer;
-
-import org.eclipse.jdt.annotation.NonNullByDefault;
+package com.snap252.vaadin.pivot.valuegetter;
 
 import com.snap252.org.aggregators.NumberStatistics;
 
-@NonNullByDefault
-public enum WhatToRender {
+public enum WhatOfNumberStatisticsToRender {
 	avg("Durchschnitt") {
 		@Override
 		public <N extends Number> N getValue(final NumberStatistics<N> n) {
@@ -39,7 +36,7 @@ public enum WhatToRender {
 
 	private final String s;
 
-	private WhatToRender(final String s) {
+	private WhatOfNumberStatisticsToRender(final String s) {
 		this.s = s;
 	}
 

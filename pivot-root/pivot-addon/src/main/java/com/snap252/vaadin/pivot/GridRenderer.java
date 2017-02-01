@@ -26,18 +26,26 @@ import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.ObjectProperty;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.Grid.Column;
 import com.vaadin.ui.Grid.HeaderCell;
 import com.vaadin.ui.Grid.HeaderRow;
+import com.vaadin.ui.themes.ValoTheme;
 
 @NonNullByDefault
 final class GridRenderer {
 	private final RootBucket<Item> rowBucket;
 	private final RootBucket<Item> colBucket;
 
+	private static final String SUM_TEXT = "\u2211";
+
 	GridRenderer(final BiBucketParameter<Item> p) throws IllegalArgumentException {
-		rowBucket = new RootBucket<>("row", p.values, p.rowFnkt);
-		colBucket = new RootBucket<>("col", p.values, p.colFnkt);
+		rowBucket = new RootBucket<>(SUM_TEXT, p.values, p.rowFnkt);
+		colBucket = new RootBucket<>(SUM_TEXT, p.values, p.colFnkt);
 
 		if (rowBucket.getSize(1) > 10000)
 			throw new IllegalArgumentException("too many rows: " + rowBucket.getSize(1));
@@ -421,8 +429,6 @@ final class GridRenderer {
 			}
 		}
 
-		private static final String SUM_TEXT = "\u2211";
-
 		public void writeGrid(final Grid g) {
 			for (int i = g.getHeaderRowCount() - 1; i >= 0; i--) {
 				g.removeHeaderRow(i);
@@ -443,7 +449,9 @@ final class GridRenderer {
 				if (cell.getPropertyId() == colProp) {
 					return "row-header";
 				}
-				return null;
+				final int rowDepth = ((Bucket<?>) cell.getItemId()).getLevel();
+				final int colDepth = ((Bucket<?>) cell.getPropertyId()).getLevel();
+				return "col-depth-" + colDepth + " row-depth-" + rowDepth;
 			});
 
 			// TODO:
@@ -469,23 +477,6 @@ final class GridRenderer {
 
 		protected void doHeader(final Grid g, final Bucket<?> b, final int depth) {
 			{
-				// final Button collapser = new
-				// Button(String.valueOf(oa.getKey().bucketValue),
-				// FontAwesome.CARET_DOWN);
-				// collapser.addStyleName(ValoTheme.BUTTON_BORDERLESS);
-				// collapser.addStyleName("pivot-grid-expander");
-				// collapser.addClickListener(new ClickListener() {
-				// private boolean collapsed;
-				//
-				// @Override
-				// public void buttonClick(final ClickEvent event) {
-				// collapsed = !collapsed;
-				// event.getButton().setIcon(collapsed ?
-				// FontAwesome.CARET_RIGHT : FontAwesome.CARET_DOWN);
-				// Stream.of(oa.getValue()).skip(1).map(g::getColumn).forEach(c
-				// -> c.setHidden(collapsed));
-				// }
-				// });
 				// join.setComponent(collapser);
 
 				final HeaderRow headerRow = getOrCreateHeaderRow(g, depth);
@@ -499,13 +490,43 @@ final class GridRenderer {
 						final int childDepth = depth + 1;
 						children$.forEach(c -> doHeader(g, c, childDepth));
 						final HeaderRow childRow = getOrCreateHeaderRow(g, childDepth);
-						childRow.getCell(b).setText(SUM_TEXT);
+						// childRow.getCell(b).setText(SUM_TEXT);
+						final HeaderCell ownCellInChildRow = childRow.getCell(b);
+						ownCellInChildRow.setComponent(createChildCollapseButton(g,
+								b.stream().filter(b0 -> b0 != b).collect(toList()), SUM_TEXT));
+						ownCellInChildRow.setStyleName("depth-" + depth);
 					}
 				} else {
 					meAndMyChildren = headerRow.getCell(b);
 				}
 				meAndMyChildren.setText(String.valueOf(b.bucketValue));
+				meAndMyChildren.setStyleName("depth-" + depth);
 			}
+		}
+
+		protected Button createChildCollapseButton(final Grid g, final List<? extends Bucket<?>> children,
+				final String caption) {
+			final Button collapserButton = new Button(caption, FontAwesome.CARET_DOWN);
+			collapserButton.addStyleName(ValoTheme.BUTTON_BORDERLESS);
+			collapserButton.addStyleName("pivot-grid-expander");
+			final Collection<Column> childColumns = children.stream().map(g::getColumn).collect(toList());
+			assert childColumns != null;
+			collapserButton.addClickListener(new ClickListener() {
+				private boolean collapsed;
+
+				@Override
+				public void buttonClick(final ClickEvent event) {
+					collapsed = !collapsed;
+					final Button button = event.getButton();
+					button.setIcon(collapsed ? FontAwesome.CARET_RIGHT : FontAwesome.CARET_DOWN);
+					if (collapsed)
+						button.setCaption(caption + ":" + String.valueOf(childColumns.size()));
+					else
+						button.setCaption(caption);
+					childColumns.forEach(c -> c.setHidden(collapsed));
+				}
+			});
+			return collapserButton;
 		}
 
 	}

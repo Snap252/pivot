@@ -75,7 +75,11 @@ public class RandomDataGenerator {
 						new BigDecimal(r.nextInt(10001)).scaleByPowerOfTen(-2), r.nextInt(1793),
 						new BigDecimal(r.nextInt(10001) - 10001 / 2).scaleByPowerOfTen(-2),
 						r.nextBoolean() ? null : new BigDecimal(r.nextInt(10001) - 10001 / 2).scaleByPowerOfTen(-2),
-						new Date((RANDOM.nextInt(1200) - 750) * 86400000L))).collect(Collectors.toList());
+						new Date((RANDOM.nextInt(1200) - 750) * 86400000L),
+						r.nextBoolean() ? null : String.valueOf(r.nextInt(80) + 40), random(TripleEnum.values()),
+						random(TripleEnum.values()), r.nextBoolean() ? null : random(TripleEnum.values())
+
+				)).collect(Collectors.toList());
 	}
 
 	protected static void write(final List<Person> personen, final BiBucket<Person> biBucket) {
@@ -128,6 +132,10 @@ public class RandomDataGenerator {
 		m, w, unbekannt
 	}
 
+	public enum TripleEnum {
+		e1, e2, e3
+	}
+
 	public enum Abteilung {
 		A, B, C, D, E, F, G, H, I
 	}
@@ -143,10 +151,15 @@ public class RandomDataGenerator {
 		private final BigDecimal wertNeg;
 		private final @Nullable BigDecimal wertNullable;
 		private final Abteilung abteilung;
+		private final @Nullable String nullableString;
+		private final TripleEnum e1;
+		private final TripleEnum e2;
+		private final @Nullable TripleEnum e3;
 
 		public Person(final String vorname, final String nachname, final int alter, final Geschl g, final Abteilung abt,
 				final BigDecimal wert, final int wertGanzzahl, final BigDecimal wertNeg,
-				@Nullable final BigDecimal wertNullable, final Date birthday) {
+				@Nullable final BigDecimal wertNullable, final Date birthday, @Nullable final String nullableString,
+				final TripleEnum e1, final TripleEnum e2, @Nullable final TripleEnum e3) {
 			this.vorname = vorname;
 			this.nachname = nachname;
 			this.alter = alter;
@@ -157,6 +170,26 @@ public class RandomDataGenerator {
 			this.wertNeg = wertNeg;
 			this.wertNullable = wertNullable;
 			this.birthday = birthday;
+			this.nullableString = nullableString;
+			this.e1 = e1;
+			this.e2 = e2;
+			this.e3 = e3;
+		}
+
+		public TripleEnum getE1() {
+			return e1;
+		}
+
+		public TripleEnum getE2() {
+			return e2;
+		}
+
+		public @Nullable TripleEnum getE3() {
+			return e3;
+		}
+
+		public @Nullable String getNullableString() {
+			return nullableString;
 		}
 
 		public BigDecimal getWertNeg() {

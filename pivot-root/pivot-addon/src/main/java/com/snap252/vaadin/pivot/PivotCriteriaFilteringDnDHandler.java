@@ -15,6 +15,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ValoTheme;
 @NonNullByDefault
 public class PivotCriteriaFilteringDnDHandler extends DropHandlerImplementation<FilteringComponent<?>> {
 
@@ -70,6 +71,7 @@ public class PivotCriteriaFilteringDnDHandler extends DropHandlerImplementation<
 			b = popupButton;
 		} else
 			b = new Button(createFilter.toString());
+		b.addStyleName(ValoTheme.BUTTON_SMALL);
 		return b;
 	}
 }

@@ -26,6 +26,7 @@ import com.vaadin.ui.DragAndDropWrapper.DragStartMode;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.themes.ValoTheme;
 
 import fi.jasoft.dragdroplayouts.DDHorizontalLayout;
 import fi.jasoft.dragdroplayouts.DDVerticalLayout;
@@ -44,7 +45,7 @@ public class PivotUI extends GridLayout {
 		setSpacing(true);
 		final PivotGrid pivotGrid$ = new PivotGrid();
 		{
-			final Component renderer = new Label("renderer");
+			final Component renderer = new Label("");
 			renderer.setSizeUndefined();
 			properties = new HorizontalLayout();
 			properties.setCaption("properties");
@@ -123,6 +124,7 @@ public class PivotUI extends GridLayout {
 
 		final Component[] labels = c.getContainerPropertyIds().stream().map(propertyId -> {
 			final Component button = new Button(propertyId.toString());
+			button.addStyleName(ValoTheme.BUTTON_SMALL);
 			button.setEnabled(false);
 			final DragAndDropWrapper wrapper = new DragAndDropWrapper(button);
 			wrapper.setDragStartMode(DragStartMode.COMPONENT);

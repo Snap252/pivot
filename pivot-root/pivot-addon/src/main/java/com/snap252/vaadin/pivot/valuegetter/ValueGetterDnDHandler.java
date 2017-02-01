@@ -16,6 +16,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ValoTheme;
 
 public class ValueGetterDnDHandler extends DropHandlerImplementation<FilteringRenderingComponent<?>> {
 
@@ -93,6 +94,7 @@ public class ValueGetterDnDHandler extends DropHandlerImplementation<FilteringRe
 			b = popupButton;
 		} else
 			b = new Button(createFilter.toString());
+		b.addStyleName(ValoTheme.BUTTON_SMALL);
 		return b;
 	}
 

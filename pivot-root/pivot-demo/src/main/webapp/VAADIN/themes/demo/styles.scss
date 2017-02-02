@@ -1,25 +1,24 @@
 @import "../valo/valo.scss";
 @import "addons.scss";
 
-$gray: #d1d1cf;
-$green: #40b527;
-$darkgreen: darken($green, 30%);
+$tg-expander-padding: 7px;
+$tg-expander-width: 5px;
 
 @mixin scale-grid($primary-stylename: v-grid-tiny, $scale-factor: 0.85) {
 	$border-factor: 0.75;
-	
+
 	$v-grid-row-height: ceil($v-table-row-height * $scale-factor * $border-factor);
 	$v-grid-header-font-size: ceil($v-table-header-font-size * $scale-factor);
-	
+
 //	$v-grid-cell-padding-horizontal: 1.5 * $v-table-cell-padding-horizontal * $scale-factor;
 	$v-grid-cell-padding-horizontal: round($v-table-cell-padding-horizontal * $scale-factor * $border-factor);
-	
-	$v-font-size: ceil($v-font-size * $scale-factor); 
+
+	$v-font-size: ceil($v-font-size * $scale-factor);
 	$v-unit-size--small: round($v-unit-size * $v-scaling-factor--small);
 	$v-font-size--small: ceil($v-font-size * $v-scaling-factor--small);
-	
+
 	@include valo-grid ($primary-stylename: $primary-stylename);
-	
+
 	.#{$primary-stylename} {
 		font-weight: normal;
 	}
@@ -71,7 +70,7 @@ $darkgreen: darken($green, 30%);
 		padding-left: 4px;
 	}
 	@include scale-grid;
-	
+
 	.v-gridlayout-slot > .v-ddwrapper {
 		$v-grid-border-color-source: $v-grid-row-background-color;
 		border: valo-border($color: $v-grid-border-color-source, $strength: 0.8);

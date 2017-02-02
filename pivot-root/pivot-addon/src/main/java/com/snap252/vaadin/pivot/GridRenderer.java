@@ -309,9 +309,10 @@ final class GridRenderer {
 
 			private final Class<?> pivotCellReferenceClazz = PivotCellReference.class;
 
+			@SuppressWarnings("unchecked")
 			@Override
-			public Class<?> getType(final Object propertyId) {
-				return pivotCellReferenceClazz;
+			public Class<PivotCellReference<?>> getType(final Object propertyId) {
+				return (Class<PivotCellReference<?>>) pivotCellReferenceClazz;
 			}
 
 			@Override

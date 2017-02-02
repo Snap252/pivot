@@ -1,17 +1,20 @@
 package com.snap252.vaadin.pivot.valuegetter;
 
+import java.math.BigDecimal;
 import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNull;
 
+import com.snap252.vaadin.pivot.PivotCellReference;
+import com.snap252.vaadin.pivot.renderer.BigDecimalRenderer;
 import com.vaadin.data.Item;
-import com.vaadin.ui.renderers.TextRenderer;
 
 public final class ModelAggregtorDelegate implements ModelAggregtor<Object> {
 	private ModelAggregtor<?> delegate;
 
 	public boolean setDelegate(final ModelAggregtor<?> delegate) {
-		if (this.delegate == delegate)
+		if (delegate != null && this.delegate == delegate)
 			return false;
 
 		this.delegate = delegate == null ? new DummyAggregator() : delegate;
@@ -26,20 +29,21 @@ public final class ModelAggregtorDelegate implements ModelAggregtor<Object> {
 		this(new DummyAggregator());
 	}
 
-	private static class DummyAggregator implements ModelAggregtor<String> {
+	private static class DummyAggregator implements ModelAggregtor<Object> {
 
 		@Override
-		public Collector<@NonNull Item, ?, String> getAggregator() {
-			return Collector.of(() -> {
-				return "";
-			}, (x, y) -> {
-			}, (x, y) -> "");
+		public Collector<@NonNull Item, ?, BigDecimal> getAggregator() {
+			return Collectors.collectingAndThen(Collectors.counting(), BigDecimal::valueOf);
 		}
 
 		@SuppressWarnings("null")
 		@Override
-		public RendererConverter<String, String> createRendererConverter() {
-			return new RendererConverter<String, String>(new TextRenderer(), x -> x.getValue(), String.class);
+		public RendererConverter<?, ? extends @NonNull BigDecimal> createRendererConverter() {
+			final BigDecimalRenderer renderer = new BigDecimalRenderer("-");
+			renderer.setFormat("0");
+
+			return new RendererConverter<BigDecimal, BigDecimal>(renderer, PivotCellReference::getValue,
+					BigDecimal.class);
 		}
 	}
 

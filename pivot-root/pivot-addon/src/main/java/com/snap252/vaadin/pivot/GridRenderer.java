@@ -545,6 +545,9 @@ final class GridRenderer {
 				}
 				meAndMyChildren.setText(String.valueOf(b.bucketValue));
 				meAndMyChildren.setStyleName("depth-" + depth);
+				for (int i = depth + 1; i < g.getHeaderRowCount(); i++) {
+					g.getHeaderRow(i).getCell(b).setStyleName("depth-" + depth);
+				}
 			}
 		}
 

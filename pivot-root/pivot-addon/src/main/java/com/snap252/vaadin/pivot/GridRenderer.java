@@ -18,6 +18,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import com.snap252.org.pivoting.BiBucketParameter;
 import com.snap252.org.pivoting.Bucket;
 import com.snap252.org.pivoting.RootBucket;
+import com.snap252.vaadin.pivot.GridRenderer.GridWriter.BucketContainer.BucketItem.CellProperty;
 import com.snap252.vaadin.pivot.valuegetter.ModelAggregtor;
 import com.snap252.vaadin.pivot.valuegetter.ModelAggregtorDelegate;
 import com.vaadin.data.Container.Hierarchical;
@@ -56,6 +57,9 @@ final class GridRenderer {
 	public <AGG, REN> GridWriter<AGG, REN> createGridWriter() {
 		return new GridWriter<>();
 	}
+
+	private static final Class<PivotCellReference<?>> PIVOT_CELL_REFERENCE_CLAZZ = PivotCellReference
+			.cast(PivotCellReference.class);
 
 	public final class GridWriter<W, R> {
 
@@ -96,10 +100,10 @@ final class GridRenderer {
 		};
 
 		private final Collection<ValueChangeListener> valueChangeListeners = new HashSet<>();
-		private final Collection<Runnable> valueResetter = new HashSet<>();
+		private final Collection<GridRenderer.GridWriter<W, R>.BucketContainer.BucketItem.CellProperty> propertyResetter = new HashSet<>();
 
 		private void fireValueChange() {
-			valueResetter.forEach(Runnable::run);
+			propertyResetter.forEach(CellProperty::resetValue);
 
 			if (valueChangeListeners.isEmpty())
 				return;
@@ -172,44 +176,71 @@ final class GridRenderer {
 				return null;
 			}
 
-			private final Map<Object, BucketItem> cache = new HashMap<>();
+			private final Map<Bucket<Item>, BucketItem> cache = new HashMap<>();
 
-			@SuppressWarnings({ "unchecked" })
 			@Override
 			public BucketItem getItem(final Object itemId) {
-				return cache.computeIfAbsent(itemId, x -> new BucketItem((Bucket<Item>) x));
+				return getForRow(itemId);
 			}
 
-			class BucketItem implements Item {
-				class CellProperty implements Property<PivotCellReference<?>>, Property.ValueChangeNotifier {
+			@SuppressWarnings("unchecked")
+			protected BucketItem getForRow(final Object itemId) {
+				return cache.computeIfAbsent((Bucket<Item>) itemId, x -> new BucketItem(x));
+			}
+
+			final class BucketItem implements Item {
+				final class CellProperty implements Property<PivotCellReference<?>>, Property.ValueChangeNotifier {
 
 					private final Bucket<Item> colBucket;
 					@Nullable
-					private PivotCellReference<?> v;
-					private final List<Item> filterOwnValues;
-					private final Class<PivotCellReference<?>> clazz;
+					private PivotCellReference<?> cachedPivotCellReference;
 
 					public CellProperty(final Bucket<Item> colBucket) {
 						this.colBucket = colBucket;
 						assert rowBucket != colBucket;
-						valueResetter.add(() -> v = null);
-						// TODO: may work better if using parent bucket
-						filterOwnValues = rowBucket.getMerged(colBucket);
-						this.clazz = PivotCellReference.cast(PivotCellReference.class);
+						propertyResetter.add(this);
+					}
+
+					private void resetValue() {
+						cachedPivotCellReference = null;
+					}
+
+					@Nullable
+					private List<Item> filterOwnValues;
+
+					private Collection<Item> getOwnItems() {
+						if (filterOwnValues != null)
+							return filterOwnValues;
+
+						final Bucket<Item> colParent = colBucket.parent;
+						if (colParent != null) {
+							final Collection<Item> itemsInParent = getForColumn(colParent).getOwnItems();
+							// TODO: maybe better get if from row parent
+							final List<Item> v$;
+							if (itemsInParent.isEmpty())
+								v$ = Collections.emptyList();
+							else
+								v$ = itemsInParent.stream().filter(colBucket).collect(toList());
+							filterOwnValues = v$;
+							return v$;
+						}
+
+						final List<Item> v$ = rowBucket.filterOwnValues(x -> true).collect(toList());
+						filterOwnValues = v$;
+						return v$;
 					}
 
 					@Override
 					public PivotCellReference<?> getValue() {
-						if (v != null)
-							return v;
-						else {
-							final Collector<Item, ?, ?> aggregator = aggregatorDelegator.getAggregator();
-							final Object newValue0 = filterOwnValues.stream().collect(aggregator);
-							final PivotCellReference<@Nullable ?> newValue = new PivotCellReference<@Nullable Object>(
-									newValue0, rowBucket, colBucket, BucketContainer.this);
-							v = newValue;
-							return newValue;
-						}
+						if (cachedPivotCellReference != null)
+							return cachedPivotCellReference;
+
+						final Collector<Item, ?, ?> aggregator = aggregatorDelegator.getAggregator();
+						final Object newValue0 = getOwnItems().stream().collect(aggregator);
+						final PivotCellReference<@Nullable ?> newValue = new PivotCellReference<@Nullable Object>(
+								newValue0, rowBucket, colBucket, BucketContainer.this);
+						cachedPivotCellReference = newValue;
+						return newValue;
 					}
 
 					@Override
@@ -219,7 +250,7 @@ final class GridRenderer {
 
 					@Override
 					public Class<PivotCellReference<?>> getType() {
-						return clazz;
+						return PIVOT_CELL_REFERENCE_CLAZZ;
 					}
 
 					@Override
@@ -259,7 +290,7 @@ final class GridRenderer {
 					this.rowBucket = itemId;
 				}
 
-				private final Map<@NonNull Object, @NonNull CellProperty> cache = new HashMap<>();
+				private final Map<Bucket<Item>, CellProperty> cache = new HashMap<>();
 
 				@SuppressWarnings({ "unchecked" })
 				@Override
@@ -267,7 +298,11 @@ final class GridRenderer {
 					if (id == colProp) {
 						return new ObjectProperty<>(rowBucket.getBucketValue());
 					}
-					return cache.computeIfAbsent(id, x -> new CellProperty((Bucket<Item>) x));
+					return getForColumn((Bucket<@NonNull Item>) id);
+				}
+
+				protected CellProperty getForColumn(final Bucket<Item> id) {
+					return cache.computeIfAbsent(id, CellProperty::new);
 				}
 
 				@SuppressWarnings("null")
@@ -309,9 +344,10 @@ final class GridRenderer {
 
 			private final Class<?> pivotCellReferenceClazz = PivotCellReference.class;
 
+			@SuppressWarnings("unchecked")
 			@Override
-			public Class<?> getType(final Object propertyId) {
-				return pivotCellReferenceClazz;
+			public Class<PivotCellReference<?>> getType(final Object propertyId) {
+				return (Class<PivotCellReference<?>>) pivotCellReferenceClazz;
 			}
 
 			@Override
@@ -509,6 +545,9 @@ final class GridRenderer {
 				}
 				meAndMyChildren.setText(String.valueOf(b.bucketValue));
 				meAndMyChildren.setStyleName("depth-" + depth);
+				for (int i = depth + 1; i < g.getHeaderRowCount(); i++) {
+					g.getHeaderRow(i).getCell(b).setStyleName("depth-" + depth);
+				}
 			}
 		}
 

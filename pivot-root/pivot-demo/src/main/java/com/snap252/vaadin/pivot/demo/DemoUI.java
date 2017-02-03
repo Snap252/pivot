@@ -52,7 +52,7 @@ public class DemoUI extends UI {
 	}
 
 	protected void setDS(final PivotUI pivotGrid) {
-		List<Person> personen = RandomDataGenerator.createPersons(2000);
+		List<Person> personen = RandomDataGenerator.createPersons(4000);
 		BeanItemContainer<Person> container = new BeanItemContainer<>(Person.class);
 		container.addAll(personen);
 		pivotGrid.setContainerDataSource(container);

@@ -492,9 +492,10 @@ final class GridRenderer {
 				if (cell.getPropertyId() == colProp) {
 					return "row-header";
 				}
-				final int rowDepth = ((Bucket<?>) cell.getItemId()).getLevel();
+//				final int rowDepth = ((Bucket<?>) cell.getItemId()).getLevel();
 				final int colDepth = ((Bucket<?>) cell.getPropertyId()).getLevel();
-				return "col-depth-" + colDepth + " row-depth-" + rowDepth;
+//				return "col-depth-" + colDepth + " row-depth-" + rowDepth;
+				return "depth-" + colDepth;
 			});
 
 			// TODO:

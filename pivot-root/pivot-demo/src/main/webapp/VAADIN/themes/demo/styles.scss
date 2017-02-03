@@ -23,6 +23,41 @@ $tg-expander-width: 5px;
 		font-weight: normal;
 	}
 }
+@mixin grid-levels($primary-stylename: v-grid-tiny) {
+	$v1: 250;
+	$v2: 230;
+	.#{$primary-stylename}-header .#{$primary-stylename}-cell, .#{$primary-stylename}-row > td {
+
+		&.depth-0 {
+			@include valo-gradient(rgb($v2, $v1, $v1));
+		}
+
+		&.depth-1 {
+			@include valo-gradient(rgb($v1, $v2, $v2));
+		}
+
+		&.depth-2 {
+			@include valo-gradient(rgb($v2, $v1, $v2));
+		}
+		&.depth-3 {
+			@include valo-gradient(rgb($v2, $v2, $v1));
+		}
+	}
+	.pivot-ui-cols {
+		.v-ddwrapper-index-0 > * {
+			@include valo-gradient(rgb($v2, $v1, $v1));
+		}
+		.v-ddwrapper-index-1 > * {
+			@include valo-gradient(rgb($v1, $v2, $v2));
+		}
+		.v-ddwrapper-index-2 > * {
+			@include valo-gradient(rgb($v2, $v1, $v2));
+		}
+		.v-ddwrapper-index-3 > * {
+			@include valo-gradient(rgb($v2, $v2, $v1));
+		}
+	}
+}
 
 // Prefix all selectors in your theme with .demo
 .demo {
@@ -48,23 +83,8 @@ $tg-expander-width: 5px;
 		.row-header {
 			font-weight: bold;
 		}
-		td.col-depth-0, th.depth-0 {
-			background-color: rgba(250, 220, 220, 0.4);
-			background-image: none;
-		}
-		td.col-depth-1, th.depth-1 {
-			background-color: rgba(220, 250, 220, 0.4);
-			background-image: none;
-		}
-		td.col-depth-2, th.depth-2 {
-			background-color: rgba(220, 220, 250, 0.4);
-			background-image: none;
-		}
-		td.col-depth-3, th.depth-3 {
-			background-color: rgba(220, 250, 250, 0.4);
-			background-image: none;
-		}
 	}
+	@include grid-levels;
 
 	.v-tree-grid-expander {
 		padding-left: 4px;

@@ -72,6 +72,7 @@ public class PivotUI extends GridLayout {
 			aggregatorDragAndDropWrapper.setDropHandler(aggDopHandler);
 
 			final DDHorizontalLayout cols = new DDHorizontalLayout();
+			cols.addStyleName("pivot-ui-cols");
 			final DropHandler dropHandler = new PivotCriteriaFilteringDnDHandler(cols, false,
 					colFnkts -> gridWriter = pivotGrid$.setContainerDataSource(p.setColFnkt(colFnkts), gridWriter));
 			cols.setDropHandler(dropHandler);
@@ -84,6 +85,7 @@ public class PivotUI extends GridLayout {
 
 		{
 			final DDVerticalLayout rows = new DDVerticalLayout();
+			rows.addStyleName("pivot-ui-rows");
 			final DropHandler dropHandler = new PivotCriteriaFilteringDnDHandler(rows, true,
 					rowFnkts -> gridWriter = pivotGrid$.setContainerDataSource(p.setRowFnkt(rowFnkts), gridWriter));
 			rows.setDropHandler(dropHandler);

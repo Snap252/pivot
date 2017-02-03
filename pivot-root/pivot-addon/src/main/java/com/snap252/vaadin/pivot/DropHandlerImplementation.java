@@ -19,6 +19,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.DragAndDropWrapper;
 import com.vaadin.ui.DragAndDropWrapper.DragStartMode;
 import com.vaadin.ui.DragAndDropWrapper.WrapperTargetDetails;
+import com.vaadin.ui.HasComponents;
 
 import fi.jasoft.dragdroplayouts.DDHorizontalLayout.HorizontalLayoutTargetDetails;
 import fi.jasoft.dragdroplayouts.DDVerticalLayout.VerticalLayoutTargetDetails;
@@ -93,13 +94,26 @@ public abstract class DropHandlerImplementation<T> implements DropHandler {
 			final DropHandlerImplementation<T> pivotCriteriaList) {
 		assert pivotCriteriaList.cols.getComponentIndex(sourceComponent) != -1;
 		pivotCriteriaList.cols.removeComponent(sourceComponent);
+		pivotCriteriaList.updateAllComponentIndices();
+
 		final boolean changed = pivotCriteriaList.pivotCriteriaList.remove(data2);
 		assert changed;
 	}
 
+	private void updateAllComponentIndices(){
+		final HasComponents hc = cols;
+		hc.forEach(new Consumer<Component>() {
+			int index = 1;
+			@Override
+			public void accept(final Component c) {
+				c.setStyleName("index-" + index++);
+			}
+		});
+	}
+
 	protected abstract AbstractComponent createUIComponent(T createFilter);
 
-	protected void doWithFilteringComponent(final T createFilter, final int index) {
+	protected final void doWithFilteringComponent(final T createFilter, final int index) {
 		final AbstractComponent uiComponent = createUIComponent(createFilter);
 
 		final DragAndDropWrapper moveWrapper = new DragAndDropWrapper(uiComponent);
@@ -107,6 +121,8 @@ public abstract class DropHandlerImplementation<T> implements DropHandler {
 			cols.addComponent(moveWrapper);
 		else
 			cols.addComponent(moveWrapper, index);
+
+		updateAllComponentIndices();
 
 		moveWrapper.setDragStartMode(DragStartMode.COMPONENT);
 		uiComponent.setData(createFilter);

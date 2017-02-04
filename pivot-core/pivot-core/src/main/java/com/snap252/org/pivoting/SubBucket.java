@@ -9,9 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
 public class SubBucket<V> extends Bucket<V> {
@@ -82,16 +80,6 @@ public class SubBucket<V> extends Bucket<V> {
 			return children.stream().mapToInt(b -> b.getSize(forSelf)).sum() + forSelf;
 		else
 			return forSelf;
-	}
-
-	@Override
-	public Stream<Bucket<V>> stream() {
-		@Nullable
-		final List<@NonNull Bucket<V>> children$ = children;
-		if (children$ != null)
-			return Stream.concat(children$.stream().flatMap(Bucket::stream), Stream.of(this));
-		else
-			return Stream.of(this);
 	}
 
 	@Override

@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collector;
-import java.util.stream.Stream;
 
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -95,16 +94,6 @@ public class CopyBucket<V, W> extends Bucket<V> {
 	@Override
 	public int getSize(final int forSelf) {
 		return origBucket.getSize(forSelf);
-	}
-
-	@Override
-	public Stream<CopyBucket<V, W>> stream() {
-
-		final List<CopyBucket<V, W>> children$ = children;
-		if (children$ == null || children$.isEmpty()) {
-			return Stream.of(this);
-		}
-		return Stream.concat(Stream.of(this), children$.stream().flatMap(CopyBucket::stream));
 	}
 
 	@Override

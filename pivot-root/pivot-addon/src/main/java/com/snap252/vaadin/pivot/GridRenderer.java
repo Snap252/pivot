@@ -7,22 +7,28 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collector;
+import java.util.stream.Stream;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
-import com.snap252.org.pivoting.BiBucketParameter;
 import com.snap252.org.pivoting.Bucket;
 import com.snap252.org.pivoting.RootBucket;
-import com.snap252.vaadin.pivot.GridRenderer.GridWriter.BucketContainer.BucketItem.CellProperty;
+import com.snap252.vaadin.pivot.GridRenderer.BucketContainer.BucketItem.CellProperty;
+import com.snap252.vaadin.pivot.GridRendererParameter.GridRendererChangeParameterKind;
 import com.snap252.vaadin.pivot.valuegetter.ModelAggregtor;
-import com.snap252.vaadin.pivot.valuegetter.ModelAggregtorDelegate;
+import com.vaadin.data.Collapsible;
+import com.vaadin.data.Container;
 import com.vaadin.data.Container.Hierarchical;
 import com.vaadin.data.Container.Indexed;
+import com.vaadin.data.Container.ItemSetChangeNotifier;
+import com.vaadin.data.Container.PropertySetChangeNotifier;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -39,68 +45,59 @@ import com.vaadin.ui.themes.ValoTheme;
 
 @NonNullByDefault
 final class GridRenderer {
-	private final RootBucket<Item> rowBucket;
-	private final RootBucket<Item> colBucket;
 
 	private static final String SUM_TEXT = "\u2211";
 
-	GridRenderer(final BiBucketParameter<Item> p) throws IllegalArgumentException {
-		rowBucket = new RootBucket<>(SUM_TEXT, p.values, p.rowFnkt);
-		colBucket = new RootBucket<>(SUM_TEXT, p.values, p.colFnkt);
-
-		if (rowBucket.getSize(1) > 10000)
-			throw new IllegalArgumentException("too many rows: " + rowBucket.getSize(1));
-		if (colBucket.getSize(1) > 100)
-			throw new IllegalArgumentException("too many columns: " + colBucket.getSize(1));
+	GridRenderer(final GridRendererParameter<Item> gp, final Grid g) throws IllegalArgumentException {
+		g.setContainerDataSource(new BucketContainer(gp));
 	}
 
-	public <AGG, REN> GridWriter<AGG, REN> createGridWriter() {
-		return new GridWriter<>();
-	}
+	// private final ModelAggregtorDelegate aggregatorDelegator = new
+	// ModelAggregtorDelegate();
+	//
+	// private void setModelAggregator(final ModelAggregtor<?> modelAggregator)
+	// {
+	// this.aggregatorDelegator.setDelegate(modelAggregator);
+	// fireValueChange();
+	// }
+	//
+	// private ModelAggregtor<?> getModelAggregator() {
+	// return this.aggregatorDelegator.getDelegate();
+	// }
+	//
+	// public void updateRenderer(final Grid g) {
+	//
+	// g.getColumns().forEach(col -> {
+	// col.setResizable(false);
+	// col.setSortable(false);
+	// if (col.getPropertyId() != colProp) {
+	// aggregatorDelegator.createRendererConverter().setToColumn(col);
+	// col.setMinimumWidth(50);
+	// } else
+	// col.setMinimumWidth(170);
+	//
+	// });
+	// /*
+	// * hack for https://vaadin.com/forum#!/thread/9319379
+	// */
+	// // g.setCellStyleGenerator(g.getCellStyleGenerator());
+	// }
 
-	private static final Class<PivotCellReference<?>> PIVOT_CELL_REFERENCE_CLAZZ = PivotCellReference
-			.cast(PivotCellReference.class);
-
-	public final class GridWriter<W, R> {
-
-		private final ModelAggregtorDelegate aggregatorDelegator = new ModelAggregtorDelegate();
-
-		public void setModelAggregator(final ModelAggregtor<?> modelAggregator) {
-			this.aggregatorDelegator.setDelegate(modelAggregator);
-			fireValueChange();
+	private static final Object COLLAPSE_COL_PROPERTY_ID = new Object() {
+		@Override
+		public String toString() {
+			return "";
 		}
+	};
 
-		public ModelAggregtor<?> getModelAggregator() {
-			return this.aggregatorDelegator.getDelegate();
-		}
-
-		public void updateRenderer(final Grid g) {
-
-			g.getColumns().forEach(col -> {
-				col.setResizable(false);
-				col.setSortable(false);
-				if (col.getPropertyId() != colProp) {
-					aggregatorDelegator.createRendererConverter().setToColumn(col);
-					col.setMinimumWidth(50);
-				} else
-					col.setMinimumWidth(170);
-
-			});
-			/*
-			 * hack for https://vaadin.com/forum#!/thread/9319379
-			 */
-			// g.setCellStyleGenerator(g.getCellStyleGenerator());
-		}
-
-		private final Object colProp = new Object() {
-			@Override
-			public String toString() {
-				return "";
-			}
-		};
+	static class BucketContainer
+			implements Indexed, Hierarchical, ItemSetChangeNotifier, PropertySetChangeNotifier, Collapsible {
+		private RootBucket<Item> rowBucket;
+		private RootBucket<Item> colBucket;
 
 		private final Collection<ValueChangeListener> valueChangeListeners = new HashSet<>();
-		private final Collection<GridRenderer.GridWriter<W, R>.BucketContainer.BucketItem.CellProperty> propertyResetter = new HashSet<>();
+		private final Collection<BucketContainer.BucketItem.CellProperty> propertyResetter = new HashSet<>();
+		private ModelAggregtor<?> aggregatorDelegator;
 
 		private void fireValueChange() {
 			propertyResetter.forEach(CellProperty::resetValue);
@@ -122,462 +119,623 @@ final class GridRenderer {
 			}
 		}
 
-		class BucketContainer implements Indexed, Hierarchical {
+		public BucketContainer(final GridRendererParameter<Item> gp) {
+			rowBucket = gp.creatRowBucket(SUM_TEXT);
+			colBucket = gp.creatColBucket(SUM_TEXT);
+			this.aggregatorDelegator = gp.getModelAggregator();
 
-			public BucketContainer() {
-			}
+			gp.addParameterChangeListener(GridRendererChangeParameterKind.ROW_FNKT, e -> {
+				rowBucket = e.gridParameter.creatRowBucket(SUM_TEXT);
 
-			@Override
-			public @Nullable Object nextItemId(final Object itemId) {
-				assert false;
-				return null;
-			}
+				final List<@NonNull ?> openIds = rootItemIds().stream()
+						.collect(toList());
+				expandedItemIds.addAll(openIds);
+				visibleItemIds.addAll(rootItemIds());
+				openIds.forEach(this::showDescendants);
+				fireItemSetChanged();
+			});
 
-			@Override
-			public @Nullable Object prevItemId(final Object itemId) {
-				assert false;
-				return null;
-			}
+			gp.addParameterChangeListener(GridRendererChangeParameterKind.COL_FNKT, e ->
 
-			@Override
-			public @Nullable Object firstItemId() {
-				assert false;
-				return null;
-			}
+			{
+				colBucket = e.gridParameter.creatColBucket(SUM_TEXT);
+				firePropertySetSetChanged();
+			});
 
-			@Override
-			public @Nullable Object lastItemId() {
-				assert false;
-				return null;
-			}
+			gp.addParameterChangeListener(GridRendererChangeParameterKind.AGGREGATOR, _ignore -> {
+				this.aggregatorDelegator = _ignore.gridParameter.getModelAggregator();
+				fireValueChange();
+			});
 
-			@Override
-			public boolean isFirstId(final Object itemId) {
-				assert false;
-				return false;
-			}
+		}
 
-			@Override
-			public boolean isLastId(final Object itemId) {
-				assert false;
-				return false;
-			}
+		@Override
+		public @Nullable Object nextItemId(final Object itemId) {
+			assert false;
+			return null;
+		}
 
-			@Override
-			public @Nullable Object addItemAfter(final Object previousItemId) throws UnsupportedOperationException {
-				assert false;
-				return null;
-			}
+		@Override
+		public @Nullable Object prevItemId(final Object itemId) {
+			assert false;
+			return null;
+		}
 
-			@Override
-			public @Nullable Item addItemAfter(final Object previousItemId, final Object newItemId)
-					throws UnsupportedOperationException {
-				assert false;
-				return null;
-			}
+		@Override
+		public @Nullable Object firstItemId() {
+			assert false;
+			return null;
+		}
 
-			private final Map<Bucket<Item>, BucketItem> cache = new HashMap<>();
+		@Override
+		public @Nullable Object lastItemId() {
+			assert false;
+			return null;
+		}
 
-			@Override
-			public BucketItem getItem(final Object itemId) {
-				return getForRow(itemId);
-			}
+		@Override
+		public boolean isFirstId(final Object itemId) {
+			assert false;
+			return false;
+		}
 
-			@SuppressWarnings("unchecked")
-			protected BucketItem getForRow(final Object itemId) {
-				return cache.computeIfAbsent((Bucket<Item>) itemId, x -> new BucketItem(x));
-			}
+		@Override
+		public boolean isLastId(final Object itemId) {
+			assert false;
+			return false;
+		}
 
-			final class BucketItem implements Item {
-				final class CellProperty implements Property<PivotCellReference<?>>, Property.ValueChangeNotifier {
+		@Override
+		public @Nullable Object addItemAfter(final Object previousItemId) throws UnsupportedOperationException {
+			assert false;
+			return null;
+		}
 
-					private final Bucket<Item> colBucket;
-					@Nullable
-					private PivotCellReference<?> cachedPivotCellReference;
+		@Override
+		public @Nullable Item addItemAfter(final Object previousItemId, final Object newItemId)
+				throws UnsupportedOperationException {
+			assert false;
+			return null;
+		}
 
-					public CellProperty(final Bucket<Item> colBucket) {
-						this.colBucket = colBucket;
-						assert rowBucket != colBucket;
-						propertyResetter.add(this);
-					}
+		private final Map<Bucket<Item>, BucketItem> cache = new HashMap<>();
 
-					private void resetValue() {
-						cachedPivotCellReference = null;
-					}
+		@Override
+		public BucketItem getItem(final Object itemId) {
+			return getForRow(itemId);
+		}
 
-					@Nullable
-					private List<Item> filterOwnValues;
+		@SuppressWarnings("unchecked")
+		protected BucketItem getForRow(final Object itemId) {
+			return cache.computeIfAbsent((Bucket<Item>) itemId, x -> new BucketItem(x));
+		}
 
-					private Collection<Item> getOwnItems() {
-						if (filterOwnValues != null)
-							return filterOwnValues;
+		final class BucketItem implements Item {
+			final class CellProperty implements Property<PivotCellReference<?>>, Property.ValueChangeNotifier {
 
-						final Bucket<Item> colParent = colBucket.parent;
-						if (colParent != null) {
-							final Collection<Item> itemsInParent = getForColumn(colParent).getOwnItems();
-							// TODO: maybe better get if from row parent
-							final List<Item> v$;
-							if (itemsInParent.isEmpty())
-								v$ = Collections.emptyList();
-							else
-								v$ = itemsInParent.stream().filter(colBucket).collect(toList());
-							filterOwnValues = v$;
-							return v$;
-						}
+				private final Bucket<Item> colBucket;
+				@Nullable
+				private PivotCellReference<?> cachedPivotCellReference;
 
-						final List<Item> v$ = rowBucket.filterOwnValues(x -> true).collect(toList());
+				public CellProperty(final Bucket<Item> colBucket) {
+					this.colBucket = colBucket;
+					assert rowBucket != colBucket;
+					propertyResetter.add(this);
+				}
+
+				private void resetValue() {
+					cachedPivotCellReference = null;
+				}
+
+				@Nullable
+				private List<Item> filterOwnValues;
+
+				private Collection<Item> getOwnItems() {
+					if (filterOwnValues != null)
+						return filterOwnValues;
+
+					final Bucket<Item> colParent = colBucket.parent;
+					if (colParent != null) {
+						final Collection<Item> itemsInParent = getForColumn(colParent).getOwnItems();
+						// TODO: maybe better get if from row parent
+						final List<Item> v$;
+						if (itemsInParent.isEmpty())
+							v$ = Collections.emptyList();
+						else
+							v$ = itemsInParent.stream().filter(colBucket).collect(toList());
 						filterOwnValues = v$;
 						return v$;
 					}
 
-					@Override
-					public PivotCellReference<?> getValue() {
-						if (cachedPivotCellReference != null)
-							return cachedPivotCellReference;
-
-						final Collector<Item, ?, ?> aggregator = aggregatorDelegator.getAggregator();
-						final Object newValue0 = getOwnItems().stream().collect(aggregator);
-						final PivotCellReference<@Nullable ?> newValue = new PivotCellReference<@Nullable Object>(
-								newValue0, rowBucket, colBucket, BucketContainer.this);
-						cachedPivotCellReference = newValue;
-						return newValue;
-					}
-
-					@Override
-					public void setValue(@Nullable final PivotCellReference<?> newValue) throws ReadOnlyException {
-						throw new ReadOnlyException();
-					}
-
-					@Override
-					public Class<PivotCellReference<?>> getType() {
-						return PIVOT_CELL_REFERENCE_CLAZZ;
-					}
-
-					@Override
-					public boolean isReadOnly() {
-						return true;
-					}
-
-					@Override
-					public void setReadOnly(final boolean newStatus) {
-					}
-
-					@Override
-					public void addValueChangeListener(final com.vaadin.data.Property.ValueChangeListener listener) {
-						valueChangeListeners.add(listener);
-					}
-
-					@Override
-					public void addListener(final com.vaadin.data.Property.ValueChangeListener listener) {
-						addValueChangeListener(listener);
-
-					}
-
-					@Override
-					public void removeValueChangeListener(final com.vaadin.data.Property.ValueChangeListener listener) {
-						valueChangeListeners.remove(listener);
-					}
-
-					@Override
-					public void removeListener(final com.vaadin.data.Property.ValueChangeListener listener) {
-						removeValueChangeListener(listener);
-					}
-				}
-
-				private final Bucket<Item> rowBucket;
-
-				public BucketItem(final Bucket<Item> itemId) {
-					this.rowBucket = itemId;
-				}
-
-				private final Map<Bucket<Item>, CellProperty> cache = new HashMap<>();
-
-				@SuppressWarnings({ "unchecked" })
-				@Override
-				public @NonNull Property<?> getItemProperty(final Object id) {
-					if (id == colProp) {
-						return new ObjectProperty<>(rowBucket.getBucketValue());
-					}
-					return getForColumn((Bucket<@NonNull Item>) id);
-				}
-
-				protected CellProperty getForColumn(final Bucket<Item> id) {
-					return cache.computeIfAbsent(id, CellProperty::new);
-				}
-
-				@SuppressWarnings("null")
-				@Override
-				public Collection<?> getItemPropertyIds() {
-					assert false;
-					return null;
+					final List<Item> v$ = rowBucket.filterOwnValues(x -> true).collect(toList());
+					filterOwnValues = v$;
+					return v$;
 				}
 
 				@Override
-				public boolean addItemProperty(final Object id, @SuppressWarnings("rawtypes") final Property property)
-						throws UnsupportedOperationException {
-					throw new UnsupportedOperationException();
+				public PivotCellReference<?> getValue() {
+					if (cachedPivotCellReference != null)
+						return cachedPivotCellReference;
+
+					final Collector<Item, ?, ?> aggregator = aggregatorDelegator.getAggregator();
+					final Object newValue0 = getOwnItems().stream().collect(aggregator);
+					final PivotCellReference<@Nullable ?> newValue = new PivotCellReference<@Nullable Object>(newValue0,
+							rowBucket, colBucket, BucketContainer.this);
+					cachedPivotCellReference = newValue;
+					return newValue;
 				}
 
 				@Override
-				public boolean removeItemProperty(final Object id) throws UnsupportedOperationException {
-					throw new UnsupportedOperationException();
+				public void setValue(@Nullable final PivotCellReference<?> newValue) throws ReadOnlyException {
+					throw new ReadOnlyException();
 				}
 
+				@Override
+				public Class<PivotCellReference<?>> getType() {
+					return PivotCellReference.PARAMETRIZED_CLASS;
+				}
+
+				@Override
+				public boolean isReadOnly() {
+					return true;
+				}
+
+				@Override
+				public void setReadOnly(final boolean newStatus) {
+				}
+
+				@Override
+				public void addValueChangeListener(final com.vaadin.data.Property.ValueChangeListener listener) {
+					valueChangeListeners.add(listener);
+				}
+
+				@Override
+				public void addListener(final com.vaadin.data.Property.ValueChangeListener listener) {
+					addValueChangeListener(listener);
+
+				}
+
+				@Override
+				public void removeValueChangeListener(final com.vaadin.data.Property.ValueChangeListener listener) {
+					valueChangeListeners.remove(listener);
+				}
+
+				@Override
+				public void removeListener(final com.vaadin.data.Property.ValueChangeListener listener) {
+					removeValueChangeListener(listener);
+				}
 			}
 
-			@Override
-			public Collection<?> getContainerPropertyIds() {
-				final List<Object> collect = colBucket.stream().collect(toList());
-				collect.add(0, colProp);
-				return collect;
+			private final Bucket<Item> rowBucket;
+
+			public BucketItem(final Bucket<Item> itemId) {
+				this.rowBucket = itemId;
 			}
 
+			private final Map<Bucket<Item>, CellProperty> cache = new HashMap<>();
+
+			@SuppressWarnings({ "unchecked" })
 			@Override
-			public Collection<?> getItemIds() {
-				return rowBucket.stream().collect(toList());
+			public @NonNull Property<?> getItemProperty(final Object id) {
+				if (id == COLLAPSE_COL_PROPERTY_ID) {
+					return new ObjectProperty<>(rowBucket.getBucketValue());
+				}
+				return getForColumn((Bucket<@NonNull Item>) id);
 			}
 
-			@Override
-			public @Nullable Property<?> getContainerProperty(final Object itemId, final Object propertyId) {
-				return getItem(itemId).getItemProperty(propertyId);
-			}
-
-			private final Class<?> pivotCellReferenceClazz = PivotCellReference.class;
-
-			@SuppressWarnings("unchecked")
-			@Override
-			public Class<PivotCellReference<?>> getType(final Object propertyId) {
-				return (Class<PivotCellReference<?>>) pivotCellReferenceClazz;
-			}
-
-			@Override
-			public int size() {
-				return rowBucket.stream().collect(counting()).intValue();
-				// assert false;
-				// return 0;
-			}
-
-			@Override
-			public boolean containsId(final Object itemId) {
-				return true;
-				// assert false;
-				// return false;
-			}
-
-			@Override
-			public Item addItem(final Object itemId) throws UnsupportedOperationException {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public Object addItem() throws UnsupportedOperationException {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public boolean removeItem(final Object itemId) throws UnsupportedOperationException {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public boolean addContainerProperty(final Object propertyId, final Class<?> type,
-					@Nullable final Object defaultValue) throws UnsupportedOperationException {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public boolean removeContainerProperty(final Object propertyId) throws UnsupportedOperationException {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public boolean removeAllItems() throws UnsupportedOperationException {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public int indexOfId(final Object itemId) {
-				assert false;
-				return 0;
+			protected CellProperty getForColumn(final Bucket<Item> id) {
+				return cache.computeIfAbsent(id, CellProperty::new);
 			}
 
 			@SuppressWarnings("null")
 			@Override
-			public Object getIdByIndex(final int index) {
+			public Collection<?> getItemPropertyIds() {
 				assert false;
 				return null;
 			}
 
 			@Override
-			public List<?> getItemIds(final int startIndex, final int numberOfItems) {
-				return rowBucket.stream().skip(startIndex).limit(numberOfItems).collect(toList());
-				// assert false;
-				// return null;
-			}
-
-			@Override
-			public Object addItemAt(final int index) throws UnsupportedOperationException {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public Item addItemAt(final int index, final Object newItemId) throws UnsupportedOperationException {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public @Nullable Collection<@NonNull ?> getChildren(final Object itemId) {
-				final Bucket<?> c = (Bucket<?>) itemId;
-				return c.getChildren();
-			}
-
-			@Override
-			public @Nullable Object getParent(final Object itemId) {
-				final Bucket<?> r = (Bucket<?>) itemId;
-				return r.parent;
-			}
-
-			@Override
-			public Collection<?> rootItemIds() {
-				assert isRoot(rowBucket);
-				return Collections.singleton(rowBucket);
-			}
-
-			@Override
-			public boolean setParent(final Object itemId, @Nullable final Object newParentId)
+			public boolean addItemProperty(final Object id, @SuppressWarnings("rawtypes") final Property property)
 					throws UnsupportedOperationException {
 				throw new UnsupportedOperationException();
 			}
 
 			@Override
-			public boolean areChildrenAllowed(final Object itemId) {
-				assert false;
-				return false;
-			}
-
-			@Override
-			public boolean setChildrenAllowed(final Object itemId, final boolean areChildrenAllowed)
-					throws UnsupportedOperationException {
+			public boolean removeItemProperty(final Object id) throws UnsupportedOperationException {
 				throw new UnsupportedOperationException();
 			}
 
-			@Override
-			public boolean isRoot(final Object itemId) {
-				return itemId == rowBucket;
-			}
-
-			@Override
-			public boolean hasChildren(final Object itemId) {
-				return ((Bucket<?>) itemId).getChildren() != null;
-			}
 		}
 
-		public void writeGrid(final Grid g) {
-			for (int i = g.getHeaderRowCount() - 1; i >= 0; i--) {
-				g.removeHeaderRow(i);
-			}
-			g.setDefaultHeaderRow(null);
+		@Override
+		public Collection<?> getContainerPropertyIds() {
+			final List<Object> collect = colBucket.reverseStream().collect(toList());
+			collect.add(0, COLLAPSE_COL_PROPERTY_ID);
+			return collect;
+		}
 
-			g.setCellDescriptionGenerator(null);
-			g.setRowDescriptionGenerator(null);
-			g.addStyleName("pivot");
+		@Override
+		public List<@NonNull Bucket<?>> getItemIds() {
+			return getItemIdStream().collect(toList());
+		}
 
-			g.removeAllColumns();
+		protected Stream<? extends @NonNull Bucket<@NonNull Item>> getItemIdStream() {
+			return rowBucket.stream().filter(visibleItemIds::contains);
+		}
 
-			final BucketContainer bc = new BucketContainer();
-			g.setContainerDataSource(bc);
-			doHeader(g, colBucket, 0);
+		@Override
+		public @Nullable Property<?> getContainerProperty(final Object itemId, final Object propertyId) {
+			return getItem(itemId).getItemProperty(propertyId);
+		}
 
-			g.setCellStyleGenerator(cell -> {
-				if (cell.getPropertyId() == colProp) {
-					return "row-header";
-				}
-//				final int rowDepth = ((Bucket<?>) cell.getItemId()).getLevel();
-				final int colDepth = ((Bucket<?>) cell.getPropertyId()).getLevel();
-//				return "col-depth-" + colDepth + " row-depth-" + rowDepth;
-				return "depth-" + colDepth;
-			});
+		private final Class<?> pivotCellReferenceClazz = PivotCellReference.class;
 
-			// TODO:
-			// g.setCellDescriptionGenerator(cell -> {
-			// if (cell.getPropertyId() == bc.colProp) {
+		@SuppressWarnings("unchecked")
+		@Override
+		public Class<PivotCellReference<?>> getType(final Object propertyId) {
+			return (Class<PivotCellReference<?>>) pivotCellReferenceClazz;
+		}
+
+		@Override
+		public int size() {
+			return getItemIdStream().collect(counting()).intValue();
+			// assert false;
+			// return 0;
+		}
+
+		@Override
+		public boolean containsId(final Object itemId) {
+			assert getItemIdStream().anyMatch(id -> id == itemId);
+			return true;
+			// assert false;
+			// return false;
+		}
+
+		@Override
+		public Item addItem(final Object itemId) throws UnsupportedOperationException {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Object addItem() throws UnsupportedOperationException {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean removeItem(final Object itemId) throws UnsupportedOperationException {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean addContainerProperty(final Object propertyId, final Class<?> type,
+				@Nullable final Object defaultValue) throws UnsupportedOperationException {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean removeContainerProperty(final Object propertyId) throws UnsupportedOperationException {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean removeAllItems() throws UnsupportedOperationException {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public int indexOfId(final Object itemId) {
+			return getItemIds().indexOf(itemId);
+		}
+
+		@Override
+		public Object getIdByIndex(final int index) {
+			return getItemIds().get(index);
+		}
+
+		@Override
+		public List<?> getItemIds(final int startIndex, final int numberOfItems) {
+			return getItemIdStream().skip(startIndex).limit(numberOfItems).collect(toList());
+			// assert false;
 			// return null;
-			// }
-			//
-			// @SuppressWarnings({ "unchecked", "rawtypes" })
-			// final BucketContainer<R, W>.BucketItem.CellProperty cellProperty
-			// = (CellProperty) cell.getProperty();
-			// final R rawValue = cellProperty.getValue();
-			// if (rawValue == null)
-			// return null;
-			// return rawValue.toString().replace("; ",
-			// "<br/>").replace("NumberStatistics [", "").replace("]",
-			// "<br/>");
-			// });
-
-			// g.getColumns().stream().filter(c -> c.getPropertyId() !=
-			// bc.colProp).forEach(columnHandler);
-
 		}
 
-		protected void doHeader(final Grid g, final Bucket<?> b, final int depth) {
-			{
-				// join.setComponent(collapser);
-
-				final HeaderRow headerRow = getOrCreateHeaderRow(g, depth);
-				final Object @NonNull [] children = b.stream().toArray();
-				final HeaderCell meAndMyChildren;
-				if (children.length > 1) {
-					meAndMyChildren = headerRow.join(children);
-					@Nullable
-					final List<? extends Bucket<?>> children$ = b.getChildren();
-					if (children$ != null) {
-						final int childDepth = depth + 1;
-						children$.forEach(c -> doHeader(g, c, childDepth));
-						final HeaderRow childRow = getOrCreateHeaderRow(g, childDepth);
-						// childRow.getCell(b).setText(SUM_TEXT);
-						final HeaderCell ownCellInChildRow = childRow.getCell(b);
-						ownCellInChildRow.setComponent(createChildCollapseButton(g,
-								b.stream().filter(b0 -> b0 != b).collect(toList()), SUM_TEXT));
-						ownCellInChildRow.setStyleName("depth-" + depth);
-					}
-				} else {
-					meAndMyChildren = headerRow.getCell(b);
-				}
-				meAndMyChildren.setText(String.valueOf(b.bucketValue));
-				meAndMyChildren.setStyleName("depth-" + depth);
-				for (int i = depth + 1; i < g.getHeaderRowCount(); i++) {
-					g.getHeaderRow(i).getCell(b).setStyleName("depth-" + depth);
-				}
-			}
+		@Override
+		public Object addItemAt(final int index) throws UnsupportedOperationException {
+			throw new UnsupportedOperationException();
 		}
 
-		protected Button createChildCollapseButton(final Grid g, final List<? extends Bucket<?>> children,
-				final String caption) {
-			final Button collapserButton = new Button(caption, FontAwesome.CARET_DOWN);
-			collapserButton.addStyleName(ValoTheme.BUTTON_BORDERLESS);
-			collapserButton.addStyleName("pivot-grid-expander");
-			final Collection<Column> childColumns = children.stream().map(g::getColumn).collect(toList());
-			assert childColumns != null;
-			collapserButton.addClickListener(new ClickListener() {
-				private boolean collapsed;
+		@Override
+		public Item addItemAt(final int index, final Object newItemId) throws UnsupportedOperationException {
+			throw new UnsupportedOperationException();
+		}
 
+		@Override
+		public @Nullable Collection<@NonNull ?> getChildren(final Object itemId) {
+			final Bucket<?> c = (Bucket<?>) itemId;
+			return c.getChildren();
+		}
+
+		@Override
+		public @Nullable Object getParent(final Object itemId) {
+			final Bucket<?> r = (Bucket<?>) itemId;
+			return r.parent;
+		}
+
+		@Override
+		public Collection<@NonNull Bucket<?>> rootItemIds() {
+			assert isRoot(rowBucket);
+			return Collections.singleton(rowBucket);
+		}
+
+		@Override
+		public boolean setParent(final Object itemId, @Nullable final Object newParentId)
+				throws UnsupportedOperationException {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean areChildrenAllowed(final Object itemId) {
+			assert false;
+			return false;
+		}
+
+		@Override
+		public boolean setChildrenAllowed(final Object itemId, final boolean areChildrenAllowed)
+				throws UnsupportedOperationException {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean isRoot(final Object itemId) {
+			return itemId == rowBucket;
+		}
+
+		@Override
+		public boolean hasChildren(final Object itemId) {
+			return ((Bucket<?>) itemId).getChildren() != null;
+		}
+
+		private final Set<Container.ItemSetChangeListener> itemSetEventListeners = new LinkedHashSet<>();
+
+		@Override
+		public void addItemSetChangeListener(final ItemSetChangeListener listener) {
+			itemSetEventListeners.add(listener);
+		}
+
+		@Deprecated
+		@Override
+		public void addListener(final ItemSetChangeListener listener) {
+			addItemSetChangeListener(listener);
+		}
+
+		@Override
+		public void removeItemSetChangeListener(final ItemSetChangeListener listener) {
+			itemSetEventListeners.remove(listener);
+		}
+
+		@Deprecated
+		@Override
+		public void removeListener(final ItemSetChangeListener listener) {
+			removeItemSetChangeListener(listener);
+		}
+
+		private void fireItemSetChanged() {
+			cache.clear();
+			final ItemSetChangeEvent event = new ItemSetChangeEvent() {
 				@Override
-				public void buttonClick(final ClickEvent event) {
-					collapsed = !collapsed;
-					final Button button = event.getButton();
-					button.setIcon(collapsed ? FontAwesome.CARET_RIGHT : FontAwesome.CARET_DOWN);
-					if (collapsed)
-						button.setCaption(caption + ":" + String.valueOf(childColumns.size()));
-					else
-						button.setCaption(caption);
-					childColumns.forEach(c -> c.setHidden(collapsed));
+				public Container getContainer() {
+					return BucketContainer.this;
 				}
-			});
-			return collapserButton;
+			};
+			for (final ItemSetChangeListener itemSetEventListener : itemSetEventListeners) {
+				itemSetEventListener.containerItemSetChange(event);
+			}
+		}
+
+		private void firePropertySetSetChanged() {
+			cache.clear();
+			final PropertySetChangeEvent event = new PropertySetChangeEvent() {
+				@Override
+				public Container getContainer() {
+					return BucketContainer.this;
+				}
+			};
+			for (final @NonNull PropertySetChangeListener itemSetEventListener : propertySetEventListeners) {
+				itemSetEventListener.containerPropertySetChange(event);
+			}
+		}
+
+		private final Set<Container.PropertySetChangeListener> propertySetEventListeners = new LinkedHashSet<>();
+
+		@Override
+		public void addPropertySetChangeListener(final PropertySetChangeListener listener) {
+			propertySetEventListeners.add(listener);
+		}
+
+		@Override
+		@Deprecated
+		public void addListener(final PropertySetChangeListener listener) {
+			addPropertySetChangeListener(listener);
+
+		}
+
+		@Override
+		public void removePropertySetChangeListener(final PropertySetChangeListener listener) {
+			propertySetEventListeners.remove(listener);
+		}
+
+		@Override
+		@Deprecated
+		public void removeListener(final PropertySetChangeListener listener) {
+			removePropertySetChangeListener(listener);
+		}
+
+		private final Collection<Object> expandedItemIds = new HashSet<>();
+		private final Collection<Object> visibleItemIds = new HashSet<>();
+
+		@Override
+		public void setCollapsed(final Object itemId, final boolean collapsed) {
+			boolean changed;
+			if (collapsed) {
+				changed = expandedItemIds.remove(itemId);
+				hideDescendants(itemId);
+			} else {
+				changed = expandedItemIds.add(itemId);
+				showDescendants(itemId);
+			}
+
+			assert changed;
+			if (changed)
+				fireItemSetChanged();
+		}
+
+		@Override
+		public boolean isCollapsed(final Object itemId) {
+			return !expandedItemIds.contains(itemId);
+		}
+
+		private void showDescendants(final Object parentId) {
+			insertChildrenIfParentExpandedRecursively(parentId);
+		}
+
+		private void insertChildrenIfParentExpandedRecursively(final Object parentId) {
+			if (!isCollapsed(parentId)) {
+				for (final Object childId : getChildrenx(parentId)) {
+					visibleItemIds.add(childId);
+					insertChildrenIfParentExpandedRecursively(childId);
+				}
+			}
+		}
+
+		@SuppressWarnings("null")
+		protected Collection<@NonNull ?> getChildrenx(final Object parentId) {
+			final Bucket<?> b = (Bucket<?>) parentId;
+			final List<@NonNull ?> children = b.getChildren();
+			return children == null ? Collections.emptySet() : children;
+		}
+
+		private void hideDescendants(final Object parentId) {
+			removeChildrenRecursively(parentId);
+		}
+
+		private void removeChildrenRecursively(final Object parentId) {
+			for (final Object childId : getChildrenx(parentId)) {
+				final boolean wasVisible = visibleItemIds.remove(childId);
+				if (wasVisible) {
+					removeChildrenRecursively(childId);
+				}
+			}
 		}
 
 	}
+
+	public void writeGrid(final Grid g) {
+		for (int i = g.getHeaderRowCount() - 1; i >= 0; i--) {
+			g.removeHeaderRow(i);
+		}
+		g.setDefaultHeaderRow(null);
+
+		g.setCellDescriptionGenerator(null);
+		g.setRowDescriptionGenerator(null);
+		g.addStyleName("pivot");
+
+		g.removeAllColumns();
+
+		final BucketContainer bc = new BucketContainer();
+		g.setContainerDataSource(bc);
+		doHeader(g, colBucket, 0);
+
+		g.setCellStyleGenerator(cell -> {
+			if (cell.getPropertyId() == COLLAPSE_COL_PROPERTY_ID) {
+				return "row-header";
+			}
+			// final int rowDepth = ((Bucket<?>)
+			// cell.getItemId()).getLevel();
+			final int colDepth = ((Bucket<?>) cell.getPropertyId()).getLevel();
+			// return "col-depth-" + colDepth + " row-depth-" + rowDepth;
+			return "depth-" + colDepth;
+		});
+
+		// TODO:
+		// g.setCellDescriptionGenerator(cell -> {
+		// if (cell.getPropertyId() == bc.colProp) {
+		// return null;
+		// }
+		//
+		// @SuppressWarnings({ "unchecked", "rawtypes" })
+		// final BucketContainer<R, W>.BucketItem.CellProperty cellProperty
+		// = (CellProperty) cell.getProperty();
+		// final R rawValue = cellProperty.getValue();
+		// if (rawValue == null)
+		// return null;
+		// return rawValue.toString().replace("; ",
+		// "<br/>").replace("NumberStatistics [", "").replace("]",
+		// "<br/>");
+		// });
+
+		// g.getColumns().stream().filter(c -> c.getPropertyId() !=
+		// bc.colProp).forEach(columnHandler);
+
+	}
+
+	protected void doHeader(final Grid g, final Bucket<?> b, final int depth) {
+		{
+			// join.setComponent(collapser);
+
+			final HeaderRow headerRow = getOrCreateHeaderRow(g, depth);
+			final Object @NonNull [] children = b.stream().toArray();
+			final HeaderCell meAndMyChildren;
+			if (children.length > 1) {
+				meAndMyChildren = headerRow.join(children);
+				@Nullable
+				final List<? extends Bucket<?>> children$ = b.getChildren();
+				if (children$ != null) {
+					final int childDepth = depth + 1;
+					children$.forEach(c -> doHeader(g, c, childDepth));
+					final HeaderRow childRow = getOrCreateHeaderRow(g, childDepth);
+					// childRow.getCell(b).setText(SUM_TEXT);
+					final HeaderCell ownCellInChildRow = childRow.getCell(b);
+					ownCellInChildRow.setComponent(
+							createChildCollapseButton(g, b.stream().filter(b0 -> b0 != b).collect(toList()), SUM_TEXT));
+					ownCellInChildRow.setStyleName("depth-" + depth);
+				}
+			} else {
+				meAndMyChildren = headerRow.getCell(b);
+			}
+			meAndMyChildren.setText(String.valueOf(b.bucketValue));
+			meAndMyChildren.setStyleName("depth-" + depth);
+			for (int i = depth + 1; i < g.getHeaderRowCount(); i++) {
+				g.getHeaderRow(i).getCell(b).setStyleName("depth-" + depth);
+			}
+		}
+	}
+
+	protected Button createChildCollapseButton(final Grid g, final List<? extends Bucket<?>> children,
+			final String caption) {
+		final Button collapserButton = new Button(caption, FontAwesome.CARET_DOWN);
+		collapserButton.addStyleName(ValoTheme.BUTTON_BORDERLESS);
+		collapserButton.addStyleName("pivot-grid-expander");
+		final Collection<Column> childColumns = children.stream().map(g::getColumn).collect(toList());
+		assert childColumns != null;
+		collapserButton.addClickListener(new ClickListener() {
+			private boolean collapsed;
+
+			@Override
+			public void buttonClick(final ClickEvent event) {
+				collapsed = !collapsed;
+				final Button button = event.getButton();
+				button.setIcon(collapsed ? FontAwesome.CARET_RIGHT : FontAwesome.CARET_DOWN);
+				if (collapsed)
+					button.setCaption(caption + ":" + String.valueOf(childColumns.size()));
+				else
+					button.setCaption(caption);
+				childColumns.forEach(c -> c.setHidden(collapsed));
+			}
+		});
+		return collapserButton;
+	}
+
+	// }
 
 	private static HeaderRow getOrCreateHeaderRow(final Grid g, final int depth) {
 		if (depth >= g.getHeaderRowCount()) {

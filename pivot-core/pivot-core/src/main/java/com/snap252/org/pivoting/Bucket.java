@@ -62,7 +62,21 @@ public abstract class Bucket<V> implements Predicate<@NonNull V> {
 
 	public abstract int getSize(int forSelf);
 
-	public abstract Stream<? extends Bucket<V>> stream();
+	public final Stream<? extends Bucket<V>> stream() {
+		final @Nullable List<? extends @NonNull Bucket<V>> children$ = getChildren();
+		if (children$ != null)
+			return Stream.concat(Stream.of(this), children$.stream().flatMap(Bucket::stream));
+		else
+			return Stream.of(this);
+	}
+
+	public final Stream<? extends Bucket<V>> reverseStream() {
+		final @Nullable List<? extends @NonNull Bucket<V>> children$ = getChildren();
+		if (children$ != null)
+			return Stream.concat(children$.stream().flatMap(Bucket::stream), Stream.of(this));
+		else
+			return Stream.of(this);
+	}
 
 	@Override
 	public boolean test(final V v) {
@@ -76,7 +90,7 @@ public abstract class Bucket<V> implements Predicate<@NonNull V> {
 		return values.stream().filter(f);
 	}
 
-	public abstract @Nullable List<? extends Bucket<V>> getChildren();
+	public abstract @Nullable List<@NonNull ? extends Bucket<V>> getChildren();
 
 	protected Collection<V> filter(final Collection<V> l) {
 		if (l.isEmpty()) {

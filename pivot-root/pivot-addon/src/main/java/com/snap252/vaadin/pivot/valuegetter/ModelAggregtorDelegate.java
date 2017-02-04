@@ -29,7 +29,8 @@ public final class ModelAggregtorDelegate implements ModelAggregtor<Object> {
 		this(new DummyAggregator());
 	}
 
-	private static class DummyAggregator implements ModelAggregtor<Object> {
+	//TODO: extract
+	public static class DummyAggregator implements ModelAggregtor<Object> {
 
 		@Override
 		public Collector<@NonNull Item, ?, BigDecimal> getAggregator() {

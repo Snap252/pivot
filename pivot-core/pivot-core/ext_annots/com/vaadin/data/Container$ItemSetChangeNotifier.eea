@@ -1,0 +1,13 @@
+class com/vaadin/data/Container$ItemSetChangeNotifier
+addItemSetChangeListener
+ (Lcom/vaadin/data/Container$ItemSetChangeListener;)V
+ (L1com/vaadin/data/Container$ItemSetChangeListener;)V
+addListener
+ (Lcom/vaadin/data/Container$ItemSetChangeListener;)V
+ (L1com/vaadin/data/Container$ItemSetChangeListener;)V
+removeItemSetChangeListener
+ (Lcom/vaadin/data/Container$ItemSetChangeListener;)V
+ (L1com/vaadin/data/Container$ItemSetChangeListener;)V
+removeListener
+ (Lcom/vaadin/data/Container$ItemSetChangeListener;)V
+ (L1com/vaadin/data/Container$ItemSetChangeListener;)V

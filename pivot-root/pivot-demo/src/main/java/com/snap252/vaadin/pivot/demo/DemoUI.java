@@ -6,10 +6,12 @@ import javax.servlet.annotation.WebServlet;
 
 import com.snap252.org.testing.RandomDataGenerator;
 import com.snap252.org.testing.RandomDataGenerator.Person;
+import com.snap252.vaadin.pivot.GridRendererParameter;
 import com.snap252.vaadin.pivot.PivotUI;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.annotations.VaadinServletConfiguration;
+import com.vaadin.data.Item;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
@@ -27,11 +29,13 @@ public class DemoUI extends UI {
 	public static class Servlet extends VaadinServlet {
 	}
 
+	GridRendererParameter<Item> gridRendererParameter = new GridRendererParameter<>();
+
 	@Override
 	protected void init(VaadinRequest request) {
 
 		// Initialize our new UI component
-		final PivotUI pivotGrid = new PivotUI();
+		final PivotUI pivotGrid = new PivotUI(gridRendererParameter);
 		pivotGrid.setSizeFull();
 
 		setDS(pivotGrid);
@@ -55,6 +59,8 @@ public class DemoUI extends UI {
 		List<Person> personen = RandomDataGenerator.createPersons(4000);
 		BeanItemContainer<Person> container = new BeanItemContainer<>(Person.class);
 		container.addAll(personen);
-		pivotGrid.setContainerDataSource(container);
+		List<Item> containerItems = pivotGrid.setContainerDataSource(PivotUI.cloneContainer(container));
+		gridRendererParameter.setValues(containerItems);
 	}
+
 }

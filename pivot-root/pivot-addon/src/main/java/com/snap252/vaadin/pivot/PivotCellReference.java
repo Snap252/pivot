@@ -5,7 +5,7 @@ import java.util.Objects;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.snap252.org.pivoting.Bucket;
-import com.snap252.vaadin.pivot.GridRenderer.GridWriter;
+import com.snap252.vaadin.pivot.GridRenderer.BucketContainer;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 
@@ -15,15 +15,18 @@ public class PivotCellReference<T> {
 	private final T value;
 	private final Bucket<Item> rowBucket2;
 	private final Bucket<Item> colBucket2;
-	private final GridWriter<?, ?>.BucketContainer container;
+	private final BucketContainer container;
 
 	public PivotCellReference(final T newValue, final Bucket<Item> rowBucket, final Bucket<Item> colBucket,
-			final GridWriter<?, ?>.BucketContainer container) {
+			final BucketContainer container) {
 		this.value = newValue;
 		rowBucket2 = rowBucket;
 		colBucket2 = colBucket;
 		this.container = container;
 	}
+
+	public static final Class<PivotCellReference<?>> PARAMETRIZED_CLASS = PivotCellReference
+			.cast(PivotCellReference.class);
 
 	private PivotCellReference<T> getReference(final Bucket<Item> rowBucket, final Bucket<Item> colBucket) {
 		@SuppressWarnings("unchecked")

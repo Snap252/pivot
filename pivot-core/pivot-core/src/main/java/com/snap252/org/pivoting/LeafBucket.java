@@ -1,7 +1,6 @@
 package com.snap252.org.pivoting;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -15,11 +14,6 @@ public class LeafBucket<V> extends Bucket<V> {
 	@Override
 	public int getSize(final int forSelf) {
 		return 1;
-	}
-
-	@Override
-	public Stream<Bucket<V>> stream() {
-		return Stream.of(this);
 	}
 
 	@Override

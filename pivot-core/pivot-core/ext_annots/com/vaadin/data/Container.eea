@@ -11,6 +11,9 @@ containsId
 getContainerProperty
  (Ljava/lang/Object;Ljava/lang/Object;)Lcom/vaadin/data/Property;
  (L1java/lang/Object;L1java/lang/Object;)L0com/vaadin/data/Property;
+getContainerPropertyIds
+ ()Ljava/util/Collection<*>;
+ ()Ljava/util/Collection<*1>;
 getItem
  (Ljava/lang/Object;)Lcom/vaadin/data/Item;
  (L1java/lang/Object;)Lcom/vaadin/data/Item;

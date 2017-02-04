@@ -1,0 +1,13 @@
+class com/vaadin/data/Container$PropertySetChangeNotifier
+addListener
+ (Lcom/vaadin/data/Container$PropertySetChangeListener;)V
+ (L1com/vaadin/data/Container$PropertySetChangeListener;)V
+addPropertySetChangeListener
+ (Lcom/vaadin/data/Container$PropertySetChangeListener;)V
+ (L1com/vaadin/data/Container$PropertySetChangeListener;)V
+removeListener
+ (Lcom/vaadin/data/Container$PropertySetChangeListener;)V
+ (L1com/vaadin/data/Container$PropertySetChangeListener;)V
+removePropertySetChangeListener
+ (Lcom/vaadin/data/Container$PropertySetChangeListener;)V
+ (L1com/vaadin/data/Container$PropertySetChangeListener;)V

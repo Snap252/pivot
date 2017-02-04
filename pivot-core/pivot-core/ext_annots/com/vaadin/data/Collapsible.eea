@@ -1,0 +1,7 @@
+class com/vaadin/data/Collapsible
+isCollapsed
+ (Ljava/lang/Object;)Z
+ (L1java/lang/Object;)Z
+setCollapsed
+ (Ljava/lang/Object;Z)V
+ (L1java/lang/Object;Z)V

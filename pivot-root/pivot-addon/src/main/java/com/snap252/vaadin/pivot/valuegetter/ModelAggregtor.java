@@ -16,6 +16,7 @@ public interface ModelAggregtor<VALUE> {
 	public Collector<Item, ?, ? extends VALUE> getAggregator();
 
 	public RendererConverter<?, ? extends VALUE> createRendererConverter();
+	
 
 	public static class RendererConverter<T, VALUE> {
 		private final Renderer<T> renderer;

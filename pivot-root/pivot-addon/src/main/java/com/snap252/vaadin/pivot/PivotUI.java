@@ -2,19 +2,15 @@ package com.snap252.vaadin.pivot;
 
 import static java.util.stream.Collectors.toList;
 
-import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.jdt.annotation.Nullable;
 import org.vaadin.miki.mapcontainer.MapContainer;
 
-import com.snap252.org.pivoting.BiBucketParameter;
-import com.snap252.vaadin.pivot.GridRenderer.GridWriter;
-import com.snap252.vaadin.pivot.valuegetter.FilteringRenderingComponent;
 import com.snap252.vaadin.pivot.valuegetter.ValueGetterDnDHandler;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
@@ -35,15 +31,12 @@ import fi.jasoft.dragdroplayouts.DDVerticalLayout;
 public class PivotUI extends GridLayout {
 
 	private final HorizontalLayout properties;
-	private BiBucketParameter<Item> p;
 
-	private @Nullable GridWriter<?, ?> gridWriter;
-
-	@SuppressWarnings("null")
-	public PivotUI() {
+	public PivotUI(final GridRendererParameter<Item> gridRendererParameter) {
 		super(2, 3);
+
 		setSpacing(true);
-		final PivotGrid pivotGrid$ = new PivotGrid();
+		final PivotGrid pivotGrid$ = new PivotGrid(gridRendererParameter);
 		{
 			final Component renderer = new Label("");
 			renderer.setSizeUndefined();
@@ -59,13 +52,9 @@ public class PivotUI extends GridLayout {
 			aggregator.setSpacing(true);
 			final DragAndDropWrapper aggregatorDragAndDropWrapper = new DragAndDropWrapper(aggregator);
 			final DropHandler aggDopHandler = new ValueGetterDnDHandler(aggregator, true, i -> {
-				final FilteringRenderingComponent<?> valueProperty = !i.isEmpty() ? i.get(0) : null;
-
-				if (gridWriter != null)
-					gridWriter.setModelAggregator(valueProperty);
+				gridRendererParameter.setModelAggregator(!i.isEmpty() ? i.get(0) : null);
 			}, () -> {
-				if (gridWriter != null)
-					gridWriter.updateRenderer(pivotGrid$);
+				// TODO: sub-ChangeListener in GridRendererParameter
 			});
 
 			aggregator.setDropHandler(aggDopHandler);
@@ -74,7 +63,7 @@ public class PivotUI extends GridLayout {
 			final DDHorizontalLayout cols = new DDHorizontalLayout();
 			cols.addStyleName("pivot-ui-cols");
 			final DropHandler dropHandler = new PivotCriteriaFilteringDnDHandler(cols, false,
-					colFnkts -> gridWriter = pivotGrid$.setContainerDataSource(p.setColFnkt(colFnkts), gridWriter));
+					gridRendererParameter::setColFnkt);
 			cols.setDropHandler(dropHandler);
 			cols.setSpacing(true);
 
@@ -87,7 +76,7 @@ public class PivotUI extends GridLayout {
 			final DDVerticalLayout rows = new DDVerticalLayout();
 			rows.addStyleName("pivot-ui-rows");
 			final DropHandler dropHandler = new PivotCriteriaFilteringDnDHandler(rows, true,
-					rowFnkts -> gridWriter = pivotGrid$.setContainerDataSource(p.setRowFnkt(rowFnkts), gridWriter));
+					gridRendererParameter::setRowFnkt);
 			rows.setDropHandler(dropHandler);
 			rows.setSpacing(true);
 
@@ -104,8 +93,30 @@ public class PivotUI extends GridLayout {
 		setColumnExpandRatio(1, 1);
 	}
 
-	@SuppressWarnings("null")
-	public void setContainerDataSource(final Container origContainer) {
+	public List<Item> setContainerDataSource(final Container container) {
+		
+		// p = new
+		// BiBucketParameter<>(c.getItemIds().stream().map(c::getItem).collect(toList()),
+		// Collections.emptyList(),
+		// Collections.emptyList());
+
+		final Component[] labels = container.getContainerPropertyIds().stream().map(propertyId -> {
+			final Component button = new Button(propertyId.toString());
+			button.addStyleName(ValoTheme.BUTTON_SMALL);
+			button.setEnabled(false);
+			final DragAndDropWrapper wrapper = new DragAndDropWrapper(button);
+			wrapper.setDragStartMode(DragStartMode.COMPONENT);
+			wrapper.setData(new NameType(propertyId.toString(), container.getType(propertyId)));
+			return wrapper;
+		}).toArray(i -> new Component[i]);
+		properties.removeAllComponents();
+		properties.addComponents(labels);
+		
+		return container.getItemIds().stream().map(container::getItem).collect(toList());
+
+	}
+
+	public static Container cloneContainer(final Container origContainer) {
 		final Map<Object, Class<?>> m0 = origContainer.getContainerPropertyIds().stream()
 				.collect(Collectors.toMap(Function.identity(), origContainer::getType, (u, v) -> {
 					throw new IllegalStateException(String.format("Duplicate key %s", u));
@@ -120,22 +131,7 @@ public class PivotUI extends GridLayout {
 				}, (u, v) -> {
 					throw new IllegalStateException(String.format("Duplicate key %s", u));
 				}, LinkedHashMap::new));
-		final Container c = new MapContainer(m0, m1);
-		p = new BiBucketParameter<>(c.getItemIds().stream().map(c::getItem).collect(toList()), Collections.emptyList(),
-				Collections.emptyList());
-
-		final Component[] labels = c.getContainerPropertyIds().stream().map(propertyId -> {
-			final Component button = new Button(propertyId.toString());
-			button.addStyleName(ValoTheme.BUTTON_SMALL);
-			button.setEnabled(false);
-			final DragAndDropWrapper wrapper = new DragAndDropWrapper(button);
-			wrapper.setDragStartMode(DragStartMode.COMPONENT);
-			wrapper.setData(new NameType(propertyId.toString(), c.getType(propertyId)));
-			return wrapper;
-		}).toArray(i -> new Component[i]);
-		properties.removeAllComponents();
-		properties.addComponents(labels);
-
+		return new MapContainer(m0, m1);
 	}
 
 }

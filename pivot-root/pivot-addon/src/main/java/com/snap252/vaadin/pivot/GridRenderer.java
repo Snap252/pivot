@@ -29,6 +29,7 @@ import com.vaadin.data.Container;
 import com.vaadin.data.Container.Hierarchical;
 import com.vaadin.data.Container.Indexed;
 import com.vaadin.data.Container.ItemSetChangeNotifier;
+import com.vaadin.data.Container.PropertySetChangeListener;
 import com.vaadin.data.Container.PropertySetChangeNotifier;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
@@ -56,12 +57,13 @@ final class GridRenderer {
 		gridParameter.addParameterChangeListener(GridRendererChangeParameterKind.AGGREGATOR,
 				_ignore -> updateGridColumns(grid, _ignore.gridParameter.getModelAggregator()));
 
-		bucketContainer.addPropertySetChangeListener(_ignore -> {
+		final PropertySetChangeListener columnsChanged = _ignore -> {
 			updateGridColumns(grid, gridParameter.getModelAggregator());
 			grid.setColumnOrder(grid.getContainerDataSource().getContainerPropertyIds().toArray());
 			updateGridHeader(grid, bucketContainer.colBucket, gridParameter.getColDepth());
 
-		});
+		};
+		bucketContainer.addPropertySetChangeListener(columnsChanged);
 		grid.setCellStyleGenerator(cell -> {
 			if (cell.getPropertyId() == COLLAPSE_COL_PROPERTY_ID) {
 				return "row-header";
@@ -159,11 +161,13 @@ final class GridRenderer {
 
 			gp.addParameterChangeListener(GridRendererChangeParameterKind.ROW_FNKT, e -> {
 				rowBucket = e.gridParameter.creatRowBucket(SUM_TEXT);
+				{
+					final List<@NonNull ?> openIds = rootItemIds().stream().collect(toList());
+					expandedItemIds.addAll(openIds);
+					visibleItemIds.addAll(rootItemIds());
+					openIds.forEach(this::showDescendants);
+				}
 
-				final List<@NonNull ?> openIds = rootItemIds().stream().collect(toList());
-				expandedItemIds.addAll(openIds);
-				visibleItemIds.addAll(rootItemIds());
-				openIds.forEach(this::showDescendants);
 				fireItemSetChanged();
 			});
 
@@ -696,12 +700,9 @@ final class GridRenderer {
 				final HeaderRow childRow = g.getHeaderRow(childDepth);
 				// childRow.getCell(b).setText(SUM_TEXT);
 				final HeaderCell ownCellInChildRow = childRow.getCell(b);
-				if (true)
-					ownCellInChildRow.setComponent(
-							createChildCollapseButton(g, b.stream().filter(b0 -> b0 != b).collect(toList()), SUM_TEXT));
-				else
-					ownCellInChildRow.setText(SUM_TEXT);
-				
+				ownCellInChildRow.setComponent(
+						createChildCollapseButton(g, b.stream().filter(b0 -> b0 != b).collect(toList()), SUM_TEXT));
+
 				ownCellInChildRow.setStyleName("depth-" + depth);
 			}
 		} else {

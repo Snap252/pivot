@@ -21,11 +21,14 @@ import com.vaadin.ui.themes.ValoTheme;
 public class ValueGetterDnDHandler extends DropHandlerImplementation<FilteringRenderingComponent<?>> {
 
 	private final ValueFactory valueFactory = new ValueFactory();
+	private final Runnable upateAggregator;
 	private final Runnable upateRenderer;
 
 	public ValueGetterDnDHandler(final AbstractOrderedLayout cols, final boolean vertical,
-			final Consumer<List<FilteringRenderingComponent<?>>> refresher, final Runnable upateRenderer) {
+			final Consumer<List<FilteringRenderingComponent<?>>> refresher, final Runnable upateAggregator,
+			final Runnable upateRenderer) {
 		super(cols, vertical, refresher);
+		this.upateAggregator = upateAggregator;
 		this.upateRenderer = upateRenderer;
 	}
 
@@ -44,8 +47,9 @@ public class ValueGetterDnDHandler extends DropHandlerImplementation<FilteringRe
 			final Button deleteButton = new Button("Entfernen", evt -> {
 				removeFromList(Objects.requireNonNull(popupButton.getParent()), createFilter, this);
 				popupButton.setPopupVisible(false);
-				refresh();
+				upateAggregator.run();
 			});
+
 			final Button closeButton = new Button("Schließen", evt -> popupButton.setPopupVisible(false));
 
 			final HorizontalLayout footer = new HorizontalLayout(deleteButton, closeButton);
@@ -60,7 +64,7 @@ public class ValueGetterDnDHandler extends DropHandlerImplementation<FilteringRe
 				final PopupVisibilityListener listener = new PopupVisibilityListener() {
 					@Override
 					public void popupVisibilityChange(final PopupVisibilityEvent _ignore2) {
-						refresh();
+						upateAggregator.run();
 						/* we need a this-context here */
 						popupButton.removePopupVisibilityListener(this);
 						popupButton.setCaption(createFilter.toString());
@@ -98,9 +102,4 @@ public class ValueGetterDnDHandler extends DropHandlerImplementation<FilteringRe
 		return b;
 	}
 
-	@Override
-	protected void refresh() {
-		super.refresh();
-		upateRenderer.run();
-	}
 }

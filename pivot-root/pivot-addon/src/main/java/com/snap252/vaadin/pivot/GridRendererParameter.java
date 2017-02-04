@@ -18,13 +18,13 @@ import com.snap252.vaadin.pivot.valuegetter.ModelAggregtor;
 import com.snap252.vaadin.pivot.valuegetter.ModelAggregtorDelegate;
 
 @NonNullByDefault
-public class GridRendererParameter<LIST_INPUT_TYPE> {
+public final class GridRendererParameter<LIST_INPUT_TYPE> {
 	private List<LIST_INPUT_TYPE> values = new ArrayList<>();
 
 	enum GridRendererChangeParameterKind {
-		ROW_FNKT, COL_FNKT, AGGREGATOR, RENDERER
+		ROW_FNKT, COL_FNKT, VALUES, AGGREGATOR, CONVERTER, RENDERER
 
-		, VALUES;
+		;
 	}
 
 	@FunctionalInterface
@@ -48,7 +48,7 @@ public class GridRendererParameter<LIST_INPUT_TYPE> {
 			return;
 
 		this.values = values;
-		fireEvent(GridRendererChangeParameterKind.ROW_FNKT);
+		rowFunctionsUpated();
 		fireEvent(GridRendererChangeParameterKind.COL_FNKT);
 	}
 
@@ -110,7 +110,23 @@ public class GridRendererParameter<LIST_INPUT_TYPE> {
 
 		this.rowFnkt.clear();
 		this.rowFnkt.addAll(rowFnkt);
+		rowFunctionsUpated();
+	}
+
+	public void rowFunctionsUpated() {
 		fireEvent(GridRendererChangeParameterKind.ROW_FNKT);
+	}
+
+	public void colFunctionsUpated() {
+		fireEvent(GridRendererChangeParameterKind.COL_FNKT);
+	}
+
+	public void rendererUpated() {
+		fireEvent(GridRendererChangeParameterKind.RENDERER);
+	}
+
+	public void aggregatorUpated() {
+		fireEvent(GridRendererChangeParameterKind.AGGREGATOR);
 	}
 
 	public void setModelAggregator(@Nullable final ModelAggregtor<?> aggregator) {

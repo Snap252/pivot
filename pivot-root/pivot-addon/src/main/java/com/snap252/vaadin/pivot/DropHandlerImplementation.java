@@ -29,14 +29,14 @@ public abstract class DropHandlerImplementation<T> implements DropHandler {
 
 	private final AbstractOrderedLayout cols;
 	private final boolean vertical;
-	private final Consumer<List<T>> refresher;
+	private final Consumer<List<T>> refresherOfSetChanged;
 	private final List<T> pivotCriteriaList;
 
 	public DropHandlerImplementation(final AbstractOrderedLayout cols, final boolean vertical,
-			final Consumer<List<T>> refresher) {
+			final Consumer<List<T>> refresherOfSetChanged) {
 		this.cols = cols;
 		this.vertical = vertical;
-		this.refresher = refresher;
+		this.refresherOfSetChanged = refresherOfSetChanged;
 		this.pivotCriteriaList = new ArrayList<T>();
 	}
 
@@ -98,6 +98,7 @@ public abstract class DropHandlerImplementation<T> implements DropHandler {
 
 		final boolean changed = pivotCriteriaList.pivotCriteriaList.remove(data2);
 		assert changed;
+		pivotCriteriaList.fireListChanged();
 	}
 
 	private void updateAllComponentIndices(){
@@ -135,10 +136,14 @@ public abstract class DropHandlerImplementation<T> implements DropHandler {
 		else
 			pivotCriteriaList.add(index, createFilter);
 
-		refresh();
+		fireListChanged();
 	}
 
-	protected void refresh() {
-		refresher.accept(pivotCriteriaList);
+	private void fireListChanged() {
+		refresherOfSetChanged.accept(pivotCriteriaList);
 	}
+
+//	protected final void refresh() {
+//		refresherOfPropertyChanged.run();
+//	}
 }

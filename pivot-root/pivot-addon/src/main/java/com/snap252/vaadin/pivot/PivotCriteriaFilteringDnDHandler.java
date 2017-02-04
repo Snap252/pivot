@@ -16,14 +16,21 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
+
 @NonNullByDefault
 public class PivotCriteriaFilteringDnDHandler extends DropHandlerImplementation<FilteringComponent<?>> {
 
 	private final FilterFactory filterFactory = new FilterFactory();
+	private final Runnable refererOfPropertyChanged;
 
 	public PivotCriteriaFilteringDnDHandler(final AbstractOrderedLayout cols, final boolean vertical,
-			final Consumer<List<FilteringComponent<?>>> refresher) {
+			final Consumer<List<FilteringComponent<?>>> refresher, final Runnable refererOfPropertyChanged) {
 		super(cols, vertical, refresher);
+		this.refererOfPropertyChanged = refererOfPropertyChanged;
+	}
+	
+	private void refresh(){
+		refererOfPropertyChanged.run();
 	}
 
 	@Override

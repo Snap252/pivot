@@ -53,9 +53,7 @@ public class PivotUI extends GridLayout {
 			final DragAndDropWrapper aggregatorDragAndDropWrapper = new DragAndDropWrapper(aggregator);
 			final DropHandler aggDopHandler = new ValueGetterDnDHandler(aggregator, true, i -> {
 				gridRendererParameter.setModelAggregator(!i.isEmpty() ? i.get(0) : null);
-			}, () -> {
-				// TODO: sub-ChangeListener in GridRendererParameter
-			});
+			}, gridRendererParameter::aggregatorUpated, gridRendererParameter::rendererUpated);
 
 			aggregator.setDropHandler(aggDopHandler);
 			aggregatorDragAndDropWrapper.setDropHandler(aggDopHandler);
@@ -63,7 +61,7 @@ public class PivotUI extends GridLayout {
 			final DDHorizontalLayout cols = new DDHorizontalLayout();
 			cols.addStyleName("pivot-ui-cols");
 			final DropHandler dropHandler = new PivotCriteriaFilteringDnDHandler(cols, false,
-					gridRendererParameter::setColFnkt);
+					gridRendererParameter::setColFnkt, gridRendererParameter::colFunctionsUpated);
 			cols.setDropHandler(dropHandler);
 			cols.setSpacing(true);
 
@@ -76,7 +74,7 @@ public class PivotUI extends GridLayout {
 			final DDVerticalLayout rows = new DDVerticalLayout();
 			rows.addStyleName("pivot-ui-rows");
 			final DropHandler dropHandler = new PivotCriteriaFilteringDnDHandler(rows, true,
-					gridRendererParameter::setRowFnkt);
+					gridRendererParameter::setRowFnkt, gridRendererParameter::rowFunctionsUpated);
 			rows.setDropHandler(dropHandler);
 			rows.setSpacing(true);
 
@@ -94,7 +92,7 @@ public class PivotUI extends GridLayout {
 	}
 
 	public List<Item> setContainerDataSource(final Container container) {
-		
+
 		// p = new
 		// BiBucketParameter<>(c.getItemIds().stream().map(c::getItem).collect(toList()),
 		// Collections.emptyList(),
@@ -111,7 +109,7 @@ public class PivotUI extends GridLayout {
 		}).toArray(i -> new Component[i]);
 		properties.removeAllComponents();
 		properties.addComponents(labels);
-		
+
 		return container.getItemIds().stream().map(container::getItem).collect(toList());
 
 	}

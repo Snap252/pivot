@@ -47,13 +47,8 @@ public class SubBucket<V> extends Bucket<V> {
 		assert childCriterions.size() == partitionCriterionsAndSubCriterions.size() - 1;
 
 		final List<Bucket<V>> children$ = collect.entrySet().stream().sorted(Entry.comparingByKey(ownCriterion))
-
-				.map(e -> {
-					return childCriterions.isEmpty()
-							? new LeafBucket<V>(e.getKey(), this, ownCriterion, e.getValue(), level + 1)
-							: new SubBucket<V>(e.getKey(), childCriterions, this, ownCriterion, e.getValue(),
-									level + 1);
-				}).collect(Collectors.toList());
+				.map(e -> new SubBucket<V>(e.getKey(), childCriterions, this, ownCriterion, e.getValue(), level + 1))
+				.collect(Collectors.toList());
 
 		assert children$.stream().flatMap(c -> c.values.stream()).collect(toSet()).equals(new HashSet<V>(
 				values)) : parent/*

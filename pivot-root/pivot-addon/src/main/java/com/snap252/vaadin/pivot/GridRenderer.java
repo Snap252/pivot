@@ -23,6 +23,7 @@ import com.snap252.org.pivoting.RootBucket;
 import com.snap252.vaadin.pivot.GridRenderer.BucketContainer.BucketItem.CellProperty;
 import com.snap252.vaadin.pivot.GridRendererParameter.GridRendererChangeParameterKind;
 import com.snap252.vaadin.pivot.valuegetter.ModelAggregtor;
+import com.snap252.vaadin.pivot.valuegetter.ModelAggregtor.RendererConverter;
 import com.vaadin.data.Collapsible;
 import com.vaadin.data.Container;
 import com.vaadin.data.Container.Hierarchical;
@@ -48,8 +49,40 @@ final class GridRenderer {
 
 	private static final String SUM_TEXT = "\u2211";
 
-	GridRenderer(final GridRendererParameter<Item> gp, final Grid g) throws IllegalArgumentException {
-		g.setContainerDataSource(new BucketContainer(gp));
+	GridRenderer(final GridRendererParameter<Item> gridParameter, final Grid grid) throws IllegalArgumentException {
+		final BucketContainer bucketContainer = new BucketContainer(gridParameter);
+		grid.setContainerDataSource(bucketContainer);
+
+		gridParameter.addParameterChangeListener(GridRendererChangeParameterKind.AGGREGATOR,
+				_ignore -> updateGridColumns(grid, _ignore.gridParameter.getModelAggregator()));
+
+		bucketContainer.addPropertySetChangeListener(_ignore -> {
+			updateGridColumns(grid, gridParameter.getModelAggregator());
+			grid.setColumnOrder(grid.getContainerDataSource().getContainerPropertyIds().toArray());
+			updateGridHeader(grid, bucketContainer.colBucket, gridParameter.getColDepth());
+
+		});
+		grid.setCellStyleGenerator(cell -> {
+			if (cell.getPropertyId() == COLLAPSE_COL_PROPERTY_ID) {
+				return "row-header";
+			}
+			// final int rowDepth = ((Bucket<?>)
+			// cell.getItemId()).getLevel();
+			final int colDepth = ((Bucket<?>) cell.getPropertyId()).getLevel();
+			// return "col-depth-" + colDepth + " row-depth-" + rowDepth;
+			return "depth-" + colDepth;
+		});
+	}
+
+	protected void updateGridColumns(final Grid grid, final ModelAggregtor<?> modelAggregator) {
+		grid.getColumns().forEach(column -> {
+			if (column.getPropertyId() != COLLAPSE_COL_PROPERTY_ID) {
+				final RendererConverter<?, ?> rc = modelAggregator.createRendererConverter();
+				rc.setToColumn(column);
+				column.setMinimumWidth(75);
+			} else
+				column.setMinimumWidth(170);
+		});
 	}
 
 	// private final ModelAggregtorDelegate aggregatorDelegator = new
@@ -99,7 +132,7 @@ final class GridRenderer {
 		private final Collection<BucketContainer.BucketItem.CellProperty> propertyResetter = new HashSet<>();
 		private ModelAggregtor<?> aggregatorDelegator;
 
-		private void fireValueChange() {
+		private void resetPropertiesAndFireValueChange() {
 			propertyResetter.forEach(CellProperty::resetValue);
 
 			if (valueChangeListeners.isEmpty())
@@ -127,24 +160,21 @@ final class GridRenderer {
 			gp.addParameterChangeListener(GridRendererChangeParameterKind.ROW_FNKT, e -> {
 				rowBucket = e.gridParameter.creatRowBucket(SUM_TEXT);
 
-				final List<@NonNull ?> openIds = rootItemIds().stream()
-						.collect(toList());
+				final List<@NonNull ?> openIds = rootItemIds().stream().collect(toList());
 				expandedItemIds.addAll(openIds);
 				visibleItemIds.addAll(rootItemIds());
 				openIds.forEach(this::showDescendants);
 				fireItemSetChanged();
 			});
 
-			gp.addParameterChangeListener(GridRendererChangeParameterKind.COL_FNKT, e ->
-
-			{
+			gp.addParameterChangeListener(GridRendererChangeParameterKind.COL_FNKT, e -> {
 				colBucket = e.gridParameter.creatColBucket(SUM_TEXT);
 				firePropertySetSetChanged();
 			});
 
 			gp.addParameterChangeListener(GridRendererChangeParameterKind.AGGREGATOR, _ignore -> {
 				this.aggregatorDelegator = _ignore.gridParameter.getModelAggregator();
-				fireValueChange();
+				resetPropertiesAndFireValueChange();
 			});
 
 		}
@@ -348,7 +378,7 @@ final class GridRenderer {
 		}
 
 		@Override
-		public Collection<?> getContainerPropertyIds() {
+		public Collection<@NonNull ?> getContainerPropertyIds() {
 			final List<Object> collect = colBucket.reverseStream().collect(toList());
 			collect.add(0, COLLAPSE_COL_PROPERTY_ID);
 			return collect;
@@ -540,9 +570,8 @@ final class GridRenderer {
 					return BucketContainer.this;
 				}
 			};
-			for (final @NonNull PropertySetChangeListener itemSetEventListener : propertySetEventListeners) {
-				itemSetEventListener.containerPropertySetChange(event);
-			}
+			propertySetEventListeners
+					.forEach(itemSetEventListener -> itemSetEventListener.containerPropertySetChange(event));
 		}
 
 		private final Set<Container.PropertySetChangeListener> propertySetEventListeners = new LinkedHashSet<>();
@@ -629,84 +658,59 @@ final class GridRenderer {
 
 	}
 
-	public void writeGrid(final Grid g) {
-		for (int i = g.getHeaderRowCount() - 1; i >= 0; i--) {
-			g.removeHeaderRow(i);
+	private void updateGridHeader(final Grid grid, final Bucket<?> colBucket, final int depth) {
+		assert colBucket != null;
+		for (int i = grid.getHeaderRowCount() - 1; i >= 0; i--) {
+			grid.removeHeaderRow(i);
 		}
-		g.setDefaultHeaderRow(null);
+		grid.setDefaultHeaderRow(null);
+		for (int i = 0; i <= depth; i++) {
+			grid.appendHeaderRow();
+		}
 
-		g.setCellDescriptionGenerator(null);
-		g.setRowDescriptionGenerator(null);
-		g.addStyleName("pivot");
+		grid.setCellDescriptionGenerator(null);
+		grid.setRowDescriptionGenerator(null);
+		grid.addStyleName("pivot");
 
-		g.removeAllColumns();
-
-		final BucketContainer bc = new BucketContainer();
-		g.setContainerDataSource(bc);
-		doHeader(g, colBucket, 0);
-
-		g.setCellStyleGenerator(cell -> {
-			if (cell.getPropertyId() == COLLAPSE_COL_PROPERTY_ID) {
-				return "row-header";
-			}
-			// final int rowDepth = ((Bucket<?>)
-			// cell.getItemId()).getLevel();
-			final int colDepth = ((Bucket<?>) cell.getPropertyId()).getLevel();
-			// return "col-depth-" + colDepth + " row-depth-" + rowDepth;
-			return "depth-" + colDepth;
-		});
-
-		// TODO:
-		// g.setCellDescriptionGenerator(cell -> {
-		// if (cell.getPropertyId() == bc.colProp) {
-		// return null;
-		// }
-		//
-		// @SuppressWarnings({ "unchecked", "rawtypes" })
-		// final BucketContainer<R, W>.BucketItem.CellProperty cellProperty
-		// = (CellProperty) cell.getProperty();
-		// final R rawValue = cellProperty.getValue();
-		// if (rawValue == null)
-		// return null;
-		// return rawValue.toString().replace("; ",
-		// "<br/>").replace("NumberStatistics [", "").replace("]",
-		// "<br/>");
-		// });
-
-		// g.getColumns().stream().filter(c -> c.getPropertyId() !=
-		// bc.colProp).forEach(columnHandler);
-
+		doHeader(grid, colBucket, 0);
 	}
 
 	protected void doHeader(final Grid g, final Bucket<?> b, final int depth) {
-		{
-			// join.setComponent(collapser);
+		if (g.getColumns().isEmpty())
+			return;
 
-			final HeaderRow headerRow = getOrCreateHeaderRow(g, depth);
-			final Object @NonNull [] children = b.stream().toArray();
-			final HeaderCell meAndMyChildren;
-			if (children.length > 1) {
-				meAndMyChildren = headerRow.join(children);
-				@Nullable
-				final List<? extends Bucket<?>> children$ = b.getChildren();
-				if (children$ != null) {
-					final int childDepth = depth + 1;
-					children$.forEach(c -> doHeader(g, c, childDepth));
-					final HeaderRow childRow = getOrCreateHeaderRow(g, childDepth);
-					// childRow.getCell(b).setText(SUM_TEXT);
-					final HeaderCell ownCellInChildRow = childRow.getCell(b);
+		assert g.getColumn(b) != null : g.getColumns();
+
+		final HeaderRow headerRow = g.getHeaderRow(depth);
+		assert headerRow != null;
+
+		final Object @NonNull [] children = b.stream().toArray();
+		final HeaderCell meAndMyChildren;
+		if (children.length > 1) {
+			meAndMyChildren = headerRow.join(children);
+			@Nullable
+			final List<? extends Bucket<?>> children$ = b.getChildren();
+			if (children$ != null) {
+				final int childDepth = depth + 1;
+				children$.forEach(c -> doHeader(g, c, childDepth));
+				final HeaderRow childRow = g.getHeaderRow(childDepth);
+				// childRow.getCell(b).setText(SUM_TEXT);
+				final HeaderCell ownCellInChildRow = childRow.getCell(b);
+				if (true)
 					ownCellInChildRow.setComponent(
 							createChildCollapseButton(g, b.stream().filter(b0 -> b0 != b).collect(toList()), SUM_TEXT));
-					ownCellInChildRow.setStyleName("depth-" + depth);
-				}
-			} else {
-				meAndMyChildren = headerRow.getCell(b);
+				else
+					ownCellInChildRow.setText(SUM_TEXT);
+				
+				ownCellInChildRow.setStyleName("depth-" + depth);
 			}
-			meAndMyChildren.setText(String.valueOf(b.bucketValue));
-			meAndMyChildren.setStyleName("depth-" + depth);
-			for (int i = depth + 1; i < g.getHeaderRowCount(); i++) {
-				g.getHeaderRow(i).getCell(b).setStyleName("depth-" + depth);
-			}
+		} else {
+			meAndMyChildren = headerRow.getCell(b);
+		}
+		meAndMyChildren.setText(String.valueOf(b.bucketValue));
+		meAndMyChildren.setStyleName("depth-" + depth);
+		for (int i = depth + 1; i < g.getHeaderRowCount(); i++) {
+			g.getHeaderRow(i).getCell(b).setStyleName("depth-" + depth);
 		}
 	}
 
@@ -733,15 +737,5 @@ final class GridRenderer {
 			}
 		});
 		return collapserButton;
-	}
-
-	// }
-
-	private static HeaderRow getOrCreateHeaderRow(final Grid g, final int depth) {
-		if (depth >= g.getHeaderRowCount()) {
-			g.appendHeaderRow();
-			assert depth < g.getHeaderRowCount();
-		}
-		return g.getHeaderRow(depth);
 	}
 }

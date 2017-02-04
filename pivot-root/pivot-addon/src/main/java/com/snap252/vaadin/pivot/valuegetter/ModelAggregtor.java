@@ -61,7 +61,7 @@ public interface ModelAggregtor<VALUE> {
 			this.converter = converter;
 		}
 
-		Renderer<T> getRenderer() {
+		private Renderer<T> getRenderer() {
 			return renderer;
 		}
 

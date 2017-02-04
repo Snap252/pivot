@@ -73,7 +73,7 @@ public abstract class Bucket<V> implements Predicate<@NonNull V> {
 	public final Stream<? extends Bucket<V>> reverseStream() {
 		final @Nullable List<? extends @NonNull Bucket<V>> children$ = getChildren();
 		if (children$ != null)
-			return Stream.concat(children$.stream().flatMap(Bucket::stream), Stream.of(this));
+			return Stream.concat(children$.stream().flatMap(Bucket::reverseStream), Stream.of(this));
 		else
 			return Stream.of(this);
 	}

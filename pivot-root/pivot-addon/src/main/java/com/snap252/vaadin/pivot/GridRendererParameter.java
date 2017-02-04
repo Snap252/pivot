@@ -3,6 +3,7 @@ package com.snap252.vaadin.pivot;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -45,7 +46,7 @@ public class GridRendererParameter<LIST_INPUT_TYPE> {
 	public void setValues(final List<LIST_INPUT_TYPE> values) {
 		if (Objects.equals(this.values, values))
 			return;
-		
+
 		this.values = values;
 		fireEvent(GridRendererChangeParameterKind.ROW_FNKT);
 		fireEvent(GridRendererChangeParameterKind.COL_FNKT);
@@ -58,6 +59,10 @@ public class GridRendererParameter<LIST_INPUT_TYPE> {
 	private final List<PivotCriteria<LIST_INPUT_TYPE, ?>> rowFnkt = new ArrayList<>();
 	private final List<PivotCriteria<LIST_INPUT_TYPE, ?>> colFnkt = new ArrayList<>();
 
+	public int getColDepth() {
+		return colFnkt.size();
+	}
+
 	private ModelAggregtor<?> modelAggregator = new ModelAggregtorDelegate.DummyAggregator();
 
 	public ModelAggregtor<?> getModelAggregator() {
@@ -69,7 +74,7 @@ public class GridRendererParameter<LIST_INPUT_TYPE> {
 
 	public void addParameterChangeListener(final GridRendererChangeParameterKind kindOfChange,
 			final ParameterChangeListener<LIST_INPUT_TYPE> listener) {
-		this.listeners.computeIfAbsent(kindOfChange, x -> new ArrayList<>()).add(listener);
+		this.listeners.computeIfAbsent(kindOfChange, x -> new LinkedList<>()).add(listener);
 		assert this.listeners.containsKey(kindOfChange);
 		assert this.listeners.get(kindOfChange) != null;
 	}
@@ -79,9 +84,7 @@ public class GridRendererParameter<LIST_INPUT_TYPE> {
 			return;
 
 		final ParametersChangedEventArgs<LIST_INPUT_TYPE> args = new ParametersChangedEventArgs<>(kindOfChange, this);
-		for (final ParameterChangeListener<LIST_INPUT_TYPE> listener : listeners.get(kindOfChange)) {
-			listener.parametersChanged(args);
-		}
+		listeners.get(kindOfChange).forEach(listener -> listener.parametersChanged(args));
 	}
 
 	public void setColFnkt(final List<? extends PivotCriteria<LIST_INPUT_TYPE, ?>> colFnkt) {

@@ -1,5 +1,7 @@
 package com.snap252.vaadin.pivot.valuegetter;
 
+import static java.util.Objects.requireNonNull;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -46,7 +48,6 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 
 	private WhatOfNumberStatisticsToRender whatToRender = WhatOfNumberStatisticsToRender.sum;
 
-	@SuppressWarnings("null")
 	public BigDecimalValueExtractor(final NameType nameType) {
 		super(nameType);
 		roundingEnabledCheckBox = new CheckBox("Rundung", false);
@@ -78,7 +79,7 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 		howToRenderComboBox.setValue(WhatOfNumberStatisticsToRender.sum);
 
 		howToRenderComboBox.addValueChangeListener(_ignore -> {
-			this.whatToRender = (WhatOfNumberStatisticsToRender) _ignore.getProperty().getValue();
+			this.whatToRender = (WhatOfNumberStatisticsToRender) requireNonNull(_ignore.getProperty().getValue());
 		});
 		numberFormatTextField.addValidator(value -> {
 			try {

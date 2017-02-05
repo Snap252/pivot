@@ -1,5 +1,7 @@
 package com.snap252.vaadin.pivot.valuegetter;
 
+import static java.util.Objects.requireNonNull;
+
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Objects;
@@ -37,7 +39,7 @@ public class ObjectValueExtractor
 		howToRenderComboBox.setValue(WhatOfObjectStatisticsToShow.cnt);
 
 		howToRenderComboBox.addValueChangeListener(value -> {
-			this.whatToRender = (WhatOfObjectStatisticsToShow) value.getProperty().getValue();
+			this.whatToRender = (WhatOfObjectStatisticsToShow) requireNonNull(value.getProperty().getValue());
 		});
 
 		formLayout.addComponents(howToRenderComboBox);

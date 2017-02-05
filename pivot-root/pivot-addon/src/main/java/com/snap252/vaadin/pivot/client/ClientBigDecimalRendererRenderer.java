@@ -8,7 +8,7 @@ import com.google.gwt.i18n.client.NumberFormat;
 import com.vaadin.client.renderers.Renderer;
 import com.vaadin.client.widget.grid.RendererCellReference;
 
-public class ClientStatisticsRenderer implements Renderer<BigDecimal> {
+public class ClientBigDecimalRendererRenderer implements Renderer<BigDecimal> {
 
 	private String nullRepresentation = null;
 
@@ -17,11 +17,12 @@ public class ClientStatisticsRenderer implements Renderer<BigDecimal> {
 		final TableCellElement element = cell.getElement();
 		element.getStyle().setTextAlign(TextAlign.RIGHT);
 
-		if (value == null) {
-			handleNull(element);
-			return;
-		}
-		element.setInnerText(getText(value));
+		element.setInnerText(getTextual(value));
+		element.addClassName("depth-" + depth);
+	}
+
+	private String getTextual(final BigDecimal value) {
+		return value == null ? nullRepresentation : getText(value);
 	}
 
 	protected String getText(final BigDecimal value) {
@@ -31,11 +32,13 @@ public class ClientStatisticsRenderer implements Renderer<BigDecimal> {
 	public void setNumberFormat(final NumberFormat nf) {
 		this.nf = nf;
 	}
+
 	public void setNullRepresentation(final String nullRepresentation) {
 		this.nullRepresentation = nullRepresentation;
 	}
 
 	private NumberFormat nf;
+	private int depth;
 
 	private String format(final BigDecimal bd) {
 		return nf.format(bd);
@@ -43,5 +46,9 @@ public class ClientStatisticsRenderer implements Renderer<BigDecimal> {
 
 	protected void handleNull(final TableCellElement element) {
 		element.setInnerText(nullRepresentation);
+	}
+
+	public void setDepth(final int depth) {
+		this.depth = depth;
 	}
 }

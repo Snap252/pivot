@@ -64,27 +64,20 @@ final class GridRenderer {
 
 		};
 		bucketContainer.addPropertySetChangeListener(columnsChanged);
-		grid.setCellStyleGenerator(cell -> {
-			if (cell.getPropertyId() == COLLAPSE_COL_PROPERTY_ID) {
-				return "row-header";
-			}
-			// final int rowDepth = ((Bucket<?>)
-			// cell.getItemId()).getLevel();
-			final int colDepth = ((Bucket<?>) cell.getPropertyId()).getLevel();
-			// return "col-depth-" + colDepth + " row-depth-" + rowDepth;
-			return "depth-" + colDepth;
-		});
 	}
 
 	protected void updateGridColumns(final Grid grid, final ModelAggregtor<?> modelAggregator) {
 		grid.getColumns().forEach(column -> {
-			if (column.getPropertyId() != COLLAPSE_COL_PROPERTY_ID) {
+			final Object columnPropertyId = column.getPropertyId();
+			if (columnPropertyId != COLLAPSE_COL_PROPERTY_ID) {
 				final RendererConverter<?, ?> rc = modelAggregator.createRendererConverter();
-				rc.setToColumn(column);
+				final Bucket<?> colBucket = (Bucket<?>) columnPropertyId;
+				rc.setToColumn(column, colBucket.getLevel());
 				column.setMinimumWidth(75);
 			} else
 				column.setMinimumWidth(170);
 		});
+		grid.setFrozenColumnCount(1);
 	}
 
 	// private final ModelAggregtorDelegate aggregatorDelegator = new

@@ -18,7 +18,8 @@ import elemental.json.JsonValue;
  * @author Snap252
  *
  */
-public class BigDecimalRenderer extends AbstractRenderer<@Nullable BigDecimal> {
+public class BigDecimalRenderer extends AbstractRenderer<@Nullable BigDecimal>
+		implements PivotRenderer<@Nullable BigDecimal> {
 
 	@SuppressWarnings("null")
 	@NonNullByDefault
@@ -60,5 +61,16 @@ public class BigDecimalRenderer extends AbstractRenderer<@Nullable BigDecimal> {
 	@NonNullByDefault
 	public JsonValue encode(final @Nullable BigDecimal value) {
 		return encode(value, BigDecimal.class);
+	}
+
+	@Override
+	public void setDepth(final int depth) {
+		final ClientRendererSharedState state = getState(false);
+		if (state.depth == depth)
+			return;
+		state.depth = depth;
+		markAsDirty();
+		return;
+
 	}
 }

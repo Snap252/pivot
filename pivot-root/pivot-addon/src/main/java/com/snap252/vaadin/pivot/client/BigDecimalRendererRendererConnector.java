@@ -21,18 +21,19 @@ import com.vaadin.shared.ui.Connect;
  * @author Vaadin Ltd
  */
 @Connect(com.snap252.vaadin.pivot.renderer.BigDecimalRenderer.class)
-public class ClientStatisticsRendererConnector extends AbstractRendererConnector<BigDecimal> {
+public class BigDecimalRendererRendererConnector extends AbstractRendererConnector<BigDecimal> {
 	// no implementation needed
 
-	public ClientStatisticsRendererConnector() {
+	public BigDecimalRendererRendererConnector() {
 		addStateChangeHandler(new StateChangeHandler() {
 
 			@Override
 			public void onStateChanged(final StateChangeEvent stateChangeEvent) {
-				final ClientStatisticsRenderer ret = getRenderer();
-				ClientRendererSharedState state = getState();
+				final ClientBigDecimalRendererRenderer ret = getRenderer();
+				final ClientRendererSharedState state = getState();
 				ret.setNumberFormat(new LocalizedNumberFormat(state.numberFormat));
 				ret.setNullRepresentation(state.nullRepresentation);
+				ret.setDepth(state.depth);
 			}
 		});
 	}
@@ -148,11 +149,12 @@ public class ClientStatisticsRendererConnector extends AbstractRendererConnector
 	}
 
 	@Override
-	public ClientStatisticsRenderer getRenderer() {
-		final ClientStatisticsRenderer ret = (ClientStatisticsRenderer) super.getRenderer();
+	public ClientBigDecimalRendererRenderer getRenderer() {
+		final ClientBigDecimalRendererRenderer ret = (ClientBigDecimalRendererRenderer) super.getRenderer();
 		final ClientRendererSharedState state = getState();
 		ret.setNumberFormat(new LocalizedNumberFormat(state.numberFormat));
 		ret.setNullRepresentation(state.nullRepresentation);
+		ret.setDepth(state.depth);
 		return ret;
 	}
 

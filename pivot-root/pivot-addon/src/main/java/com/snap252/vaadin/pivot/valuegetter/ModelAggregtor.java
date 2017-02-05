@@ -7,10 +7,10 @@ import java.util.stream.Collector;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.snap252.vaadin.pivot.PivotCellReference;
+import com.snap252.vaadin.pivot.renderer.PivotRenderer;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.converter.Converter;
 import com.vaadin.ui.Grid.Column;
-import com.vaadin.ui.renderers.Renderer;
 
 public interface ModelAggregtor<VALUE> {
 	public Collector<Item, ?, ? extends VALUE> getAggregator();
@@ -19,10 +19,10 @@ public interface ModelAggregtor<VALUE> {
 	
 
 	public static class RendererConverter<T, VALUE> {
-		private final Renderer<T> renderer;
+		private final PivotRenderer<T> renderer;
 		private final Converter<T, PivotCellReference<@Nullable VALUE>> converter;
 
-		public RendererConverter(final Renderer<T> renderer,
+		public RendererConverter(final PivotRenderer<T> renderer,
 				final Function<PivotCellReference<@Nullable VALUE>, @Nullable T> f, final Class<?> presentationType) {
 			this.renderer = renderer;
 
@@ -55,17 +55,15 @@ public interface ModelAggregtor<VALUE> {
 			};
 		}
 
-		public RendererConverter(final Renderer<T> renderer,
+		public RendererConverter(final PivotRenderer<T> renderer,
 				final Converter<T, PivotCellReference<@Nullable VALUE>> converter) {
 			this.renderer = renderer;
 			this.converter = converter;
 		}
 
-		private Renderer<T> getRenderer() {
-			return renderer;
-		}
 
-		public void setToColumn(final Column col) {
+		public void setToColumn(final Column col, final int depth) {
+			renderer.setDepth(depth);
 			col.setRenderer(renderer, converter);
 		}
 	}

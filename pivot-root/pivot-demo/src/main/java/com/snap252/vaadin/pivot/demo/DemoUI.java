@@ -24,7 +24,7 @@ import com.vaadin.ui.VerticalLayout;
 @SuppressWarnings("serial")
 public class DemoUI extends UI {
 
-	@WebServlet(value = "/*", asyncSupported = true)
+	@WebServlet(value = "/*", asyncSupported = false)
 	@VaadinServletConfiguration(productionMode = false, ui = DemoUI.class)
 	public static class Servlet extends VaadinServlet {
 	}

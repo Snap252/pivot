@@ -1,8 +1,12 @@
 package com.snap252.vaadin.pivot.demo;
 
+import java.io.IOException;
 import java.util.List;
 
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import com.snap252.org.testing.RandomDataGenerator;
 import com.snap252.org.testing.RandomDataGenerator.Person;
@@ -27,6 +31,19 @@ public class DemoUI extends UI {
 	@WebServlet(value = "/*", asyncSupported = false)
 	@VaadinServletConfiguration(productionMode = false, ui = DemoUI.class)
 	public static class Servlet extends VaadinServlet {
+		
+		@Override
+		protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+			// TODO Auto-generated method stub
+			super.doGet(req, resp);
+		}
+		
+		@Override
+		protected void service(HttpServletRequest request, HttpServletResponse response)
+				throws ServletException, IOException {
+			// TODO Auto-generated method stub
+			super.service(request, response);
+		}
 	}
 
 	GridRendererParameter<Item> gridRendererParameter = new GridRendererParameter<>();

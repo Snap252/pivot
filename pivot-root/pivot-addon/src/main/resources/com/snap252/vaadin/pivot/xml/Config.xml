@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config display-name="Geburtstags-Aufdröselung" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="./NewXMLSchema1.xsd">
+
+	<decimal name="wertGanzZahl">
+		<statistics />
+	</decimal>
+
+	<columns colorize="true">
+		<date name="geb">
+			<predefind date-rounding="YEAR" />
+		</date>
+		<date name="geb">
+			<predefind date-rounding="MONTH_ONLY_LONG" />
+		</date>
+		<date name="geb">
+			<predefind date-rounding="DAY_ONLY" />
+		</date>
+	</columns>
+
+	<rows colorize="true">
+		<string name="vorname" />
+	</rows>
+</config>

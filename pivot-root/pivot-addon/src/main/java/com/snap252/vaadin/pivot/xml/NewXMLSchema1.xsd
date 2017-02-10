@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="config" type="config"/>
+
+  <xs:complexType name="objectAttribute">
+    <xs:complexContent>
+      <xs:extension base="attribute">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="attribute" abstract="true">
+    <xs:sequence/>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="countingAggregator">
+    <xs:complexContent>
+      <xs:extension base="aggregator">
+        <xs:sequence/>
+        <xs:attribute name="mode" type="whatOfObjectStatisticsToShow"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="aggregator" abstract="true">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="numberAttribute">
+    <xs:complexContent>
+      <xs:extension base="attribute">
+        <xs:sequence/>
+        <xs:attribute name="rounding" type="xs:int" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="config">
+    <xs:sequence>
+      <xs:choice minOccurs="0">
+        <xs:element name="object" type="objectObjectValueField"/>
+        <xs:element name="decimal" type="decimalValueField"/>
+        <xs:element name="integer" type="integerValueField"/>
+      </xs:choice>
+      <xs:element name="columns" type="valuesConfig" minOccurs="0"/>
+      <xs:element name="rows" type="valuesConfig" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="display-name" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="objectObjectValueField">
+    <xs:complexContent>
+      <xs:extension base="valueField">
+        <xs:sequence>
+          <xs:element name="counting" type="countingAggregator" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="valueField" abstract="true">
+    <xs:sequence>
+      <xs:element name="aggregator" type="aggregator" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="decimalValueField">
+    <xs:complexContent>
+      <xs:extension base="valueField">
+        <xs:sequence>
+          <xs:choice minOccurs="0">
+            <xs:element name="counting" type="countingAggregator"/>
+            <xs:element name="statistics" type="numberStatisticsAggregator"/>
+          </xs:choice>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="numberStatisticsAggregator">
+    <xs:complexContent>
+      <xs:extension base="aggregator">
+        <xs:sequence/>
+        <xs:attribute name="rounding" type="xs:int"/>
+        <xs:attribute name="ignore-null" type="xs:boolean"/>
+        <xs:attribute name="mode" type="whatOfNumberStatisticsToRender"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="integerValueField">
+    <xs:complexContent>
+      <xs:extension base="valueField">
+        <xs:sequence>
+          <xs:element name="counting" type="countingAggregator" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="valuesConfig">
+    <xs:sequence>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="date" type="dateAttribute"/>
+        <xs:element name="object" type="objectAttribute"/>
+        <xs:element name="number" type="numberAttribute"/>
+        <xs:element name="string" type="stringAttribute"/>
+      </xs:choice>
+    </xs:sequence>
+    <xs:attribute name="colorize" type="xs:boolean" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="dateAttribute">
+    <xs:complexContent>
+      <xs:extension base="attribute">
+        <xs:sequence>
+          <xs:choice minOccurs="0">
+            <xs:element name="predefind" type="predefinedDateFormat"/>
+            <xs:element name="custom" type="customDateFormat"/>
+          </xs:choice>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="predefinedDateFormat">
+    <xs:complexContent>
+      <xs:extension base="configDateFormat">
+        <xs:sequence/>
+        <xs:attribute name="date-rounding" type="dateRounding"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="configDateFormat">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="customDateFormat">
+    <xs:complexContent>
+      <xs:extension base="configDateFormat">
+        <xs:sequence/>
+        <xs:attribute name="date-format" type="xs:string"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="stringAttribute">
+    <xs:complexContent>
+      <xs:extension base="attribute">
+        <xs:sequence/>
+        <xs:attribute name="sub-string" type="xs:int"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="stringValueField">
+    <xs:complexContent>
+      <xs:extension base="valueField">
+        <xs:sequence>
+          <xs:choice minOccurs="0">
+            <xs:element name="counting" type="countingAggregator"/>
+            <xs:element name="concat" type="stringConcatAggregator"/>
+          </xs:choice>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="stringConcatAggregator">
+    <xs:complexContent>
+      <xs:extension base="aggregator">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="testXml">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:simpleType name="whatOfObjectStatisticsToShow">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="cnt"/>
+      <xs:enumeration value="cntNonNull"/>
+      <xs:enumeration value="cntDistinct"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="whatOfNumberStatisticsToRender">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="avg"/>
+      <xs:enumeration value="max"/>
+      <xs:enumeration value="min"/>
+      <xs:enumeration value="sum"/>
+      <xs:enumeration value="cnt"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="dateRounding">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="YEAR"/>
+      <xs:enumeration value="MONTH_VERY_SHORT"/>
+      <xs:enumeration value="MONTH_SHORT"/>
+      <xs:enumeration value="MONTH_LONG"/>
+      <xs:enumeration value="MONTH_ONLY_SHORT"/>
+      <xs:enumeration value="MONTH_ONLY_LONG"/>
+      <xs:enumeration value="WEEK"/>
+      <xs:enumeration value="WEEK_ONLY"/>
+      <xs:enumeration value="DAY"/>
+      <xs:enumeration value="DAY_ONLY"/>
+      <xs:enumeration value="DAY_MONTH"/>
+      <xs:enumeration value="HOUR_MINUTE"/>
+      <xs:enumeration value="HOUR"/>
+      <xs:enumeration value="MINUTE"/>
+      <xs:enumeration value="ALL"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
+

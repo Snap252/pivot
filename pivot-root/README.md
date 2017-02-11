@@ -25,7 +25,6 @@ For further development of this add-on, the following tool-chain is recommended:
 - Eclipse IDE
 - m2e wtp plug-in (install it from Eclipse Marketplace)
 - Vaadin Eclipse plug-in (install it from Eclipse Marketplace)
-- JRebel Eclipse plug-in (install it from Eclipse Marketplace)
 - Chrome browser
 
 ### Importing project
@@ -38,9 +37,6 @@ Note that Eclipse may give "Plugin execution not covered by lifecycle configurat
 
 If you have not already compiled the widgetset, do it now by running vaadin:install Maven target for pivot-root project.
 
-If you have a JRebel license, it makes on the fly code changes faster. Just add JRebel nature to your pivot-demo project by clicking project with right mouse button and choosing JRebel > Add JRebel Nature
-
-To debug project and make code modifications on the fly in the server-side, right-click the pivot-demo project and choose Debug As > Debug on Server. Navigate to http://localhost:8080/pivot-demo/ to see the application.
 
 ### Debugging client-side
 

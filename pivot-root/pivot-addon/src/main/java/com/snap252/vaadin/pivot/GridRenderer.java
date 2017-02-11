@@ -22,6 +22,7 @@ import com.snap252.org.pivoting.Bucket;
 import com.snap252.org.pivoting.RootBucket;
 import com.snap252.vaadin.pivot.GridRenderer.BucketContainer.BucketItem.CellProperty;
 import com.snap252.vaadin.pivot.GridRendererParameter.GridRendererChangeParameterKind;
+import com.snap252.vaadin.pivot.utils.ClassUtils;
 import com.snap252.vaadin.pivot.valuegetter.ModelAggregtor;
 import com.snap252.vaadin.pivot.valuegetter.ModelAggregtor.RendererConverter;
 import com.vaadin.data.Collapsible;
@@ -238,11 +239,11 @@ final class GridRenderer {
 		}
 
 		final class BucketItem implements Item {
-			final class CellProperty implements Property<PivotCellReference<?>>, Property.ValueChangeNotifier {
+			final class CellProperty implements Property<PivotCellReference<?, Item>>, Property.ValueChangeNotifier {
 
 				private final Bucket<Item> colBucket;
 				@Nullable
-				private PivotCellReference<?> cachedPivotCellReference;
+				private PivotCellReference<?, Item> cachedPivotCellReference;
 
 				public CellProperty(final Bucket<Item> colBucket) {
 					this.colBucket = colBucket;
@@ -280,26 +281,26 @@ final class GridRenderer {
 				}
 
 				@Override
-				public PivotCellReference<?> getValue() {
+				public PivotCellReference<?, Item> getValue() {
 					if (cachedPivotCellReference != null)
 						return cachedPivotCellReference;
 
 					final Collector<Item, ?, ?> aggregator = aggregatorDelegator.getAggregator();
 					final Object newValue0 = getOwnItems().stream().collect(aggregator);
-					final PivotCellReference<@Nullable ?> newValue = new PivotCellReference<@Nullable Object>(newValue0,
-							rowBucket, colBucket, BucketContainer.this);
+					final PivotCellReference<@Nullable ?, Item> newValue = new PivotCellReference<@Nullable Object, Item>(
+							newValue0, rowBucket, colBucket, BucketContainer.this);
 					cachedPivotCellReference = newValue;
 					return newValue;
 				}
 
 				@Override
-				public void setValue(@Nullable final PivotCellReference<?> newValue) throws ReadOnlyException {
+				public void setValue(@Nullable final PivotCellReference<?, Item> newValue) throws ReadOnlyException {
 					throw new ReadOnlyException();
 				}
 
 				@Override
-				public Class<PivotCellReference<?>> getType() {
-					return PivotCellReference.PARAMETRIZED_CLASS;
+				public Class<PivotCellReference<?, Item>> getType() {
+					return ClassUtils.cast(PivotCellReference.class);
 				}
 
 				@Override
@@ -399,8 +400,8 @@ final class GridRenderer {
 
 		@SuppressWarnings("unchecked")
 		@Override
-		public Class<PivotCellReference<?>> getType(final Object propertyId) {
-			return (Class<PivotCellReference<?>>) pivotCellReferenceClazz;
+		public Class<PivotCellReference<?, Item>> getType(final Object propertyId) {
+			return (Class<PivotCellReference<?, Item>>) pivotCellReferenceClazz;
 		}
 
 		@Override

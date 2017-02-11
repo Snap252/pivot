@@ -62,7 +62,7 @@ public abstract class Bucket<V> implements Predicate<@NonNull V> {
 
 	public abstract int getSize(int forSelf);
 
-	public final Stream<? extends Bucket<V>> stream() {
+	public final Stream<@NonNull ? extends Bucket<V>> stream() {
 		final @Nullable List<? extends @NonNull Bucket<V>> children$ = getChildren();
 		if (children$ != null)
 			return Stream.concat(Stream.of(this), children$.stream().flatMap(Bucket::stream));

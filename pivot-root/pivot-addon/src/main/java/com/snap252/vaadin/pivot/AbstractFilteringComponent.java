@@ -3,6 +3,7 @@ package com.snap252.vaadin.pivot;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.vaadin.data.Item;
+import com.vaadin.data.Property;
 
 @NonNullByDefault
 public abstract class AbstractFilteringComponent<T extends Comparable<T>>
@@ -21,9 +22,11 @@ public abstract class AbstractFilteringComponent<T extends Comparable<T>>
 		return nameType.propertyId.toString();
 	}
 
-	@SuppressWarnings({ "unchecked", "null" })
+	@SuppressWarnings({ "unchecked" })
 	@Override
 	public T apply(final Item item) {
-		return (T) item.getItemProperty(propertyId).getValue();
+		final Property<T> property = item.getItemProperty(propertyId);
+		assert property != null;
+		return property.getValue();
 	}
 }

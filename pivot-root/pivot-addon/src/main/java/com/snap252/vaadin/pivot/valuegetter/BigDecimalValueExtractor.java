@@ -39,7 +39,8 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 
 	private boolean roundingEnabled;
 	private int sliderValue;
-	private final ComboBox howToRenderComboBox = new ComboBox("Anzeige", Arrays.asList(WhatOfNumberStatisticsToRender.values()));
+	private final ComboBox howToRenderComboBox = new ComboBox("Anzeige",
+			Arrays.asList(WhatOfNumberStatisticsToRender.values()));
 
 	private final TextField numberFormatTextField = new TextField("Format", "0.00##");
 	private final TextField nullRepresentationTextField = new TextField("Leer-Repräsentation", (String) null);
@@ -131,7 +132,7 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 
 	@Override
 	public void addRendererChangeListener(final ValueChangeListener l) {
-//		howToRenderComboBox.addValueChangeListener(l);
+		// howToRenderComboBox.addValueChangeListener(l);
 		numberFormatTextField.addValueChangeListener(l);
 		nullRepresentationTextField.addValueChangeListener(l);
 		relativeCheckBox.addValueChangeListener(l);
@@ -178,15 +179,15 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 
 		final Arithmetics<@Nullable BigDecimal> createArithmetics = new NullableArithmeticsWrapper<>(
 				createArithmetics());
-		final Function<PivotCellReference<@Nullable NumberStatistics<BigDecimal>>, @Nullable BigDecimal> f = (
-				final PivotCellReference<@Nullable NumberStatistics<BigDecimal>> x) -> {
+		final Function<PivotCellReference<@Nullable NumberStatistics<BigDecimal>, Item>, @Nullable BigDecimal> f = (
+				final PivotCellReference<@Nullable NumberStatistics<BigDecimal>, Item> x) -> {
 
 			final NumberStatistics<BigDecimal> ownValue = x.getValue();
 			if (ownValue == null)
 				return null;
 
 			final BigDecimal ownSum = singleExtractor.apply(ownValue);
-			final PivotCellReference<@Nullable NumberStatistics<BigDecimal>> parentReference = x.ofParentRow();
+			final PivotCellReference<@Nullable NumberStatistics<BigDecimal>, Item> parentReference = x.ofParentRow();
 			assert parentReference != null;
 			final NumberStatistics<BigDecimal> parentValue = parentReference.getValue();
 			assert parentValue != null;

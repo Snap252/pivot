@@ -13,7 +13,6 @@ import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
 public class BiBucket<RAW> {
@@ -42,8 +41,9 @@ public class BiBucket<RAW> {
 			assert colBucket.stream().allMatch(r -> cells.getChild(r) != null);
 		}
 
+		@SuppressWarnings("unchecked")
 		public Stream<CopyBucket<V, W>> getCells() {
-			return (@NonNull Stream<@NonNull CopyBucket<V, W>>) cells.stream();
+			return (Stream<CopyBucket<V, W>>) cells.stream();
 		}
 
 		@Override

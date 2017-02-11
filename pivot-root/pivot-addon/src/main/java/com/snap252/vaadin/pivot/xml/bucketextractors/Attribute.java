@@ -5,4 +5,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 public abstract class Attribute {
 	@XmlAttribute(name="name", required=true)
 	public String attributeName = "";
+
+	@XmlAttribute(name="subtotal")
+	public Boolean subtotal = true;
 }

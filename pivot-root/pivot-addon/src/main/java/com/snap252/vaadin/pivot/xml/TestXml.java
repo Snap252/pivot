@@ -8,7 +8,7 @@ public class TestXml {
 	public static void main(final String[] args) throws Exception {
 		final JAXBContext jaxbContext = JAXBContext.newInstance(Config.class);
 		final Unmarshaller jaxbMarshaller = jaxbContext.createUnmarshaller();
-		final Object unmarshal = jaxbMarshaller.unmarshal(TestXml.class.getResourceAsStream("Config.xml"));
+		final Config unmarshal = (Config) jaxbMarshaller.unmarshal(TestXml.class.getResourceAsStream("Config.xml"));
 		System.err.println(unmarshal);
 	}
 }

@@ -29,10 +29,6 @@ public abstract class Bucket<V> implements Predicate<@NonNull V> {
 	@Nullable
 	public final Bucket<V> parent;
 
-	public final @Nullable String getStyleClass() {
-		return extractor.getStyleClass();
-	}
-
 	public Bucket(final Object bucketValue, final @Nullable Bucket<V> parent, final PivotCriteria<V, ?> extractor,
 			final Collection<V> values, final int level) {
 		this.bucketValue = bucketValue;

@@ -97,7 +97,7 @@ public class BiBucket<RAW> {
 				w.write(MessageFormat.format(
 						"<th colspan=''{0}'' rowspan=''{1}''>---columns---<br/>/<br/>---rows---</th>", spacerColumns,
 						depth + 1));
-			w.write(MessageFormat.format("<th class=''{1}''>{0}</th>", parent.toString(), parent.getStyleClass()));
+			w.write(MessageFormat.format("<th class=''{1}''>{0}</th>", parent.toString(), ""));
 
 			for (final Bucket<RAW> row : rows) {
 				// render "self" - cell
@@ -109,7 +109,7 @@ public class BiBucket<RAW> {
 
 				final int colSpan = row.getSize(1);
 				w.write(MessageFormat.format("<th colspan=''{0}'' rowspan=''{1}'' class=''{2}''>", colSpan,
-						row.getChildren() == null ? 2 : 1, row.getStyleClass()));
+						row.getChildren() == null ? 2 : 1, ""));
 				w.write(row.bucketValue.toString());
 				w.write("</th>");
 
@@ -132,12 +132,12 @@ public class BiBucket<RAW> {
 		public void printRowHeader(final Bucket<RAW> b, final Writer w, final int colSpan) throws IOException {
 			if (b.getChildren() != null) {
 				w.write(MessageFormat.format("<th rowSpan=''{0}'' class=''{2}''>{1}</th>", b.getSize(1),
-						b.getBucketValue(), b.getStyleClass()));
+						b.getBucketValue(), ""));
 				w.write(MessageFormat.format("<th colSpan=''{0}'' class=''row ges row-ges'' title=''gesamt''>-</th>",
 						colSpan));
 			} else
 				w.write(MessageFormat.format("<th rowSpan=''{0}'' class=''{2}''>{1}</th>", b.getSize(1),
-						b.getBucketValue(), b.getStyleClass()));
+						b.getBucketValue(), ""));
 		}
 
 		public void writeHtml(final Writer w, final BiConsumer<Writer, R> cellWriter) throws IOException {
@@ -158,7 +158,7 @@ public class BiBucket<RAW> {
 					do {
 						assert b != null;
 						final List<? extends Bucket<RAW>> children = b.getChildren();
-						w.write(MessageFormat.format("<th class=''{1}''>{0}</th>", b, b.getStyleClass()));
+						w.write(MessageFormat.format("<th class=''{1}''>{0}</th>", b, ""));
 						if (children != null) {
 							b = children.get(0);
 						} else

@@ -14,12 +14,7 @@ public class RootBucket<V> extends SubBucket<V> {
 	}
 
 	public static <V> NamedPivotCriteria<V, @NonNull String> createUniquePivotCriteria() {
-		return new NamedPivotCriteria<V, String>(_ignore -> "", "r") {
-			@Override
-			public @NonNull String getStyleClass() {
-				return "root";
-			}
-		};
+		return new NamedPivotCriteria<V, String>(_ignore -> "", "r");
 	}
 
 	@SafeVarargs

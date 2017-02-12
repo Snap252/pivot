@@ -93,7 +93,7 @@ public final class GridRendererParameter<LIST_INPUT_TYPE> {
 
 		this.colFnkt.clear();
 		this.colFnkt.addAll(colFnkt);
-		fireEvent(GridRendererChangeParameterKind.COL_FNKT);
+		colFunctionsUpated();
 	}
 
 	public RootBucket<LIST_INPUT_TYPE> creatRowBucket(final String SUM_TEXT) {

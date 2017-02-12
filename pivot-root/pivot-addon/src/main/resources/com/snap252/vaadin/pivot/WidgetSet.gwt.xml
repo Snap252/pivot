@@ -3,10 +3,17 @@
 	<!-- WS Compiler: manually edited -->
 
 	<!-- Inherit DefaultWidgetSet -->
-	<inherits name="com.vaadin.DefaultWidgetSet" /> 
+	<inherits name="com.vaadin.DefaultWidgetSet" />
+
+	<inherits name="org.vaadin.treegrid.WidgetSet" />
+
+	<inherits name="org.vaadin.hene.popupbutton.widgetset.PopupbuttonWidgetset" />
+
+	<inherits name="fi.jasoft.dragdroplayouts.DragDropLayoutsWidgetSet" />
 
 	<!-- Widget styles in public -directory -->
-	<stylesheet src="pivot/styles.css"/>
-	<set-configuration-property name="devModeRedirectEnabled" value="true" />
+	<stylesheet src="pivot/styles.css" />
+	<set-configuration-property name="devModeRedirectEnabled"
+		value="true" />
 
 </module>

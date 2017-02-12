@@ -1,0 +1,11 @@
+<module>
+
+	<!-- WS Compiler: manually edited -->
+
+	<!-- Inherit DefaultWidgetSet -->
+	<inherits name="com.snap252.vaadin.pivot.WidgetSet" /> 
+
+	<!-- Widget styles in public -directory -->
+	<set-configuration-property name="devModeRedirectEnabled" value="true" />
+
+</module>

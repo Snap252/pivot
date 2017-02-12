@@ -27,6 +27,12 @@ public enum WhatOfNumberStatisticsToRender {
 			return n.sum;
 		}
 	},
+	var("Varianz") {
+		@Override
+		public <N extends Number> N getValue(final NumberStatistics<N> n) {
+			return n.varianz();
+		}
+	},
 	cnt("Anzahl Datensätze") {
 		@Override
 		public <N extends Number> N getValue(final NumberStatistics<N> n) {

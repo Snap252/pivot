@@ -5,7 +5,6 @@ import java.util.Objects;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.snap252.org.pivoting.Bucket;
-import com.snap252.vaadin.pivot.GridRenderer.BucketContainer;
 import com.snap252.vaadin.pivot.utils.ClassUtils;
 import com.vaadin.data.Property;
 

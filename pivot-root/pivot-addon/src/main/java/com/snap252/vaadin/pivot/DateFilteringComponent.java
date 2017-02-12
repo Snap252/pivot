@@ -35,6 +35,7 @@ public class DateFilteringComponent extends AbstractFilteringComponent<Date> {
 		return comp;
 	}
 
+	//TODO: formatting
 	@Override
 	public Date round(final Date ret) {
 		DateRounding value = (DateRounding) c.getValue();

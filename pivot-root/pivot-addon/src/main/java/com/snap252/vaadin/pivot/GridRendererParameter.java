@@ -104,9 +104,9 @@ public final class GridRendererParameter<LIST_INPUT_TYPE> {
 		listeners.get(kindOfChange).forEach(listener -> listener.parametersChanged(args));
 	}
 
-	private Object f(final LIST_INPUT_TYPE l, final Object object) {
-		return "";
-	}
+	// private Object f(final LIST_INPUT_TYPE l, final Object object) {
+	// return "";
+	// }
 
 	public <T extends Comparable<T>> void setColFnkt(final List<? extends FilteringComponent<?>> colFnkt) {
 		this.colFnkt.clear();
@@ -117,14 +117,23 @@ public final class GridRendererParameter<LIST_INPUT_TYPE> {
 	@SuppressWarnings("null")
 	private <T extends Comparable<T>> Stream<PivotCriteria<LIST_INPUT_TYPE, T>> toPivotCriterias(
 			final List<? extends FilteringComponent<T>> colFnkt) {
-		return colFnkt.stream().map(
-				(Function<FilteringComponent<T>, PivotCriteria<LIST_INPUT_TYPE, T>>) cf -> new PivotCriteria<LIST_INPUT_TYPE, T>() {
-					@SuppressWarnings("unchecked")
-					@Override
-					public T apply(final LIST_INPUT_TYPE t) {
-						return cf.round((T) f(t, cf.getPropertyId()));
-					}
-				});
+		return colFnkt.stream().map((Function<FilteringComponent<T>, PivotCriteria<LIST_INPUT_TYPE, T>>) cf -> {
+			final Object propertyId = cf.getPropertyId();
+			final String name = String.valueOf(propertyId);
+			return new PivotCriteria<LIST_INPUT_TYPE, T>() {
+				@SuppressWarnings("unchecked")
+				@Override
+				public T apply(final LIST_INPUT_TYPE t) {
+					final Object mappedValue = mappingFuncion.apply(t, propertyId);
+					return cf.round((T) mappedValue);
+				}
+
+				@Override
+				public String toString() {
+					return name;
+				}
+			};
+		});
 	}
 
 	public RootBucket<LIST_INPUT_TYPE> creatRowBucket(final String SUM_TEXT) {
@@ -137,7 +146,7 @@ public final class GridRendererParameter<LIST_INPUT_TYPE> {
 
 	public void setRowFnkt(final List<? extends FilteringComponent<?>> rowFnkt) {
 		this.rowFnkt.clear();
-		this.colFnkt.addAll(toPivotCriterias(rowFnkt).collect(toList()));
+		this.rowFnkt.addAll(toPivotCriterias(rowFnkt).collect(toList()));
 		rowFunctionsUpated();
 	}
 

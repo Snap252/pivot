@@ -5,10 +5,12 @@ import static java.util.stream.Collectors.toList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.vaadin.miki.mapcontainer.MapContainer;
 
 import com.snap252.vaadin.pivot.valuegetter.ValueGetterDnDHandler;
@@ -120,11 +122,11 @@ public class PivotUI extends GridLayout {
 					throw new IllegalStateException(String.format("Duplicate key %s", u));
 				}, LinkedHashMap::new));
 
-		final Map<Object, Map<Object, Object>> m1 = origContainer.getItemIds().stream()
+		final Map<Object, Map<Object, @Nullable Object>> m1 = origContainer.getItemIds().stream()
 				.collect(Collectors.toMap(Function.identity(), itemId -> {
 					final Item item = origContainer.getItem(itemId);
-					final LinkedHashMap<Object, Object> v = new LinkedHashMap<>();
-					item.getItemPropertyIds().forEach(p -> v.put(p, item.getItemProperty(p).getValue()));
+					final LinkedHashMap<Object, @Nullable Object> v = new LinkedHashMap<>();
+					item.getItemPropertyIds().forEach(p -> v.put(p, Objects.requireNonNull(item.getItemProperty(p)).getValue()));
 					return v;
 				}, (u, v) -> {
 					throw new IllegalStateException(String.format("Duplicate key %s", u));

@@ -15,10 +15,10 @@ public class PivotCellReference<T, ITEM> {
 	private final T value;
 	private final Bucket<ITEM> rowBucket2;
 	private final Bucket<ITEM> colBucket2;
-	private final BucketContainer container;
+	private final BucketContainer<ITEM> container;
 
 	public PivotCellReference(final T newValue, final Bucket<ITEM> rowBucket, final Bucket<ITEM> colBucket,
-			final BucketContainer container) {
+			final BucketContainer<ITEM> container) {
 		this.value = newValue;
 		rowBucket2 = rowBucket;
 		colBucket2 = colBucket;

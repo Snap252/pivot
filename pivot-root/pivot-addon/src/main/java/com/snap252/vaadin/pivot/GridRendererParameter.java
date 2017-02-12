@@ -14,7 +14,6 @@ import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -82,6 +81,7 @@ public final class GridRendererParameter<LIST_INPUT_TYPE> {
 	}
 
 	public Collector<Object, ?, ?> getCollector() {
+		@SuppressWarnings("unchecked")
 		final BiFunction<Object, Object, Object> mappingFuncion2 = (BiFunction<Object, Object, Object>) mappingFuncion;
 		return modelAggregator.getAggregator(mappingFuncion2);
 	}
@@ -114,13 +114,15 @@ public final class GridRendererParameter<LIST_INPUT_TYPE> {
 		colFunctionsUpated();
 	}
 
-	private <T extends @NonNull Comparable<T>> Stream<@NonNull PivotCriteria<LIST_INPUT_TYPE, T>> toPivotCriterias(
+	@SuppressWarnings("null")
+	private <T extends Comparable<T>> Stream<PivotCriteria<LIST_INPUT_TYPE, T>> toPivotCriterias(
 			final List<? extends FilteringComponent<T>> colFnkt) {
 		return colFnkt.stream().map(
-				(Function<@NonNull FilteringComponent<T>, @NonNull PivotCriteria<LIST_INPUT_TYPE, T>>) cf -> new PivotCriteria<LIST_INPUT_TYPE, T>() {
+				(Function<FilteringComponent<T>, PivotCriteria<LIST_INPUT_TYPE, T>>) cf -> new PivotCriteria<LIST_INPUT_TYPE, T>() {
+					@SuppressWarnings("unchecked")
 					@Override
-					public @NonNull T apply(@NonNull final LIST_INPUT_TYPE t) {
-						return (T) f(t, cf.getPropertyId());
+					public T apply(final LIST_INPUT_TYPE t) {
+						return cf.round((T) f(t, cf.getPropertyId()));
 					}
 				});
 	}

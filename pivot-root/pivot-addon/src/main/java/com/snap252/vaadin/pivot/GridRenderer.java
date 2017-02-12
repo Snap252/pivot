@@ -51,8 +51,8 @@ final class GridRenderer {
 
 	private static final String SUM_TEXT = "\u2211";
 
-	GridRenderer(final GridRendererParameter<?> gridParameter, final Grid grid) throws IllegalArgumentException {
-		final BucketContainer bucketContainer = new BucketContainer(gridParameter);
+	<X> GridRenderer(final GridRendererParameter<X> gridParameter, final Grid grid) throws IllegalArgumentException {
+		final BucketContainer<X> bucketContainer = new BucketContainer<>(gridParameter);
 		grid.setContainerDataSource(bucketContainer);
 
 		gridParameter.addParameterChangeListener(GridRendererChangeParameterKind.AGGREGATOR,
@@ -119,14 +119,14 @@ final class GridRenderer {
 		}
 	};
 
-	static class BucketContainer
+	static class BucketContainer<X>
 			implements Indexed, Hierarchical, ItemSetChangeNotifier, PropertySetChangeNotifier, Collapsible {
-		private RootBucket<?> rowBucket;
-		private RootBucket<?> colBucket;
+		private RootBucket<X> rowBucket;
+		private RootBucket<X> colBucket;
 		private Collector<Object, ?, ?> aggregator;
 
 		private final Collection<ValueChangeListener> valueChangeListeners = new HashSet<>();
-		private final Collection<BucketContainer.BucketItem.CellProperty> propertyResetter = new HashSet<>();
+		private final Collection<BucketContainer<X>.BucketItem.CellProperty> propertyResetter = new HashSet<>();
 
 		private void resetPropertiesAndFireValueChange() {
 			propertyResetter.forEach(CellProperty::resetValue);
@@ -148,7 +148,7 @@ final class GridRenderer {
 			}
 		}
 
-		public BucketContainer(final GridRendererParameter<?> gp) {
+		public BucketContainer(final GridRendererParameter<X> gp) {
 			rowBucket = gp.creatRowBucket(SUM_TEXT);
 			colBucket = gp.creatColBucket(SUM_TEXT);
 
@@ -227,7 +227,7 @@ final class GridRenderer {
 			return null;
 		}
 
-		private final Map<Bucket<Item>, BucketItem> cache = new HashMap<>();
+		private final Map<Bucket<X>, BucketItem> cache = new HashMap<>();
 
 		@Override
 		public BucketItem getItem(final Object itemId) {
@@ -236,17 +236,17 @@ final class GridRenderer {
 
 		@SuppressWarnings("unchecked")
 		protected BucketItem getForRow(final Object itemId) {
-			return cache.computeIfAbsent((Bucket<Item>) itemId, x -> new BucketItem(x));
+			return cache.computeIfAbsent((Bucket<X>) itemId, x -> new BucketItem(x));
 		}
 
 		final class BucketItem implements Item {
-			final class CellProperty implements Property<PivotCellReference<?, Item>>, Property.ValueChangeNotifier {
+			final class CellProperty implements Property<PivotCellReference<?, ?>>, Property.ValueChangeNotifier {
 
-				private final Bucket<Item> colBucket;
+				private final Bucket<X> colBucket;
 				@Nullable
-				private PivotCellReference<?, Item> cachedPivotCellReference;
+				private PivotCellReference<?, ?> cachedPivotCellReference;
 
-				public CellProperty(final Bucket<Item> colBucket) {
+				public CellProperty(final Bucket<X> colBucket) {
 					this.colBucket = colBucket;
 					assert rowBucket != colBucket;
 					propertyResetter.add(this);
@@ -257,17 +257,17 @@ final class GridRenderer {
 				}
 
 				@Nullable
-				private List<Item> filterOwnValues;
+				private List<X> filterOwnValues;
 
-				private Collection<Item> getOwnItems() {
+				private Collection<X> getOwnItems() {
 					if (filterOwnValues != null)
 						return filterOwnValues;
 
-					final Bucket<Item> colParent = colBucket.parent;
+					final Bucket<X> colParent = colBucket.parent;
 					if (colParent != null) {
-						final Collection<Item> itemsInParent = getForColumn(colParent).getOwnItems();
+						final Collection<X> itemsInParent = getForColumn(colParent).getOwnItems();
 						// TODO: maybe better get if from row parent
-						final List<Item> v$;
+						final List<X> v$;
 						if (itemsInParent.isEmpty())
 							v$ = Collections.emptyList();
 						else
@@ -276,25 +276,25 @@ final class GridRenderer {
 						return v$;
 					}
 
-					final List<Item> v$ = rowBucket.filterOwnValues(x -> true).collect(toList());
+					final List<X> v$ = rowBucket.filterOwnValues(x -> true).collect(toList());
 					filterOwnValues = v$;
 					return v$;
 				}
 
 				@Override
-				public PivotCellReference<?, Item> getValue() {
+				public PivotCellReference<?, ?> getValue() {
 					if (cachedPivotCellReference != null)
 						return cachedPivotCellReference;
 
 					final Object newValue0 = getOwnItems().stream().collect(aggregator);
-					final PivotCellReference<@Nullable ?, Item> newValue = new PivotCellReference<@Nullable Object, Item>(
+					final PivotCellReference<@Nullable ?, X> newValue = new PivotCellReference<@Nullable Object, X>(
 							newValue0, rowBucket, colBucket, BucketContainer.this);
 					cachedPivotCellReference = newValue;
 					return newValue;
 				}
 
 				@Override
-				public void setValue(@Nullable final PivotCellReference<?, Item> newValue) throws ReadOnlyException {
+				public void setValue(@Nullable final PivotCellReference<?, ?> newValue) throws ReadOnlyException {
 					throw new ReadOnlyException();
 				}
 
@@ -334,13 +334,13 @@ final class GridRenderer {
 				}
 			}
 
-			private final Bucket<Item> rowBucket;
+			private final Bucket<X> rowBucket;
 
-			public BucketItem(final Bucket<Item> itemId) {
+			public BucketItem(final Bucket<X> itemId) {
 				this.rowBucket = itemId;
 			}
 
-			private final Map<Bucket<Item>, CellProperty> cache = new HashMap<>();
+			private final Map<Bucket<X>, CellProperty> cache = new HashMap<>();
 
 			@SuppressWarnings({ "unchecked" })
 			@Override
@@ -348,16 +348,16 @@ final class GridRenderer {
 				if (id == COLLAPSE_COL_PROPERTY_ID) {
 					return new ObjectProperty<>(rowBucket.getBucketValue());
 				}
-				return getForColumn((Bucket<@NonNull Item>) id);
+				return getForColumn((Bucket<X>) id);
 			}
 
-			protected CellProperty getForColumn(final Bucket<Item> id) {
+			protected CellProperty getForColumn(final Bucket<X> id) {
 				return cache.computeIfAbsent(id, CellProperty::new);
 			}
 
 			@SuppressWarnings("null")
 			@Override
-			public Collection<?> getItemPropertyIds() {
+			public Collection<X> getItemPropertyIds() {
 				assert false;
 				return null;
 			}
@@ -383,11 +383,11 @@ final class GridRenderer {
 		}
 
 		@Override
-		public List<@NonNull Bucket<?>> getItemIds() {
+		public List<@NonNull Bucket<X>> getItemIds() {
 			return getItemIdStream().collect(toList());
 		}
 
-		protected Stream<? extends @NonNull Bucket<@NonNull ?>> getItemIdStream() {
+		protected Stream<? extends @NonNull Bucket<X>> getItemIdStream() {
 			return rowBucket.stream().filter(visibleItemIds::contains);
 		}
 
@@ -490,7 +490,7 @@ final class GridRenderer {
 		}
 
 		@Override
-		public Collection<@NonNull Bucket<?>> rootItemIds() {
+		public Collection<@NonNull Bucket<X>> rootItemIds() {
 			assert isRoot(rowBucket);
 			return Collections.singleton(rowBucket);
 		}

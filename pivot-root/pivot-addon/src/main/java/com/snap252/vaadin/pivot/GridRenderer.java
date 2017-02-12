@@ -267,18 +267,18 @@ final class GridRenderer {
 					if (colParent != null) {
 						final Collection<X> itemsInParent = getForColumn(colParent).getOwnItems();
 						// TODO: maybe better get if from row parent
-						final List<X> v$;
+						final List<X> filterOwnValues$;
 						if (itemsInParent.isEmpty())
-							v$ = Collections.emptyList();
+							filterOwnValues$ = Collections.emptyList();
 						else
-							v$ = itemsInParent.stream().filter(colBucket).collect(toList());
-						filterOwnValues = v$;
-						return v$;
+							filterOwnValues$ = itemsInParent.stream().filter(colBucket).collect(toList());
+						filterOwnValues = filterOwnValues$;
+						return filterOwnValues$;
 					}
 
-					final List<X> v$ = rowBucket.filterOwnValues(x -> true).collect(toList());
-					filterOwnValues = v$;
-					return v$;
+					final List<X> filterOwnValues$ = rowBucket.filterOwnValues(x -> true).collect(toList());
+					filterOwnValues = filterOwnValues$;
+					return filterOwnValues$;
 				}
 
 				@Override
@@ -287,8 +287,8 @@ final class GridRenderer {
 						return cachedPivotCellReference;
 
 					final Object newValue0 = getOwnItems().stream().collect(aggregator);
-					final PivotCellReference<@Nullable ?, X> newValue = new PivotCellReference<@Nullable Object, X>(
-							newValue0, rowBucket, colBucket, BucketContainer.this);
+					final PivotCellReference<?, X> newValue = new PivotCellReference<@Nullable Object, X>(newValue0,
+							rowBucket, colBucket, BucketContainer.this);
 					cachedPivotCellReference = newValue;
 					return newValue;
 				}

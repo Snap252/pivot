@@ -1,6 +1,5 @@
 <module>
 
-	<!-- WS Compiler: manually edited -->
 
 	<!-- Inherit DefaultWidgetSet -->
 	<inherits name="com.snap252.vaadin.pivot.WidgetSet" /> 
@@ -8,4 +7,12 @@
 	<!-- Widget styles in public -directory -->
 	<set-configuration-property name="devModeRedirectEnabled" value="true" />
 
+
+    <inherits name="org.vaadin.treegrid.WidgetSet" />
+
+    <inherits name="org.vaadin.hene.popupbutton.widgetset.PopupbuttonWidgetset" />
+
+    <inherits name="fi.jasoft.dragdroplayouts.DragDropLayoutsWidgetSet" />
+
+    <inherits name="com.vaadin.DefaultWidgetSet" />
 </module>

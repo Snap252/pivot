@@ -29,7 +29,7 @@ import com.vaadin.ui.VerticalLayout;
 public class DemoUI extends UI {
 
 	@WebServlet(value = "/*", asyncSupported = false)
-	@VaadinServletConfiguration(productionMode = false, ui = DemoUI.class, widgetset="com.snap252.vaadin.pivot.WidgetSet")
+	@VaadinServletConfiguration(productionMode = false, ui = DemoUI.class, widgetset="com.snap252.vaadin.pivotdemo.WidgetSet")
 	public static class Servlet extends VaadinServlet {
 		
 		@Override

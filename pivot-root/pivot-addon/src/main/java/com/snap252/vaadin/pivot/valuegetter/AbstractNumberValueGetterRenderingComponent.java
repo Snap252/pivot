@@ -1,5 +1,6 @@
 package com.snap252.vaadin.pivot.valuegetter;
 
+import java.util.function.BiFunction;
 import java.util.stream.Collector;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -12,7 +13,6 @@ import com.snap252.org.aggregators.NumberStatistics;
 import com.snap252.org.aggregators.PivotCollectors;
 import com.snap252.vaadin.pivot.AbstractFilteringComponent;
 import com.snap252.vaadin.pivot.NameType;
-import com.vaadin.data.Item;
 
 public abstract class AbstractNumberValueGetterRenderingComponent<T extends Number & Comparable<T>>
 		extends AbstractFilteringComponent<T> implements FilteringRenderingComponent<NumberStatistics<T>> {
@@ -21,11 +21,13 @@ public abstract class AbstractNumberValueGetterRenderingComponent<T extends Numb
 		super(nameType);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public Collector<Item, MutableValue<@Nullable T>, @Nullable NumberStatistics<@Nullable T>> getAggregator() {
-		return PivotCollectors.<@NonNull Item, @Nullable T>getNumberReducer(this::apply,
-				new NullableArithmeticsWrapper<>(createArithmetics()));
+	public Collector<Object, MutableValue<@Nullable T>, @Nullable NumberStatistics<@Nullable T>> getAggregator(
+			final BiFunction<Object, Object, Object> f) {
+		return PivotCollectors.<@NonNull Object, @Nullable T>getNumberReducer(x -> (T) f.apply(x, propertyId), new NullableArithmeticsWrapper<>(createArithmetics()));
 	}
 
 	protected abstract Arithmetics<T> createArithmetics();
+
 }

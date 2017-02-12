@@ -4,7 +4,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.Objects;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
@@ -14,14 +14,13 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import com.snap252.vaadin.pivot.NameType;
 import com.snap252.vaadin.pivot.renderer.BigDecimalRenderer;
-import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
 
 public class ObjectValueExtractor
-		implements FilteringRenderingComponent<ObjectStatistics>, Function<Item, @Nullable Object> {
+		implements FilteringRenderingComponent<ObjectStatistics> {
 	protected final NameType nameType;
 	protected final Object propertyId;
 	private final AbstractComponent comp;
@@ -58,9 +57,9 @@ public class ObjectValueExtractor
 	}
 
 	@Override
-	public Collector<Item, ObjectStatistics, ObjectStatistics> getAggregator() {
+	public Collector<Object, ObjectStatistics, ObjectStatistics> getAggregator(final BiFunction<Object, Object, Object> f) {
 		return Collector.of((Supplier<@NonNull ObjectStatistics>) () -> new ObjectStatistics(),
-				(os1, os2) -> os1.add(apply(os2)), (os1, os2) -> os1.mergeTo(os2), Function.identity());
+				(os1, os2) -> os1.add(f.apply(os2, propertyId)), (os1, os2) -> os1.mergeTo(os2), Function.identity());
 	}
 
 	@SuppressWarnings("null")
@@ -81,10 +80,6 @@ public class ObjectValueExtractor
 
 	}
 
-	@Override
-	public @Nullable Object apply(@NonNull final Item item) {
-		return Objects.requireNonNull(item.getItemProperty(propertyId)).getValue();
-	}
 
 	@Override
 	public String toString() {

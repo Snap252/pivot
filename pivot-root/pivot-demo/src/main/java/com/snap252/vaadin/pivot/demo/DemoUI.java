@@ -29,24 +29,12 @@ import com.vaadin.ui.VerticalLayout;
 public class DemoUI extends UI {
 
 	@WebServlet(value = "/*", asyncSupported = false)
-	@VaadinServletConfiguration(productionMode = false, ui = DemoUI.class, widgetset="com.snap252.vaadin.pivotdemo.WidgetSet")
+	@VaadinServletConfiguration(productionMode = false, ui = DemoUI.class, widgetset = "com.snap252.vaadin.pivot.WidgetSet")
 	public static class Servlet extends VaadinServlet {
-		
-		@Override
-		protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-			// TODO Auto-generated method stub
-			super.doGet(req, resp);
-		}
-		
-		@Override
-		protected void service(HttpServletRequest request, HttpServletResponse response)
-				throws ServletException, IOException {
-			// TODO Auto-generated method stub
-			super.service(request, response);
-		}
 	}
 
-	GridRendererParameter<Item> gridRendererParameter = new GridRendererParameter<>();
+	private final GridRendererParameter<Item> gridRendererParameter = new GridRendererParameter<>(
+			(i, propertyId) -> i.getItemProperty(propertyId).getValue());
 
 	@Override
 	protected void init(VaadinRequest request) {

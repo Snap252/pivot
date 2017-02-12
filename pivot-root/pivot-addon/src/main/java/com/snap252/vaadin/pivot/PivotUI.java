@@ -32,7 +32,7 @@ public class PivotUI extends GridLayout {
 
 	private final HorizontalLayout properties;
 
-	public PivotUI(final GridRendererParameter<Item> gridRendererParameter) {
+	public PivotUI(final GridRendererParameter<?> gridRendererParameter) {
 		super(2, 3);
 
 		setSpacing(true);

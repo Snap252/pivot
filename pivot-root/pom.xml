@@ -60,22 +60,6 @@
 		</profile>
 	</profiles>
 
-	<build>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>com.vaadin</groupId>
-					<artifactId>vaadin-maven-plugin</artifactId>
-					<version>${vaadin.plugin.version}</version>
-					<configuration>
-						<strict>true</strict>
-						<force>true</force>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
-
 	<distributionManagement>
 		<snapshotRepository>
 			<id>ossrh</id>

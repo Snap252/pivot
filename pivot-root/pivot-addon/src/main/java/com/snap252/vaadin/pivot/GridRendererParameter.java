@@ -1,5 +1,7 @@
 package com.snap252.vaadin.pivot;
 
+import static java.util.stream.Collectors.toList;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
@@ -7,24 +9,34 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.stream.Collector;
+import java.util.stream.Stream;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.snap252.org.pivoting.PivotCriteria;
 import com.snap252.org.pivoting.RootBucket;
 import com.snap252.vaadin.pivot.GridRendererParameter.ParameterChangeListener.ParametersChangedEventArgs;
+import com.snap252.vaadin.pivot.valuegetter.DummyAggregator;
 import com.snap252.vaadin.pivot.valuegetter.ModelAggregtor;
-import com.snap252.vaadin.pivot.valuegetter.ModelAggregtorDelegate;
 
 @NonNullByDefault
 public final class GridRendererParameter<LIST_INPUT_TYPE> {
 	private List<LIST_INPUT_TYPE> values = new ArrayList<>();
+	private final BiFunction<LIST_INPUT_TYPE, Object, Object> mappingFuncion;
 
 	enum GridRendererChangeParameterKind {
 		ROW_FNKT, COL_FNKT, VALUES, AGGREGATOR, CONVERTER, RENDERER
 
 		;
+	}
+
+	public GridRendererParameter(final BiFunction<LIST_INPUT_TYPE, Object, Object> mappingFuncion) {
+		this.mappingFuncion = mappingFuncion;
 	}
 
 	@FunctionalInterface
@@ -63,10 +75,15 @@ public final class GridRendererParameter<LIST_INPUT_TYPE> {
 		return colFnkt.size();
 	}
 
-	private ModelAggregtor<?> modelAggregator = new ModelAggregtorDelegate.DummyAggregator();
+	private ModelAggregtor<?> modelAggregator = new DummyAggregator();
 
 	public ModelAggregtor<?> getModelAggregator() {
 		return modelAggregator;
+	}
+
+	public Collector<Object, ?, ?> getCollector() {
+		final BiFunction<Object, Object, Object> mappingFuncion2 = (BiFunction<Object, Object, Object>) mappingFuncion;
+		return modelAggregator.getAggregator(mappingFuncion2);
 	}
 
 	private final Map<GridRendererChangeParameterKind, Collection<ParameterChangeListener<LIST_INPUT_TYPE>>> listeners = new EnumMap<>(
@@ -87,13 +104,25 @@ public final class GridRendererParameter<LIST_INPUT_TYPE> {
 		listeners.get(kindOfChange).forEach(listener -> listener.parametersChanged(args));
 	}
 
-	public void setColFnkt(final List<? extends PivotCriteria<LIST_INPUT_TYPE, ?>> colFnkt) {
-		if (Objects.equals(colFnkt, this.colFnkt))
-			return;
+	private Object f(final LIST_INPUT_TYPE l, final Object object) {
+		return "";
+	}
 
+	public <T extends Comparable<T>> void setColFnkt(final List<? extends FilteringComponent<?>> colFnkt) {
 		this.colFnkt.clear();
-		this.colFnkt.addAll(colFnkt);
+		this.colFnkt.addAll(toPivotCriterias(colFnkt).collect(toList()));
 		colFunctionsUpated();
+	}
+
+	private <T extends @NonNull Comparable<T>> Stream<@NonNull PivotCriteria<LIST_INPUT_TYPE, T>> toPivotCriterias(
+			final List<? extends FilteringComponent<T>> colFnkt) {
+		return colFnkt.stream().map(
+				(Function<@NonNull FilteringComponent<T>, @NonNull PivotCriteria<LIST_INPUT_TYPE, T>>) cf -> new PivotCriteria<LIST_INPUT_TYPE, T>() {
+					@Override
+					public @NonNull T apply(@NonNull final LIST_INPUT_TYPE t) {
+						return (T) f(t, cf.getPropertyId());
+					}
+				});
 	}
 
 	public RootBucket<LIST_INPUT_TYPE> creatRowBucket(final String SUM_TEXT) {
@@ -104,12 +133,9 @@ public final class GridRendererParameter<LIST_INPUT_TYPE> {
 		return new RootBucket<LIST_INPUT_TYPE>(SUM_TEXT, getValues(), colFnkt);
 	}
 
-	public void setRowFnkt(final List<? extends PivotCriteria<LIST_INPUT_TYPE, ?>> rowFnkt) {
-		if (Objects.equals(rowFnkt, this.rowFnkt))
-			return;
-
+	public void setRowFnkt(final List<? extends FilteringComponent<?>> rowFnkt) {
 		this.rowFnkt.clear();
-		this.rowFnkt.addAll(rowFnkt);
+		this.colFnkt.addAll(toPivotCriterias(rowFnkt).collect(toList()));
 		rowFunctionsUpated();
 	}
 
@@ -130,7 +156,7 @@ public final class GridRendererParameter<LIST_INPUT_TYPE> {
 	}
 
 	public void setModelAggregator(@Nullable final ModelAggregtor<?> aggregator) {
-		this.modelAggregator = aggregator != null ? aggregator : new ModelAggregtorDelegate.DummyAggregator();
+		this.modelAggregator = aggregator != null ? aggregator : new DummyAggregator();
 		fireEvent(GridRendererChangeParameterKind.AGGREGATOR);
 	}
 

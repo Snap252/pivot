@@ -51,7 +51,7 @@ final class GridRenderer {
 
 	private static final String SUM_TEXT = "\u2211";
 
-	GridRenderer(final GridRendererParameter<Item> gridParameter, final Grid grid) throws IllegalArgumentException {
+	GridRenderer(final GridRendererParameter<?> gridParameter, final Grid grid) throws IllegalArgumentException {
 		final BucketContainer bucketContainer = new BucketContainer(gridParameter);
 		grid.setContainerDataSource(bucketContainer);
 
@@ -121,12 +121,12 @@ final class GridRenderer {
 
 	static class BucketContainer
 			implements Indexed, Hierarchical, ItemSetChangeNotifier, PropertySetChangeNotifier, Collapsible {
-		private RootBucket<Item> rowBucket;
-		private RootBucket<Item> colBucket;
+		private RootBucket<?> rowBucket;
+		private RootBucket<?> colBucket;
+		private Collector<Object, ?, ?> aggregator;
 
 		private final Collection<ValueChangeListener> valueChangeListeners = new HashSet<>();
 		private final Collection<BucketContainer.BucketItem.CellProperty> propertyResetter = new HashSet<>();
-		private ModelAggregtor<?> aggregatorDelegator;
 
 		private void resetPropertiesAndFireValueChange() {
 			propertyResetter.forEach(CellProperty::resetValue);
@@ -148,10 +148,11 @@ final class GridRenderer {
 			}
 		}
 
-		public BucketContainer(final GridRendererParameter<Item> gp) {
+		public BucketContainer(final GridRendererParameter<?> gp) {
 			rowBucket = gp.creatRowBucket(SUM_TEXT);
 			colBucket = gp.creatColBucket(SUM_TEXT);
-			this.aggregatorDelegator = gp.getModelAggregator();
+
+			this.aggregator = gp.getCollector();
 
 			gp.addParameterChangeListener(GridRendererChangeParameterKind.ROW_FNKT, e -> {
 				rowBucket = e.gridParameter.creatRowBucket(SUM_TEXT);
@@ -171,7 +172,7 @@ final class GridRenderer {
 			});
 
 			gp.addParameterChangeListener(GridRendererChangeParameterKind.AGGREGATOR, _ignore -> {
-				this.aggregatorDelegator = _ignore.gridParameter.getModelAggregator();
+				this.aggregator = _ignore.gridParameter.getCollector();
 				resetPropertiesAndFireValueChange();
 			});
 
@@ -285,7 +286,6 @@ final class GridRenderer {
 					if (cachedPivotCellReference != null)
 						return cachedPivotCellReference;
 
-					final Collector<Item, ?, ?> aggregator = aggregatorDelegator.getAggregator();
 					final Object newValue0 = getOwnItems().stream().collect(aggregator);
 					final PivotCellReference<@Nullable ?, Item> newValue = new PivotCellReference<@Nullable Object, Item>(
 							newValue0, rowBucket, colBucket, BucketContainer.this);
@@ -387,7 +387,7 @@ final class GridRenderer {
 			return getItemIdStream().collect(toList());
 		}
 
-		protected Stream<? extends @NonNull Bucket<@NonNull Item>> getItemIdStream() {
+		protected Stream<? extends @NonNull Bucket<@NonNull ?>> getItemIdStream() {
 			return rowBucket.stream().filter(visibleItemIds::contains);
 		}
 

@@ -3,7 +3,6 @@ package com.snap252.vaadin.pivot;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
-import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.FormLayout;
@@ -31,9 +30,8 @@ public class StringFilteringComponent extends AbstractFilteringComponent<String>
 	}
 
 	@Override
-	public String apply(final Item item) {
+	public String round(final String ret) {
 		final int sliderValue = slider.getValue().intValue();
-		final String ret = super.apply(item);
 		if (sliderValue > 0 && sliderValue < ret.length()) {
 			return ret.substring(0, sliderValue);
 		}

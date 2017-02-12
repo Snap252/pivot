@@ -103,8 +103,7 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 	}
 
 	@Override
-	public BigDecimal apply(final Item item) {
-		final BigDecimal ret = getValueIntern(item);
+	public BigDecimal round(final BigDecimal ret) {
 		if (roundingEnabled) {
 			return ret.setScale(sliderValue, RoundingMode.HALF_UP);// .setScale(-sliderValue,
 																	// RoundingMode.HALF_UP);
@@ -113,13 +112,13 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 		return ret;
 	}
 
-	protected BigDecimal getValueIntern(final Item item) {
-		return (BigDecimal) getValueFromItem(item);
-	}
+//	protected BigDecimal getValueIntern(final Item item) {
+//		return (BigDecimal) getValueFromItem(item);
+//	}
 
-	protected final Object getValueFromItem(final Item item) {
-		return super.apply(item);
-	}
+//	protected final Object getValueFromItem(final Item item) {
+//		return super.apply(item);
+//	}
 
 	@Override
 	public void addValueChangeListener(final ValueChangeListener l) {

@@ -1,6 +1,7 @@
 package com.snap252.vaadin.pivot.valuegetter;
 
 import java.util.Locale;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collector;
 
@@ -14,7 +15,7 @@ import com.vaadin.data.util.converter.Converter;
 import com.vaadin.ui.Grid.Column;
 
 public interface ModelAggregtor<VALUE> {
-	public Collector<Item, ?, ? extends VALUE> getAggregator();
+	public Collector<Object, ?, ? extends VALUE> getAggregator(BiFunction<Object, Object, Object> f);
 
 	public RendererConverter<?, ? extends VALUE> createRendererConverter();
 

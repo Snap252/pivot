@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collector;
-import java.util.stream.Stream;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -108,24 +107,28 @@ public final class GridRendererParameter<LIST_INPUT_TYPE> {
 	// return "";
 	// }
 
-	public <T extends Comparable<T>> void setColFnkt(final List<? extends FilteringComponent<?>> colFnkt) {
+	public <T> void setColFnkt(final List<? extends FilteringComponent<?>> colFnkt) {
 		this.colFnkt.clear();
-		this.colFnkt.addAll(toPivotCriterias(colFnkt).collect(toList()));
+
+
+		this.colFnkt.addAll(toPivotCriterias(colFnkt));
 		colFunctionsUpated();
 	}
 
-	@SuppressWarnings("null")
-	private <T extends Comparable<T>> Stream<PivotCriteria<LIST_INPUT_TYPE, T>> toPivotCriterias(
-			final List<? extends FilteringComponent<T>> colFnkt) {
-		return colFnkt.stream().map((Function<FilteringComponent<T>, PivotCriteria<LIST_INPUT_TYPE, T>>) cf -> {
+	@SuppressWarnings("unchecked")
+	private <T> T mapTo(final LIST_INPUT_TYPE lit, final Object propertyId) {
+		return (T) mappingFuncion.apply(lit, propertyId);
+	}
+
+	private Collection<PivotCriteria<LIST_INPUT_TYPE, Object>> toPivotCriterias(
+			final List<? extends FilteringComponent<?>> colFnkt) {
+		return colFnkt.stream().map((Function<FilteringComponent<?>, PivotCriteria<LIST_INPUT_TYPE, Object>>) cf -> {
 			final Object propertyId = cf.getPropertyId();
 			final String name = String.valueOf(propertyId);
-			return new PivotCriteria<LIST_INPUT_TYPE, T>() {
-				@SuppressWarnings("unchecked")
+			return new PivotCriteria<LIST_INPUT_TYPE, Object>() {
 				@Override
-				public T apply(final LIST_INPUT_TYPE t) {
-					final Object mappedValue = mappingFuncion.apply(t, propertyId);
-					return cf.round((T) mappedValue);
+				public Object apply(final LIST_INPUT_TYPE t) {
+					return cf.round(mapTo(t, propertyId));
 				}
 
 				@Override
@@ -133,7 +136,7 @@ public final class GridRendererParameter<LIST_INPUT_TYPE> {
 					return name;
 				}
 			};
-		});
+		}).collect(toList());
 	}
 
 	public RootBucket<LIST_INPUT_TYPE> creatRowBucket(final String SUM_TEXT) {
@@ -146,7 +149,7 @@ public final class GridRendererParameter<LIST_INPUT_TYPE> {
 
 	public void setRowFnkt(final List<? extends FilteringComponent<?>> rowFnkt) {
 		this.rowFnkt.clear();
-		this.rowFnkt.addAll(toPivotCriterias(rowFnkt).collect(toList()));
+		this.rowFnkt.addAll(toPivotCriterias(rowFnkt));
 		rowFunctionsUpated();
 	}
 

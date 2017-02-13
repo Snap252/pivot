@@ -9,7 +9,7 @@ import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Slider;
 
 @NonNullByDefault
-public class NumberFilteringComponent<T extends Number & Comparable<T>> extends AbstractFilteringComponent<T> {
+public class NumberFilteringComponent<T extends Number> extends AbstractFilteringComponent<T> {
 	private final FormLayout comp;
 	private final Slider slider;
 	private int sliderValue;

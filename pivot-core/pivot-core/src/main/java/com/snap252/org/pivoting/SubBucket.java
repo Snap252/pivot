@@ -31,7 +31,7 @@ public class SubBucket<V> extends Bucket<V> {
 			children = null;
 	}
 
-	protected <A extends Comparable<A>> List<Bucket<V>> createChildren(
+	protected <A> List<Bucket<V>> createChildren(
 			final List<? extends PivotCriteria<V, ?>> partitionCriterionsAndSubCriterions,
 			@Nullable final SubBucket<V> parent, final Collection<V> values, final int level) {
 		@SuppressWarnings("unchecked")

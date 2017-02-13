@@ -2,7 +2,7 @@ package com.snap252.org.pivoting;
 
 import java.util.function.Function;
 
-public class NamedPivotCriteria<F, T extends Comparable<T>> implements PivotCriteria<F, T> {
+public class NamedPivotCriteria<F, T> implements PivotCriteria<F, T> {
 
 	private final String stringValue;
 	private final Function<F, T> f;

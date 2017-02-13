@@ -3,12 +3,11 @@ package com.snap252.vaadin.pivot;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 @NonNullByDefault
-public abstract class AbstractFilteringComponent<T extends Comparable<T>>
-		implements FilteringComponent<T> {
+public abstract class AbstractFilteringComponent<T> implements FilteringComponent<T> {
 
 	protected final NameType nameType;
 	protected final Object propertyId;
-	
+
 	@Override
 	public Object getPropertyId() {
 		return propertyId;

@@ -18,6 +18,7 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<vaadin.version>7.7.6</vaadin.version>
 		<vaadin.plugin.version>7.7.6</vaadin.plugin.version>
+		<maven.javadoc.skip>true</maven.javadoc.skip>
 
 		<!-- ZIP Manifest fields -->
 		<Implementation-Version>${project.version}</Implementation-Version>
@@ -28,11 +29,11 @@
 		<Vaadin-Addon>${project.artifactId}-${project.version}.jar</Vaadin-Addon>
 	</properties>
 
-	<!-- <organization> <name>My Name</name> <url>https://github.com/mygithubaccount/PivotGrid/</url> 
-		</organization> <scm> <url>git://github.com/mygithubaccount/PivotGrid.git</url> 
-		<connection>scm:git:git://github.com/mygithubaccount/PivotGrid.git</connection> 
-		<developerConnection>scm:git:ssh://git@github.com:/mygithubaccount/${componentClassName}.git</developerConnection> 
-		<tag>PivotGrid add-on for Vaadin</tag> </scm> <issueManagement> <system>GitHub</system> 
+	<!-- <organization> <name>My Name</name> <url>https://github.com/mygithubaccount/PivotGrid/</url>
+		</organization> <scm> <url>git://github.com/mygithubaccount/PivotGrid.git</url>
+		<connection>scm:git:git://github.com/mygithubaccount/PivotGrid.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com:/mygithubaccount/${componentClassName}.git</developerConnection>
+		<tag>PivotGrid add-on for Vaadin</tag> </scm> <issueManagement> <system>GitHub</system>
 		<url>https://github.com/mygithubaccount/PivotGrid/issues</url> </issueManagement> -->
 
 	<licenses>
@@ -93,7 +94,7 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- This can be replaced with TestNG or some other test framework supported 
+		<!-- This can be replaced with TestNG or some other test framework supported
 			by the surefire plugin -->
 		<dependency>
 			<groupId>junit</groupId>
@@ -135,6 +136,7 @@
 							<Vaadin-Package-Version>1</Vaadin-Package-Version>
 							<Vaadin-License-Title>${Vaadin-License-Title}</Vaadin-License-Title>
 							<Vaadin-Widgetsets>com.snap252.vaadin.pivot.WidgetSet</Vaadin-Widgetsets>
+							<Vaadin-Stylesheets>VAADIN/addons/pivot/pivot.scss</Vaadin-Stylesheets>
 						</manifestEntries>
 					</archive>
 				</configuration>

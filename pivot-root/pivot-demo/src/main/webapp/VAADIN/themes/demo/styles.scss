@@ -4,101 +4,14 @@
 $tg-expander-padding: 7px;
 $tg-expander-width: 5px;
 
-@mixin scale-grid($primary-stylename: v-grid-tiny, $scale-factor: 0.85) {
-	$border-factor: 0.75;
-
-	$v-grid-row-height: ceil($v-table-row-height * $scale-factor * $border-factor);
-	$v-grid-header-font-size: ceil($v-table-header-font-size * $scale-factor);
-
-//	$v-grid-cell-padding-horizontal: 1.5 * $v-table-cell-padding-horizontal * $scale-factor;
-	$v-grid-cell-padding-horizontal: round($v-table-cell-padding-horizontal * $scale-factor * $border-factor);
-
-	$v-font-size: ceil($v-font-size * $scale-factor);
-	$v-unit-size--small: round($v-unit-size * $v-scaling-factor--small);
-	$v-font-size--small: ceil($v-font-size * $v-scaling-factor--small);
-
-	@include valo-grid ($primary-stylename: $primary-stylename);
-
-	.#{$primary-stylename} {
-		font-weight: normal;
-	}
-}
-@mixin grid-levels($primary-stylename: v-grid-tiny) {
-	$v1: 250;
-	$v2: 230;
-	.#{$primary-stylename}-header .#{$primary-stylename}-cell, .#{$primary-stylename}-row > td {
-
-		&.depth-0 {
-			@include valo-gradient(rgb($v2, $v1, $v1));
-		}
-
-		&.depth-1 {
-			@include valo-gradient(rgb($v1, $v2, $v2));
-		}
-
-		&.depth-2 {
-			@include valo-gradient(rgb($v2, $v1, $v2));
-		}
-		&.depth-3 {
-			@include valo-gradient(rgb($v2, $v2, $v1));
-		}
-	}
-	.pivot-ui-cols {
-		.v-ddwrapper-index-0 > * {
-			@include valo-gradient(rgb($v2, $v1, $v1));
-		}
-		.v-ddwrapper-index-1 > * {
-			@include valo-gradient(rgb($v1, $v2, $v2));
-		}
-		.v-ddwrapper-index-2 > * {
-			@include valo-gradient(rgb($v2, $v1, $v2));
-		}
-		.v-ddwrapper-index-3 > * {
-			@include valo-gradient(rgb($v2, $v2, $v1));
-		}
-	}
-}
-
 // Prefix all selectors in your theme with .demo
 .demo {
 
 	// Include valo theme styles in your theme
 	@include valo;
 	@include addons;
-	.pivot {
-		.v-grid-tiny-header {
-			.v-button-pivot-grid-expander {
-				height: inherit;
-				padding-left: 0px;
-				&:focus:after {
-					box-shadow: none;
-				}
-				.v-button-wrap .v-icon {
-					font-size: 125%;
-				}
-			}
-		}
-	}
-	.pivot {
-		.row-header {
-			font-weight: bold;
-		}
-	}
-	@include grid-levels;
 
-	.v-tree-grid-expander {
-		padding-left: 4px;
-	}
-	@include scale-grid;
-
-	.v-gridlayout-slot > .v-ddwrapper {
-		$v-grid-border-color-source: $v-grid-row-background-color;
-		border: valo-border($color: $v-grid-border-color-source, $strength: 0.8);
-		padding: 4px;
-		.v-button {
-			line-height: 1.75;
-			height: inherit;
-			text-align: right;
-		}
+	.v-grid-tiny-cell {
+		height: 25px !important;
 	}
 }

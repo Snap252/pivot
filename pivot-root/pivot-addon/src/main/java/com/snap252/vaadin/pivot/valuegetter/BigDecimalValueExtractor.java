@@ -90,6 +90,8 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 			}
 
 		});
+		nullRepresentationTextField.setInputPrompt("-");
+		nullRepresentationTextField.setImmediate(true);
 
 		nullRepresentationTextField.addValidator(new StringLengthValidator("Maximal 10 Zeichen erlaubt", 0, 10, true));
 
@@ -127,6 +129,7 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 		slider.addValueChangeListener(l);
 		relativeCheckBox.addValueChangeListener(l);
 		numberFormatTextField.addValueChangeListener(l);
+		nullRepresentationTextField.addValueChangeListener(l);
 	}
 
 	@Override

@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.vaadin.miki.mapcontainer.MapContainer;
@@ -117,8 +118,14 @@ public class PivotUI extends GridLayout {
 	}
 
 	public static Container cloneContainer(final Container origContainer) {
+		return cloneContainer(origContainer, f -> f);
+	}
+
+	public static Container cloneContainer(final Container origContainer,
+			final Function<@NonNull Object, @Nullable Object> f) {
 		final Map<Object, Class<?>> m0 = origContainer.getContainerPropertyIds().stream()
-				.collect(Collectors.toMap(Function.identity(), origContainer::getType, (u, v) -> {
+				.filter(propertyId -> f.apply(propertyId) != null)
+				.collect(Collectors.toMap(f, origContainer::getType, (u, v) -> {
 					throw new IllegalStateException(String.format("Duplicate key %s", u));
 				}, LinkedHashMap::new));
 
@@ -126,7 +133,12 @@ public class PivotUI extends GridLayout {
 				.collect(Collectors.toMap(Function.identity(), itemId -> {
 					final Item item = origContainer.getItem(itemId);
 					final LinkedHashMap<Object, @Nullable Object> v = new LinkedHashMap<>();
-					item.getItemPropertyIds().forEach(p -> v.put(p, Objects.requireNonNull(item.getItemProperty(p)).getValue()));
+					item.getItemPropertyIds().forEach(propertyId -> {
+
+						final Object newPropertyId = f.apply(propertyId);
+						if (newPropertyId != null)
+							v.put(newPropertyId, Objects.requireNonNull(item.getItemProperty(propertyId)).getValue());
+					});
 					return v;
 				}, (u, v) -> {
 					throw new IllegalStateException(String.format("Duplicate key %s", u));

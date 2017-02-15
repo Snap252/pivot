@@ -142,7 +142,7 @@ final class GridRenderer {
 		} else {
 			meAndMyChildren = headerRow.getCell(b);
 		}
-		meAndMyChildren.setText(String.valueOf(b.bucketValue));
+		meAndMyChildren.setText(b.getFormattedBucketValue());
 		meAndMyChildren.setStyleName("depth-" + depth);
 		for (int i = depth + 1; i < g.getHeaderRowCount(); i++) {
 			g.getHeaderRow(i).getCell(b).setStyleName("depth-" + depth);

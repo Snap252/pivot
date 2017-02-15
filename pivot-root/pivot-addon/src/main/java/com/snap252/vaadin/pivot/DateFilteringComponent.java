@@ -38,15 +38,23 @@ public class DateFilteringComponent extends AbstractFilteringComponent<Date> {
 	//TODO: formatting
 	@Override
 	public Date round(final Date ret) {
-		DateRounding value = (DateRounding) c.getValue();
-		if (value == null)
-			value = DateRounding.DAY;
-		final DateFormat dateFormat = value.df;
+		final DateFormat dateFormat = getDateFormat();
 		try {
 			return dateFormat.parse(dateFormat.format(ret));
 		} catch ( final ParseException e) {
 			throw new AssertionError();
 		}
+	}
+
+	private DateFormat getDateFormat() {
+		DateRounding value = (DateRounding) c.getValue();
+		if (value == null)
+			value = DateRounding.DAY;
+		return value.df;
+	}
+	@Override
+	public String format(final Date date) {
+		return getDateFormat().format(date);
 	}
 
 //	@Override

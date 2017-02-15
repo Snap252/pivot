@@ -1,6 +1,7 @@
 package com.snap252.org.pivoting;
 
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.function.Function;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -17,5 +18,9 @@ public interface PivotCriteria<F, T> extends Function<@NonNull F, @NonNull T>, C
 
 		}
 		return 0;
+	}
+
+	default String format(final T t) {
+		return Objects.toString(t);
 	}
 }

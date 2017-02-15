@@ -132,7 +132,7 @@ final class BucketItem<X> implements Item {
 	@Override
 	public @NonNull Property<?> getItemProperty(final Object id) {
 		if (id == GridRenderer.COLLAPSE_COL_PROPERTY_ID) {
-			return new ObjectProperty<>(rowBucket.getBucketValue());
+			return new ObjectProperty<>(rowBucket.getFormattedBucketValue(), String.class);
 		}
 		return getForColumn((Bucket<X>) id);
 	}

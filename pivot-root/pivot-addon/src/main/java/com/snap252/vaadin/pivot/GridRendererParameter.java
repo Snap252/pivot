@@ -110,14 +110,17 @@ public final class GridRendererParameter<LIST_INPUT_TYPE> {
 	public <T> void setColFnkt(final List<? extends FilteringComponent<?>> colFnkt) {
 		this.colFnkt.clear();
 
-
 		this.colFnkt.addAll(toPivotCriterias(colFnkt));
 		colFunctionsUpated();
 	}
 
-	@SuppressWarnings("unchecked")
 	private <T> T mapTo(final LIST_INPUT_TYPE lit, final Object propertyId) {
-		return (T) mappingFuncion.apply(lit, propertyId);
+		return cast(mappingFuncion.apply(lit, propertyId));
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <T> T cast(final Object o) {
+		return (T) o;
 	}
 
 	private Collection<PivotCriteria<LIST_INPUT_TYPE, Object>> toPivotCriterias(
@@ -129,6 +132,11 @@ public final class GridRendererParameter<LIST_INPUT_TYPE> {
 				@Override
 				public Object apply(final LIST_INPUT_TYPE t) {
 					return cf.round(mapTo(t, propertyId));
+				}
+
+				@Override
+				public String format(final Object t) {
+					return cf.format(cast(t));
 				}
 
 				@Override

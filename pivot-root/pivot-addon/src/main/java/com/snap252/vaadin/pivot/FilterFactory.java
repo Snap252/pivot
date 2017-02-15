@@ -11,7 +11,7 @@ public class FilterFactory {
 		if (n.type == String.class)
 			return new StringFilteringComponent(n);
 
-		if (n.type == Date.class)
+		if (Date.class.isAssignableFrom(n.type))
 			return new DateFilteringComponent(n);
 		if (Number.class.isAssignableFrom(n.type))
 			return new NumberFilteringComponent<>(n);

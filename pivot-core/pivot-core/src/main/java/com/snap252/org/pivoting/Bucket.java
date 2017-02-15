@@ -42,6 +42,15 @@ public abstract class Bucket<V> implements Predicate<@NonNull V> {
 		return bucketValue;
 	}
 
+	@SuppressWarnings("unchecked")
+	private <T> T cast(final Object o) {
+		return (T) o;
+	}
+
+	public final String getFormattedBucketValue() {
+		return extractor.format(cast(bucketValue));
+	}
+
 	@Override
 	public String toString() {
 		assert extractor != null;

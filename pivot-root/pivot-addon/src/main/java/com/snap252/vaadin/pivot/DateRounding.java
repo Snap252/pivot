@@ -2,8 +2,10 @@ package com.snap252.vaadin.pivot;
 
 import java.text.SimpleDateFormat;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
+@NonNullByDefault
 public enum DateRounding {
 	YEAR(new SimpleDateFormat("yyyy"), "Jahr"),
 

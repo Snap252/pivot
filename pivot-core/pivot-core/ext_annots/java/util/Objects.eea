@@ -2,3 +2,6 @@ class java/util/Objects
 requireNonNull
  <T:Ljava/lang/Object;>(TT;)TT;
  <T:Ljava/lang/Object;>(T0T;)T1T;
+toString
+ (Ljava/lang/Object;)Ljava/lang/String;
+ (L0java/lang/Object;)L1java/lang/String;

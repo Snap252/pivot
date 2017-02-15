@@ -16,8 +16,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-		<vaadin.version>7.7.6</vaadin.version>
-		<vaadin.plugin.version>7.7.6</vaadin.plugin.version>
+		<vaadin.version>7.7.7</vaadin.version>
+		<vaadin.plugin.version>7.7.7</vaadin.plugin.version>
 		<maven.javadoc.skip>true</maven.javadoc.skip>
 
 		<!-- ZIP Manifest fields -->
@@ -78,7 +78,7 @@
 		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-treegrid</artifactId>
-			<version>0.7.3</version>
+			<version>0.7-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
@@ -196,7 +196,18 @@
 				<version>2.19.1</version>
 			</plugin>
 		</plugins>
-
+		<resources>
+			<resource>
+				<directory>src/main/java</directory>
+				<!-- com/snap252/vaadin/pivot/client -->
+				<includes>
+					<include>**/*.java</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+		</resources>
 	</build>
 
 	<profiles>

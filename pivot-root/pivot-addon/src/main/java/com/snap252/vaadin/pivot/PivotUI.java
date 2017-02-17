@@ -37,6 +37,7 @@ public class PivotUI extends GridLayout {
 
 	public PivotUI(final GridRendererParameter<?> gridRendererParameter) {
 		super(2, 3);
+		addStyleName("pivot");
 
 		setSpacing(true);
 		final PivotGrid pivotGrid$ = new PivotGrid(gridRendererParameter);

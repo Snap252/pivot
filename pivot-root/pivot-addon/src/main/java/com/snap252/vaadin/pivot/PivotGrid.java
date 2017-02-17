@@ -10,6 +10,7 @@ public class PivotGrid extends TreeGrid {
 
 	public PivotGrid(final GridRendererParameter<?> bucketParams) {
 		setPrimaryStyleName("v-grid-tiny");
+
 		setSelectionMode(SelectionMode.NONE);
 		setColumnResizeMode(ColumnResizeMode.SIMPLE);
 		new GridRenderer(bucketParams, this);

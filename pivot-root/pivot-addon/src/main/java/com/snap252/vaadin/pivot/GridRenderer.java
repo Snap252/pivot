@@ -108,7 +108,6 @@ final class GridRenderer {
 
 		grid.setCellDescriptionGenerator(null);
 		grid.setRowDescriptionGenerator(null);
-		grid.addStyleName("pivot");
 
 		doHeader(grid, colBucket, 0);
 	}

@@ -72,31 +72,29 @@ $tg-expander-width: 5px;
 				}
 			}
 		}
-	}
-	.pivot {
 		.row-header {
 			font-weight: bold;
 		}
-	}
-	@include grid-levels;
+		@include grid-levels;
 
-	.v-tree-grid-expander {
-		padding-left: 4px;
-	}
-	@include scale-grid;
-
-	.v-gridlayout-slot > .v-ddwrapper {
-		$v-grid-border-color-source: $v-grid-row-background-color;
-		border: valo-border($color: $v-grid-border-color-source, $strength: 0.8);
-		padding: 4px;
-		.v-button {
-			line-height: 1.75;
-			height: inherit;
-			text-align: right;
+		.v-tree-grid-expander {
+			padding-left: 4px;
 		}
-	}
+		@include scale-grid;
 
-	.v-grid-tiny-cell {
-		height: 25px !important;
+		.v-gridlayout-slot > .v-ddwrapper {
+			$v-grid-border-color-source: $v-grid-row-background-color;
+			border: valo-border($color: $v-grid-border-color-source, $strength: 0.8);
+			padding: 4px;
+			.v-button {
+				line-height: 1.75;
+				height: inherit;
+				text-align: right;
+			}
+		}
+
+		.v-grid-tiny-cell {
+			height: 25px !important;
+		}
 	}
 }

@@ -24,35 +24,38 @@ $tg-expander-width: 5px;
 @mixin grid-levels($primary-stylename: v-grid-tiny) {
 	$v1: 250;
 	$v2: 230;
+	$c1: rgb($v2, $v1, $v1);
+	$c2: rgb($v1, $v2, $v2);
+	$c3: rgb($v2, $v1, $v2);
+	$c4: rgb($v2, $v2, $v1);
+
 	.#{$primary-stylename}-header .#{$primary-stylename}-cell, .#{$primary-stylename}-row > td {
 
 		&.depth-0 {
-			@include valo-gradient(rgb($v2, $v1, $v1));
+			@include valo-gradient(c1);
 		}
-
 		&.depth-1 {
-			@include valo-gradient(rgb($v1, $v2, $v2));
+			@include valo-gradient(c2);
 		}
-
 		&.depth-2 {
-			@include valo-gradient(rgb($v2, $v1, $v2));
+			@include valo-gradient(c3);
 		}
 		&.depth-3 {
-			@include valo-gradient(rgb($v2, $v2, $v1));
+			@include valo-gradient(c4);
 		}
 	}
 	.pivot-ui-cols {
 		.v-ddwrapper-index-0 > * {
-			@include valo-gradient(rgb($v2, $v1, $v1));
+			@include valo-gradient(c1);
 		}
 		.v-ddwrapper-index-1 > * {
-			@include valo-gradient(rgb($v1, $v2, $v2));
+			@include valo-gradient(c2);
 		}
 		.v-ddwrapper-index-2 > * {
-			@include valo-gradient(rgb($v2, $v1, $v2));
+			@include valo-gradient(c3);
 		}
 		.v-ddwrapper-index-3 > * {
-			@include valo-gradient(rgb($v2, $v2, $v1));
+			@include valo-gradient(c4);
 		}
 	}
 }

@@ -1,0 +1,16 @@
+@import "../valo/valo.scss";
+@import "addons.scss";
+
+// Prefix all selectors in your theme with .demo
+.separator1{color:red}
+.demo {
+	@include valo;
+}
+.separator2{color:red}
+.addons {
+	@include addons;
+}
+.separator3{color:red}
+.demo {
+	@include valo;
+}

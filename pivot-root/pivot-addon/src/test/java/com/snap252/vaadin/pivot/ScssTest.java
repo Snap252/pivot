@@ -1,6 +1,5 @@
 package com.snap252.vaadin.pivot;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -41,7 +40,12 @@ public class ScssTest {
 		public void publish(final LogRecord record) {
 			if (record.getLevel() != Level.INFO) {
 				final Throwable thrown = record.getThrown();
-				throw new AssertionError(record.getLevel() + ": " + (thrown != null ? thrown.getMessage() : ""),
+				if (thrown != null)
+					thrown.printStackTrace();
+				else
+					System.err.println(record.getMessage());
+
+				throw new AssertionError(record.getLevel() + ": " + (thrown != null ? thrown.getMessage() : "" + record.getMessage()),
 						thrown);
 			}
 		}
@@ -59,10 +63,17 @@ public class ScssTest {
 
 	@Test
 	public void doSingleTest() throws Exception {
-		testSingleFile(scssResourceName);
+		final String generatedCss = testSingleFile(scssResourceName);
+		if (PRINT_CSS) {
+			System.err.println("===============================");
+			System.err.println(scssResourceName + " : " + generatedCss.length());
+			System.err.println("===============================");
+			System.err.println(generatedCss);
+			System.err.println("===============================");
+		}
 	}
 
-	private static void testSingleFile(final String scssResourceName) throws IOException, Exception {
+	static String testSingleFile(final String scssResourceName) throws Exception {
 		assert ScssTest.class.getResource(scssResourceName) != null : scssResourceName;
 
 		final ScssStylesheet scss = ScssStylesheet.get(scssResourceName);
@@ -80,17 +91,10 @@ public class ScssTest {
 		}
 		scss.compile();
 
-		if (PRINT_CSS) {
-			System.err.println("===============================");
-			System.err.println(scssResourceName + " : " + scss.printState().length());
-			System.err.println("===============================");
-			System.err.println(scss.printState());
-			System.err.println("===============================");
-		}
-
 		// DO NOT DELETE OR INLINE THIS - otherwise GC can collect the instance
 		// - and scss errors would not be shown!
 		loggers.size();
+		return scss.printState();
 	}
 
 }

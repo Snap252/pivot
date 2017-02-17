@@ -1,0 +1,14 @@
+/* This file is automatically managed and will be overwritten from time to time. */
+/* Do not manually edit this file. */
+
+/* Provided by vaadin-treegrid-0.7.3.jar */
+@import "../../../VAADIN/addons/treegrid/treegrid.scss";
+@import "../../../VAADIN/addons/pivot/pivot.scss";
+
+
+/* Import and include this mixin into your project theme to include the addon themes */
+@mixin addons {
+	@include treegrid;
+	@include pivot;
+}
+

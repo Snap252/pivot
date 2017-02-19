@@ -183,10 +183,12 @@ class BucketContainer<X>
 
 	private final Class<?> pivotCellReferenceClazz = PivotCellReference.class;
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Class<PivotCellReference<?, Item>> getType(final Object propertyId) {
-		return (Class<PivotCellReference<?, Item>>) pivotCellReferenceClazz;
+	public Class<?> getType(final Object propertyId) {
+		if (propertyId instanceof Bucket){
+			return pivotCellReferenceClazz;
+		}
+		else return String.class;
 	}
 
 	@Override

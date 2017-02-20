@@ -5,6 +5,13 @@ $tg-expander-width: 5px;
 @mixin scale-grid($primary-stylename: v-grid-tiny, $scale-factor: 0.85) {
 	$border-factor: 0.75;
 
+	$v-grid-row-height-old: $v-grid-row-height;
+	$v-grid-header-font-size-old: $v-grid-header-font-size;
+	$v-grid-cell-padding-horizontal-old: $v-grid-cell-padding-horizontal;
+	$v-font-size-old: $v-font-size;
+	$v-unit-size--small-old: $v-unit-size--small;
+	$v-font-size--small-old: $v-font-size--small;
+
 	$v-grid-row-height: ceil($v-table-row-height * $scale-factor * $border-factor);
 	$v-grid-header-font-size: ceil($v-table-header-font-size * $scale-factor);
 
@@ -15,12 +22,20 @@ $tg-expander-width: 5px;
 	$v-unit-size--small: round($v-unit-size * $v-scaling-factor--small);
 	$v-font-size--small: ceil($v-font-size * $v-scaling-factor--small);
 
-	@include valo-grid ($primary-stylename: $primary-stylename);
+	@include valo-grid($primary-stylename: $primary-stylename);
 
 	.#{$primary-stylename} {
 		font-weight: normal;
 	}
+
+	$v-grid-row-height: $v-grid-row-height-old;
+	$v-grid-header-font-size: $v-grid-header-font-size-old;
+	$v-grid-cell-padding-horizontal: $v-grid-cell-padding-horizontal-old;
+	$v-font-size: $v-font-size-old;
+	$v-unit-size--small: $v-unit-size--small-old;
+	$v-font-size--small: $v-font-size--small-old;
 }
+
 @mixin grid-levels($primary-stylename: v-grid-tiny) {
 	$v1: 250;
 	$v2: 230;

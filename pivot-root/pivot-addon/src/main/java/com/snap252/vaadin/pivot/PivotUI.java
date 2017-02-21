@@ -36,11 +36,16 @@ public class PivotUI extends GridLayout {
 	private final HorizontalLayout properties;
 
 	public PivotUI(final GridRendererParameter<?> gridRendererParameter) {
+		this(PivotGrid::new, gridRendererParameter);
+	}
+
+	public PivotUI(final Function<GridRendererParameter<?>, Component> f,
+			final GridRendererParameter<?> gridRendererParameter) {
 		super(2, 3);
 		addStyleName("pivot");
 
 		setSpacing(true);
-		final PivotGrid pivotGrid$ = new PivotGrid(gridRendererParameter);
+		final Component pivotGrid$ = f.apply(gridRendererParameter);
 		{
 			final Component renderer = new Label("");
 			renderer.setSizeUndefined();

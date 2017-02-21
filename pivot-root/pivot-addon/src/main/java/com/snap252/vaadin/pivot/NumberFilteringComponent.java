@@ -14,7 +14,7 @@ public class NumberFilteringComponent<T extends Number> extends AbstractFilterin
 	private final Slider slider;
 	private int sliderValue;
 
-	public NumberFilteringComponent(final NameType nameType) {
+	public NumberFilteringComponent(final Property nameType) {
 		super(nameType);
 		final FormLayout formLayout = new FormLayout();
 		slider = new Slider(0, 10);

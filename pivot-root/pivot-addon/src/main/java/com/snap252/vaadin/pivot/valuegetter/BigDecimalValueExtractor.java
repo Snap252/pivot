@@ -15,8 +15,8 @@ import com.snap252.org.aggregators.Arithmetics;
 import com.snap252.org.aggregators.BigDecimalArithmetics;
 import com.snap252.org.aggregators.NullableArithmeticsWrapper;
 import com.snap252.org.aggregators.NumberStatistics;
-import com.snap252.vaadin.pivot.NameType;
 import com.snap252.vaadin.pivot.PivotCellReference;
+import com.snap252.vaadin.pivot.Property;
 import com.snap252.vaadin.pivot.renderer.BigDecimalRenderer;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -49,7 +49,7 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 
 	private WhatOfNumberStatisticsToRender whatToRender = WhatOfNumberStatisticsToRender.sum;
 
-	public BigDecimalValueExtractor(final NameType nameType) {
+	public BigDecimalValueExtractor(final Property nameType) {
 		super(nameType);
 		roundingEnabledCheckBox = new CheckBox("Rundung", false);
 		final FormLayout formLayout = new FormLayout();

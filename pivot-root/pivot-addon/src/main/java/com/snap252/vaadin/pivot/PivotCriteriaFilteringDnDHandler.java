@@ -28,14 +28,14 @@ public class PivotCriteriaFilteringDnDHandler extends DropHandlerImplementation<
 		super(cols, vertical, refresher);
 		this.refererOfPropertyChanged = refererOfPropertyChanged;
 	}
-	
+
 	private void refresh(){
 		refererOfPropertyChanged.run();
 	}
 
 	@Override
 	protected FilteringComponent<?> createNew(final Object data) {
-		return filterFactory.createFilter((NameType) data);
+		return filterFactory.createFilter((Property) data);
 	}
 
 	@Override

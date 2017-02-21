@@ -18,7 +18,7 @@ public class DateFilteringComponent extends AbstractFilteringComponent<Date> {
 	private final FormLayout comp;
 	private final ComboBox c;
 
-	public DateFilteringComponent(final NameType nt) {
+	public DateFilteringComponent(final Property nt) {
 		super(nt);
 		final FormLayout formLayout = new FormLayout();
 		c = new ComboBox("Rundung", Arrays.asList(DateRounding.values()));

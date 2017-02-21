@@ -68,7 +68,7 @@ public abstract class DropHandlerImplementation<T> implements DropHandler {
 		} else
 			index = -1;
 
-		if (data instanceof NameType) {
+		if (data instanceof Property) {
 			doWithFilteringComponent(createNew(data), index);
 		} else {
 			doWithFilteringComponent(handlerRemove(event), index);

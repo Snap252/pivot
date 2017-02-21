@@ -14,7 +14,7 @@ public class StringFilteringComponent extends AbstractFilteringComponent<String>
 	private final FormLayout comp;
 	private final Slider slider;
 
-	public StringFilteringComponent(final NameType nameType) {
+	public StringFilteringComponent(final Property nameType) {
 		super(nameType);
 		final FormLayout formLayout = new FormLayout();
 		slider = new Slider(0, 10);

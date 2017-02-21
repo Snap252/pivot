@@ -2,6 +2,7 @@ package com.snap252.vaadin.pivot;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
+@Deprecated
 @NonNullByDefault
 public class NameType {
 	public final Object propertyId;

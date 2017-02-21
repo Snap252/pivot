@@ -8,7 +8,7 @@ import com.vaadin.ui.AbstractComponent;
 
 @NonNullByDefault
 public class EnumFilteringComponent<T extends Enum<T>> extends AbstractFilteringComponent<T> {
-	public EnumFilteringComponent(NameType nameType) {
+	public EnumFilteringComponent(final Property nameType) {
 		super(nameType);
 	}
 
@@ -18,6 +18,6 @@ public class EnumFilteringComponent<T extends Enum<T>> extends AbstractFiltering
 	}
 
 	@Override
-	public void addValueChangeListener(ValueChangeListener l) {
+	public void addValueChangeListener(final ValueChangeListener l) {
 	}
 }

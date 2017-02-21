@@ -8,13 +8,13 @@ import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 
 import com.snap252.vaadin.pivot.PivotCellReference;
+import com.snap252.vaadin.pivot.Property;
 import com.snap252.vaadin.pivot.renderer.BigDecimalRenderer;
 
-//TODO: extract
-public class DummyAggregator implements ModelAggregtor<Object> {
+public final class DummyAggregator implements ModelAggregtor<Object> {
 
 	@Override
-	public Collector<Object, ?, BigDecimal> getAggregator(final BiFunction<Object, Object, Object> f) {
+	public Collector<Object, ?, BigDecimal> getAggregator(final BiFunction<Object, Property, Object> _ignored) {
 		return Collectors.collectingAndThen(Collectors.counting(), BigDecimal::valueOf);
 	}
 
@@ -24,7 +24,6 @@ public class DummyAggregator implements ModelAggregtor<Object> {
 		final BigDecimalRenderer renderer = new BigDecimalRenderer("-");
 		renderer.setFormat("0");
 
-		return new RendererConverter<BigDecimal, BigDecimal>(renderer, PivotCellReference::getValue,
-				BigDecimal.class);
+		return new RendererConverter<BigDecimal, BigDecimal>(renderer, PivotCellReference::getValue, BigDecimal.class);
 	}
 }

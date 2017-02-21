@@ -1,13 +1,17 @@
 package com.snap252.vaadin.pivot.demo;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.annotation.WebServlet;
 
 import com.snap252.org.testing.RandomDataGenerator;
 import com.snap252.org.testing.RandomDataGenerator.Person;
+import com.snap252.vaadin.pivot.ContainerPropertyProvider;
 import com.snap252.vaadin.pivot.GridRendererParameter;
+import com.snap252.vaadin.pivot.PivotGrid;
 import com.snap252.vaadin.pivot.PivotUI;
+import com.snap252.vaadin.pivot.PropertyProvider;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.annotations.VaadinServletConfiguration;
@@ -29,14 +33,13 @@ public class DemoUI extends UI {
 	public static class Servlet extends VaadinServlet {
 	}
 
-	private final GridRendererParameter<Item> gridRendererParameter = new GridRendererParameter<>(
-			(i, propertyId) -> i.getItemProperty(propertyId).getValue());
+	private final GridRendererParameter<Item> gridRendererParameter = new GridRendererParameter<>(xxx());
 
 	@Override
 	protected void init(VaadinRequest request) {
 
 		// Initialize our new UI component
-		final PivotUI pivotGrid = new PivotUI(gridRendererParameter);
+		final PivotUI pivotGrid = new PivotUI(PivotGrid::new, gridRendererParameter);
 		pivotGrid.setSizeFull();
 
 		setDS(pivotGrid);
@@ -57,11 +60,14 @@ public class DemoUI extends UI {
 	}
 
 	protected void setDS(final PivotUI pivotGrid) {
+		gridRendererParameter.setValues(xxx().getItems().collect(Collectors.toList()));
+	}
+
+	private PropertyProvider<Item, ?> xxx() {
 		List<Person> personen = RandomDataGenerator.createPersons(4000);
 		BeanItemContainer<Person> container = new BeanItemContainer<>(Person.class);
 		container.addAll(personen);
-		List<Item> containerItems = pivotGrid.setContainerDataSource(PivotUI.cloneContainer(container));
-		gridRendererParameter.setValues(containerItems);
+		return new ContainerPropertyProvider(PivotUI.cloneContainer(container));
 	}
 
 }

@@ -6,7 +6,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 
 @NonNullByDefault
 public interface FilteringComponent<T> extends UIConfigurable {
-	Object getPropertyId();
+	Property getProperty();
 	default T round(final T t){
 		return t;
 	}

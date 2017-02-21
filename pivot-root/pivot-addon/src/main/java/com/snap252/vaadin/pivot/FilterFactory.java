@@ -6,20 +6,20 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 
 @NonNullByDefault
 public class FilterFactory {
-	FilteringComponent<?> createFilter(final NameType n) {
+	FilteringComponent<?> createFilter(final Property n) {
 
-		if (n.type == String.class)
+		if (n.getType() == String.class)
 			return new StringFilteringComponent(n);
 
-		if (Date.class.isAssignableFrom(n.type))
+		if (Date.class.isAssignableFrom(n.getType()))
 			return new DateFilteringComponent(n);
-		if (Number.class.isAssignableFrom(n.type))
+		if (Number.class.isAssignableFrom(n.getType()))
 			return new NumberFilteringComponent<>(n);
 
-		if (n.type.isEnum())
+		if (n.getType().isEnum())
 			return new EnumFilteringComponent<>(n);
 
-		throw new AssertionError(n.type);
+		throw new AssertionError(n.getType());
 	}
 
 }

@@ -12,7 +12,7 @@ import java.util.stream.Collector;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
-import com.snap252.vaadin.pivot.NameType;
+import com.snap252.vaadin.pivot.Property;
 import com.snap252.vaadin.pivot.renderer.BigDecimalRenderer;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.AbstractComponent;
@@ -21,17 +21,17 @@ import com.vaadin.ui.FormLayout;
 
 public class ObjectValueExtractor
 		implements FilteringRenderingComponent<ObjectStatistics> {
-	protected final NameType nameType;
-	protected final Object propertyId;
+	protected final Property nameType;
+//	protected final Object propertyId;
 	private final AbstractComponent comp;
 
 	private final ComboBox howToRenderComboBox = new ComboBox("Anzeige",
 			Arrays.asList(WhatOfObjectStatisticsToShow.values()));
 	private WhatOfObjectStatisticsToShow whatToRender = WhatOfObjectStatisticsToShow.cnt;
 
-	public ObjectValueExtractor(final NameType nameType) {
+	public ObjectValueExtractor(final Property nameType) {
 		this.nameType = nameType;
-		this.propertyId = nameType.propertyId;
+//		this.propertyId = nameType.propertyId;
 		final FormLayout formLayout = new FormLayout();
 
 		howToRenderComboBox.setNullSelectionAllowed(false);
@@ -57,9 +57,9 @@ public class ObjectValueExtractor
 	}
 
 	@Override
-	public Collector<Object, ObjectStatistics, ObjectStatistics> getAggregator(final BiFunction<Object, Object, Object> f) {
+	public Collector<Object, ObjectStatistics, ObjectStatistics> getAggregator(final BiFunction<Object, Property, Object> f) {
 		return Collector.of((Supplier<@NonNull ObjectStatistics>) () -> new ObjectStatistics(),
-				(os1, os2) -> os1.add(f.apply(os2, propertyId)), (os1, os2) -> os1.mergeTo(os2), Function.identity());
+				(os1, os2) -> os1.add(f.apply(os2, nameType)), (os1, os2) -> os1.mergeTo(os2), Function.identity());
 	}
 
 	@SuppressWarnings("null")
@@ -83,7 +83,7 @@ public class ObjectValueExtractor
 
 	@Override
 	public String toString() {
-		return nameType.propertyId.toString();
+		return nameType.toString();
 	}
 
 }

@@ -12,20 +12,20 @@ import com.snap252.org.aggregators.NullableArithmeticsWrapper;
 import com.snap252.org.aggregators.NumberStatistics;
 import com.snap252.org.aggregators.PivotCollectors;
 import com.snap252.vaadin.pivot.AbstractFilteringComponent;
-import com.snap252.vaadin.pivot.NameType;
+import com.snap252.vaadin.pivot.Property;
 
 public abstract class AbstractNumberValueGetterRenderingComponent<T extends Number>
 		extends AbstractFilteringComponent<T> implements FilteringRenderingComponent<NumberStatistics<T>> {
 
-	public AbstractNumberValueGetterRenderingComponent(final NameType nameType) {
+	public AbstractNumberValueGetterRenderingComponent(final Property nameType) {
 		super(nameType);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public Collector<Object, MutableValue<@Nullable T>, @Nullable NumberStatistics<@Nullable T>> getAggregator(
-			final BiFunction<Object, Object, Object> f) {
-		return PivotCollectors.<@NonNull Object, @Nullable T>getNumberReducer(x -> (T) f.apply(x, propertyId), new NullableArithmeticsWrapper<>(createArithmetics()));
+			final BiFunction<Object, Property, Object> f) {
+		return PivotCollectors.<@NonNull Object, @Nullable T>getNumberReducer(x -> (T) f.apply(x, property), new NullableArithmeticsWrapper<>(createArithmetics()));
 	}
 
 	protected abstract Arithmetics<T> createArithmetics();

@@ -8,6 +8,7 @@ import java.util.stream.Collector;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.snap252.vaadin.pivot.PivotCellReference;
+import com.snap252.vaadin.pivot.Property;
 import com.snap252.vaadin.pivot.renderer.PivotRenderer;
 import com.snap252.vaadin.pivot.utils.ClassUtils;
 import com.vaadin.data.Item;
@@ -15,7 +16,7 @@ import com.vaadin.data.util.converter.Converter;
 import com.vaadin.ui.Grid.Column;
 
 public interface ModelAggregtor<VALUE> {
-	public Collector<Object, ?, ? extends VALUE> getAggregator(BiFunction<Object, Object, Object> f);
+	public Collector<Object, ?, ? extends VALUE> getAggregator(BiFunction<Object, Property, Object> f);
 
 	public RendererConverter<?, ? extends VALUE> createRendererConverter();
 

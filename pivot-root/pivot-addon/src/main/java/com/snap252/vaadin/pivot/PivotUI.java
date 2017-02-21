@@ -1,9 +1,6 @@
 package com.snap252.vaadin.pivot;
 
-import static java.util.stream.Collectors.toList;
-
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
@@ -34,6 +31,7 @@ import fi.jasoft.dragdroplayouts.DDVerticalLayout;
 public class PivotUI extends GridLayout {
 
 	private final HorizontalLayout properties;
+	private final GridRendererParameter<?> gridRendererParameter;
 
 	public PivotUI(final GridRendererParameter<?> gridRendererParameter) {
 		this(PivotGrid::new, gridRendererParameter);
@@ -42,6 +40,7 @@ public class PivotUI extends GridLayout {
 	public PivotUI(final Function<GridRendererParameter<?>, Component> f,
 			final GridRendererParameter<?> gridRendererParameter) {
 		super(2, 3);
+		this.gridRendererParameter = gridRendererParameter;
 		addStyleName("pivot");
 
 		setSpacing(true);
@@ -54,7 +53,23 @@ public class PivotUI extends GridLayout {
 			properties.setSpacing(true);
 			final DragAndDropWrapper rowDndWrapper = new DragAndDropWrapper(properties);
 			addComponents(renderer, rowDndWrapper);
+
+			{
+				final Component[] labels = gridRendererParameter.getProperties().stream().map(propertyId -> {
+					assert propertyId != null;
+					final Component button = new Button(propertyId.toString());
+					button.addStyleName(ValoTheme.BUTTON_SMALL);
+					button.setEnabled(false);
+					final DragAndDropWrapper wrapper = new DragAndDropWrapper(button);
+					wrapper.setDragStartMode(DragStartMode.COMPONENT);
+					wrapper.setData(propertyId);
+					return wrapper;
+				}).toArray(i -> new Component[i]);
+				properties.removeAllComponents();
+				properties.addComponents(labels);
+			}
 		}
+
 		{
 
 			final DDVerticalLayout aggregator = new DDVerticalLayout();
@@ -100,28 +115,36 @@ public class PivotUI extends GridLayout {
 		setColumnExpandRatio(1, 1);
 	}
 
-	public List<Item> setContainerDataSource(final Container container) {
-
-		// p = new
-		// BiBucketParameter<>(c.getItemIds().stream().map(c::getItem).collect(toList()),
-		// Collections.emptyList(),
-		// Collections.emptyList());
-
-		final Component[] labels = container.getContainerPropertyIds().stream().map(propertyId -> {
+	public void updateUI() {
+		final Component[] labels = gridRendererParameter.getProperties().stream().map(propertyId -> {
+			assert propertyId != null;
 			final Component button = new Button(propertyId.toString());
 			button.addStyleName(ValoTheme.BUTTON_SMALL);
 			button.setEnabled(false);
 			final DragAndDropWrapper wrapper = new DragAndDropWrapper(button);
 			wrapper.setDragStartMode(DragStartMode.COMPONENT);
-			wrapper.setData(new NameType(propertyId.toString(), container.getType(propertyId)));
+			wrapper.setData(propertyId);
 			return wrapper;
 		}).toArray(i -> new Component[i]);
 		properties.removeAllComponents();
 		properties.addComponents(labels);
-
-		return container.getItemIds().stream().map(container::getItem).collect(toList());
-
 	}
+
+	// public <X> List<X> setContainerDataSource(final PropertyProvider<X, ?>
+	// provider) {
+	//
+	//
+	// // p = new
+	// //
+	// BiBucketParameter<>(c.getItemIds().stream().map(c::getItem).collect(toList()),
+	// // Collections.emptyList(),
+	// // Collections.emptyList());
+	//
+	//
+	//
+	// return provider.getItems().collect(toList());
+	//
+	// }
 
 	public static Container cloneContainer(final Container origContainer) {
 		return cloneContainer(origContainer, f -> f);
@@ -130,7 +153,7 @@ public class PivotUI extends GridLayout {
 	public static Container cloneContainer(final Container origContainer,
 			final Function<@NonNull Object, @Nullable Object> f) {
 		final Map<Object, Class<?>> m0 = origContainer.getContainerPropertyIds().stream()
-				.filter(propertyId -> f.apply(propertyId) != null)
+				.filter(propertyId -> f.apply(Objects.requireNonNull(propertyId)) != null)
 				.collect(Collectors.toMap(f, origContainer::getType, (u, v) -> {
 					throw new IllegalStateException(String.format("Duplicate key %s", u));
 				}, LinkedHashMap::new));
@@ -141,6 +164,7 @@ public class PivotUI extends GridLayout {
 					final LinkedHashMap<Object, @Nullable Object> v = new LinkedHashMap<>();
 					item.getItemPropertyIds().forEach(propertyId -> {
 
+						assert propertyId != null;
 						final Object newPropertyId = f.apply(propertyId);
 						if (newPropertyId != null)
 							v.put(newPropertyId, Objects.requireNonNull(item.getItemProperty(propertyId)).getValue());

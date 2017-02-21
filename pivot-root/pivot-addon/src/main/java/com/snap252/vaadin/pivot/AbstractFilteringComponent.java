@@ -5,22 +5,19 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 @NonNullByDefault
 public abstract class AbstractFilteringComponent<T> implements FilteringComponent<T> {
 
-	protected final NameType nameType;
-	protected final Object propertyId;
+	protected final Property property;
 
 	@Override
-	public Object getPropertyId() {
-		return propertyId;
+	public Property getProperty() {
+		return property;
 	}
 
-	public AbstractFilteringComponent(final NameType nameType) {
-		this.nameType = nameType;
-		this.propertyId = nameType.propertyId;
+	public AbstractFilteringComponent(final Property nameType) {
+		this.property = nameType;
 	}
 
 	@Override
 	public String toString() {
-		return nameType.propertyId.toString();
+		return property.toString();
 	}
-
 }

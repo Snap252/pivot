@@ -12,7 +12,7 @@ public class Property {
 		this.name = name;
 	}
 
-	Class<?> getType() {
+	public Class<?> getType() {
 		return clazz;
 	}
 
@@ -21,7 +21,7 @@ public class Property {
 	}
 
 	@Override
-	public String toString() {
+	public final String toString() {
 		return name;
 	}
 }

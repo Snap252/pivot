@@ -9,7 +9,7 @@ import org.vaadin.hene.popupbutton.PopupButton.PopupVisibilityEvent;
 import org.vaadin.hene.popupbutton.PopupButton.PopupVisibilityListener;
 
 import com.snap252.vaadin.pivot.DropHandlerImplementation;
-import com.snap252.vaadin.pivot.NameType;
+import com.snap252.vaadin.pivot.Property;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.Alignment;
@@ -34,7 +34,7 @@ public class ValueGetterDnDHandler extends DropHandlerImplementation<FilteringRe
 
 	@Override
 	protected FilteringRenderingComponent<?> createNew(final Object data) {
-		return valueFactory.createFilter((NameType) data);
+		return valueFactory.createFilter((Property) data);
 	}
 
 	@Override

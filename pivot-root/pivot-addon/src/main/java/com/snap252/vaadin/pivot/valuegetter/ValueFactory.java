@@ -2,20 +2,15 @@ package com.snap252.vaadin.pivot.valuegetter;
 
 import java.math.BigDecimal;
 
-import com.snap252.vaadin.pivot.NameType;
+import com.snap252.vaadin.pivot.Property;
 
 public class ValueFactory {
-	protected FilteringRenderingComponent<?> createFilter(final NameType n) {
-		if (BigDecimal.class.isAssignableFrom(n.type))
+	protected FilteringRenderingComponent<?> createFilter(final Property n) {
+		if (BigDecimal.class.isAssignableFrom(n.getType()))
 			return new BigDecimalValueExtractor(n);
-		if (Integer.class.isAssignableFrom(n.type))
+		if (Integer.class.isAssignableFrom(n.getType()))
 			return new IntValueExtractor(n);
 
 		return new ObjectValueExtractor(n);
 	}
-
-	protected boolean isAccepted(final NameType n) {
-		return true;
-	}
-
 }

@@ -25,7 +25,8 @@ import com.snap252.vaadin.pivot.valuegetter.ModelAggregtor;
 @NonNullByDefault
 public final class GridRendererParameter<LIST_INPUT_TYPE> {
 	private List<LIST_INPUT_TYPE> values = new ArrayList<>();
-	private final BiFunction<LIST_INPUT_TYPE, Object, Object> mappingFuncion;
+	private final BiFunction<LIST_INPUT_TYPE, Property, Object> mappingFuncion;
+	private final PropertyProvider<LIST_INPUT_TYPE, ?> provider;
 
 	enum GridRendererChangeParameterKind {
 		ROW_FNKT, COL_FNKT, VALUES, AGGREGATOR, CONVERTER, RENDERER
@@ -33,8 +34,13 @@ public final class GridRendererParameter<LIST_INPUT_TYPE> {
 		;
 	}
 
-	public GridRendererParameter(final BiFunction<LIST_INPUT_TYPE, Object, Object> mappingFuncion) {
-		this.mappingFuncion = mappingFuncion;
+	public <Z extends Property> GridRendererParameter(final PropertyProvider<LIST_INPUT_TYPE, Z> provider) {
+		this.mappingFuncion = ((x, y) -> provider.getValue(x, (Z) y));
+		this.provider = provider;
+	}
+
+	public Collection<? extends Property> getProperties(){
+		return provider.getProperties();
 	}
 
 	@FunctionalInterface
@@ -80,8 +86,9 @@ public final class GridRendererParameter<LIST_INPUT_TYPE> {
 	}
 
 	public Collector<Object, ?, ?> getCollector() {
+		assert mappingFuncion != null;
 		@SuppressWarnings("unchecked")
-		final BiFunction<Object, Object, Object> mappingFuncion2 = (BiFunction<Object, Object, Object>) mappingFuncion;
+		final BiFunction<Object, Property, Object> mappingFuncion2 = (BiFunction<Object, Property, Object>) mappingFuncion;
 		return modelAggregator.getAggregator(mappingFuncion2);
 	}
 
@@ -114,7 +121,7 @@ public final class GridRendererParameter<LIST_INPUT_TYPE> {
 		colFunctionsUpated();
 	}
 
-	private <T> T mapTo(final LIST_INPUT_TYPE lit, final Object propertyId) {
+	private <T> T mapTo(final LIST_INPUT_TYPE lit, final Property propertyId) {
 		return cast(mappingFuncion.apply(lit, propertyId));
 	}
 
@@ -126,12 +133,12 @@ public final class GridRendererParameter<LIST_INPUT_TYPE> {
 	private Collection<PivotCriteria<LIST_INPUT_TYPE, Object>> toPivotCriterias(
 			final List<? extends FilteringComponent<?>> colFnkt) {
 		return colFnkt.stream().map((Function<FilteringComponent<?>, PivotCriteria<LIST_INPUT_TYPE, Object>>) cf -> {
-			final Object propertyId = cf.getPropertyId();
-			final String name = String.valueOf(propertyId);
+			final Property property = cf.getProperty();
+			final String name = String.valueOf(property);
 			return new PivotCriteria<LIST_INPUT_TYPE, Object>() {
 				@Override
 				public Object apply(final LIST_INPUT_TYPE t) {
-					return cf.round(mapTo(t, propertyId));
+					return cf.round(mapTo(t, property));
 				}
 
 				@Override
@@ -182,5 +189,4 @@ public final class GridRendererParameter<LIST_INPUT_TYPE> {
 		fireEvent(GridRendererChangeParameterKind.AGGREGATOR);
 	}
 
-	// public void Supplier<Stream
 }

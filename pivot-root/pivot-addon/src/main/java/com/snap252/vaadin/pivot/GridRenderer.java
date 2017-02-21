@@ -31,10 +31,16 @@ final class GridRenderer {
 
 	<X> GridRenderer(final GridRendererParameter<X> gridParameter, final Grid grid) throws IllegalArgumentException {
 		final BucketContainer<X> bucketContainer = new BucketContainer<>(gridParameter);
-		grid.setContainerDataSource(bucketContainer);
 
 		gridParameter.addParameterChangeListener(GridRendererChangeParameterKind.AGGREGATOR,
 				_ignore -> updateGridColumns(grid, _ignore.gridParameter.getModelAggregator()));
+
+		//work around for : https://github.com/vaadin/framework/issues/8638
+		final PropertySetChangeListener columnsChanged0 = _ignore -> {
+			cleanupGridHeader(grid);
+		};
+		bucketContainer.addPropertySetChangeListener(columnsChanged0);
+		grid.setContainerDataSource(bucketContainer);
 
 		final PropertySetChangeListener columnsChanged = _ignore -> {
 			updateGridColumns(grid, gridParameter.getModelAggregator());
@@ -55,7 +61,7 @@ final class GridRenderer {
 			} else
 				column.setMinimumWidth(170);
 		});
-		grid.setFrozenColumnCount(1);
+		// grid.setFrozenColumnCount(1);
 	}
 
 	// private final ModelAggregtorDelegate aggregatorDelegator = new
@@ -98,18 +104,26 @@ final class GridRenderer {
 
 	private void updateGridHeader(final Grid grid, final Bucket<?> colBucket, final int depth) {
 		assert colBucket != null;
-		for (int i = grid.getHeaderRowCount() - 1; i >= 0; i--) {
-			grid.removeHeaderRow(i);
-		}
+		cleanupGridHeader(grid);
 		grid.setDefaultHeaderRow(null);
+
 		for (int i = 0; i <= depth; i++) {
-			grid.appendHeaderRow();
+			final HeaderRow row = grid.appendHeaderRow();
+			if (i == depth) {
+				grid.setDefaultHeaderRow(row);
+			}
 		}
 
 		grid.setCellDescriptionGenerator(null);
 		grid.setRowDescriptionGenerator(null);
 
 		doHeader(grid, colBucket, 0);
+	}
+
+	private void cleanupGridHeader(final Grid grid) {
+		for (int i = grid.getHeaderRowCount() - 1; i >= 0; i--) {
+			grid.removeHeaderRow(i);
+		}
 	}
 
 	protected void doHeader(final Grid g, final Bucket<?> b, final int depth) {
@@ -135,8 +149,6 @@ final class GridRenderer {
 				final HeaderCell ownCellInChildRow = childRow.getCell(b);
 				ownCellInChildRow.setComponent(
 						createChildCollapseButton(g, b.stream().filter(b0 -> b0 != b).collect(toList()), SUM_TEXT));
-
-				ownCellInChildRow.setStyleName("depth-" + depth);
 			}
 		} else {
 			meAndMyChildren = headerRow.getCell(b);

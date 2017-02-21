@@ -40,7 +40,7 @@ public class CopyBucket<V, W> extends Bucket<V> {
 					return child;
 				}
 			}
-			return null;
+			throw new AssertionError();
 		});
 	}
 

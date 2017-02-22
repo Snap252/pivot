@@ -15,9 +15,10 @@ import org.eclipse.jdt.annotation.Nullable;
 public abstract class Bucket<V> implements Predicate<@NonNull V> {
 	// private final Predicate<V> predicate;
 
+	@Nullable
 	public final Object bucketValue;
 
-	private final PivotCriteria<V, ?> extractor;
+	private final PivotCriteria<V, @Nullable ?> extractor;
 
 	protected final Collection<V> values;
 
@@ -29,8 +30,8 @@ public abstract class Bucket<V> implements Predicate<@NonNull V> {
 	@Nullable
 	public final Bucket<V> parent;
 
-	public Bucket(final Object bucketValue, final @Nullable Bucket<V> parent, final PivotCriteria<V, ?> extractor,
-			final Collection<V> values, final int level) {
+	public Bucket(@Nullable final Object bucketValue, final @Nullable Bucket<V> parent,
+			final PivotCriteria<V, @Nullable ?> extractor, final Collection<V> values, final int level) {
 		this.bucketValue = bucketValue;
 		this.parent = parent;
 		this.extractor = extractor;
@@ -38,6 +39,7 @@ public abstract class Bucket<V> implements Predicate<@NonNull V> {
 		this.level = level;
 	}
 
+	@Nullable
 	public final Object getBucketValue() {
 		return bucketValue;
 	}
@@ -48,7 +50,7 @@ public abstract class Bucket<V> implements Predicate<@NonNull V> {
 	}
 
 	public final @Nullable String getFormattedBucketValue() {
-		return extractor.format(cast(bucketValue));
+		return bucketValue != null ? extractor.format(cast(bucketValue)) : null;
 	}
 
 	@Override
@@ -87,8 +89,10 @@ public abstract class Bucket<V> implements Predicate<@NonNull V> {
 	public boolean test(final V v) {
 		assert parent != null;
 		assert extractor != null;
+		@Nullable
 		final Object extractedValue = extractor.apply(v);
-		return /* parent.test(v) && */bucketValue.equals(extractedValue);
+		return bucketValue == null && extractedValue == null
+				|| bucketValue != null && bucketValue.equals(extractedValue);
 	}
 
 	public final Stream<V> filterOwnValues(final Predicate<V> f) {

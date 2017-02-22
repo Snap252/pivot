@@ -110,7 +110,9 @@ public class BiBucket<RAW> {
 				final int colSpan = row.getSize(1);
 				w.write(MessageFormat.format("<th colspan=''{0}'' rowspan=''{1}'' class=''{2}''>", colSpan,
 						row.getChildren() == null ? 2 : 1, ""));
-				w.write(row.bucketValue.toString());
+				@Nullable
+				final String formattedBucketValue = row.getFormattedBucketValue();
+				w.write(formattedBucketValue != null ? formattedBucketValue : "---");
 				w.write("</th>");
 
 				if (row.getChildren() != null) {

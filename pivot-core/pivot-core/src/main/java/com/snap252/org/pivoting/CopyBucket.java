@@ -48,8 +48,8 @@ public class CopyBucket<V, W> extends Bucket<V> {
 
 	public CopyBucket(final Bucket<V> origBucket, final Collection<V> valuesBase, final Collector<V, W, W> collector,
 			final Collector<W, W, W> collector2, @Nullable final CopyBucket<V, W> parent) {
-		super(origBucket.bucketValue, parent, (PivotCriteria<V, String>) (x -> ""), origBucket.filter(valuesBase),
-				origBucket.getLevel());
+		super(origBucket.bucketValue, parent, (PivotCriteria<V, @Nullable String>) (x -> ""),
+				origBucket.filter(valuesBase), origBucket.getLevel());
 		this.origBucket = origBucket;
 
 		final Collection<? extends Bucket<V>> origChildren = origBucket.getChildren();

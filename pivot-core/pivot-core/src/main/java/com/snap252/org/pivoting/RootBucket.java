@@ -14,8 +14,8 @@ public class RootBucket<V> extends SubBucket<V> {
 		super(prefix, partitionCriterionsAndSubCriterions, null, createUniquePivotCriteria(), values, 0);
 	}
 
-	public static <V> NamedPivotCriteria<V, @NonNull String> createUniquePivotCriteria() {
-		return new NamedPivotCriteria<V, String>(_ignore -> "", "r");
+	public static <V> NamedPivotCriteria<V, @Nullable String> createUniquePivotCriteria() {
+		return new NamedPivotCriteria<V, @Nullable String>(_ignore -> "", "r");
 	}
 
 	@SafeVarargs

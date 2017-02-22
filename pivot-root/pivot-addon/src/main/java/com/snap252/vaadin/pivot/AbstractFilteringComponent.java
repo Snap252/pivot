@@ -7,19 +7,19 @@ import org.eclipse.jdt.annotation.Nullable;
 public abstract class AbstractFilteringComponent<INPUT_TYPE, @Nullable DATA_TYPE>
 		implements FilteringComponent<INPUT_TYPE, DATA_TYPE> {
 
-	protected final Property<INPUT_TYPE, @Nullable DATA_TYPE> property;
+	protected final Property<INPUT_TYPE, DATA_TYPE> property;
 
 	@Override
 	public Property<INPUT_TYPE, DATA_TYPE> getProperty() {
 		return property;
 	}
 
-	public AbstractFilteringComponent(final Property<INPUT_TYPE, @Nullable DATA_TYPE> nameType) {
-		this.property = nameType;
+	public AbstractFilteringComponent(final Property<INPUT_TYPE, @Nullable DATA_TYPE> property) {
+		this.property = property;
 	}
 
 	@Override
 	public String toString() {
-		return property.toString();
+		return property.getName();
 	}
 }

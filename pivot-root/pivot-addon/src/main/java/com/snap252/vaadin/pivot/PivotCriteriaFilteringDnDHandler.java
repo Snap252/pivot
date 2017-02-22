@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.vaadin.hene.popupbutton.PopupButton;
 import org.vaadin.hene.popupbutton.PopupButton.PopupVisibilityEvent;
 import org.vaadin.hene.popupbutton.PopupButton.PopupVisibilityListener;
@@ -18,13 +19,15 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 @NonNullByDefault
-public class PivotCriteriaFilteringDnDHandler extends DropHandlerImplementation<FilteringComponent<?, ?>> {
+public class PivotCriteriaFilteringDnDHandler<INPUT_TYPE>
+		extends DropHandlerImplementation<FilteringComponent<INPUT_TYPE, ?>> {
 
 	private final FilterFactory filterFactory = new FilterFactory();
 	private final Runnable refererOfPropertyChanged;
 
 	public PivotCriteriaFilteringDnDHandler(final AbstractOrderedLayout cols, final boolean vertical,
-			final Consumer<List<FilteringComponent<?, ?>>> refresher, final Runnable refererOfPropertyChanged) {
+			final Consumer<List<FilteringComponent<INPUT_TYPE, ?>>> refresher,
+			final Runnable refererOfPropertyChanged) {
 		super(cols, vertical, refresher);
 		this.refererOfPropertyChanged = refererOfPropertyChanged;
 	}
@@ -33,13 +36,14 @@ public class PivotCriteriaFilteringDnDHandler extends DropHandlerImplementation<
 		refererOfPropertyChanged.run();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	protected FilteringComponent<?, ?> createNew(final Object data) {
-		return filterFactory.createFilter((Property<?, ?>) data);
+	protected FilteringComponent<INPUT_TYPE, ?> createNew(final Object data) {
+		return filterFactory.createFilter((Property<INPUT_TYPE, @Nullable ?>) data);
 	}
 
 	@Override
-	protected AbstractComponent createUIComponent(final FilteringComponent<?, ?> createFilter) {
+	protected AbstractComponent createUIComponent(final FilteringComponent<INPUT_TYPE, ?> createFilter) {
 		final AbstractComponent component = createFilter.getComponent();
 
 		final Button b;

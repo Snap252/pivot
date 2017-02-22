@@ -5,7 +5,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 @NonNullByDefault
 public abstract class Property<INPUT_TYPE, @Nullable OUTPUT_TYPE> {
-	private final Class<@Nullable OUTPUT_TYPE> clazz;
+	protected final Class<@Nullable OUTPUT_TYPE> clazz;
 	private final String name;
 
 	public Property(final Class<@Nullable OUTPUT_TYPE> clazz, final String name) {

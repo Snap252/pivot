@@ -84,7 +84,7 @@ public class PivotUI extends GridLayout {
 
 			final DDHorizontalLayout cols = new DDHorizontalLayout();
 			cols.addStyleName("pivot-ui-cols");
-			final DropHandler dropHandler = new PivotCriteriaFilteringDnDHandler(cols, false,
+			final DropHandler dropHandler = new PivotCriteriaFilteringDnDHandler<INPUT_TYPE>(cols, false,
 					gridRendererParameter::setColFnkt, gridRendererParameter::colFunctionsUpated);
 			cols.setDropHandler(dropHandler);
 			cols.setSpacing(true);
@@ -97,7 +97,7 @@ public class PivotUI extends GridLayout {
 		{
 			final DDVerticalLayout rows = new DDVerticalLayout();
 			rows.addStyleName("pivot-ui-rows");
-			final DropHandler dropHandler = new PivotCriteriaFilteringDnDHandler(rows, true,
+			final DropHandler dropHandler = new PivotCriteriaFilteringDnDHandler<INPUT_TYPE>(rows, true,
 					gridRendererParameter::setRowFnkt, gridRendererParameter::rowFunctionsUpated);
 			rows.setDropHandler(dropHandler);
 			rows.setSpacing(true);

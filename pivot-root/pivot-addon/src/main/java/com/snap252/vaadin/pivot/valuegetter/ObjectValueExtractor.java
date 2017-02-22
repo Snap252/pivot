@@ -5,7 +5,6 @@ import static java.util.Objects.requireNonNull;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collector;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -18,8 +17,8 @@ import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
 
-public class ObjectValueExtractor<INPUT_TYPE> implements FilteringRenderingComponent<INPUT_TYPE, ObjectStatistics> {
-	protected final Property<INPUT_TYPE, ?> nameType;
+public class ObjectValueExtractor<INPUT_TYPE> implements FilteringRenderingComponent<INPUT_TYPE, @Nullable Object> {
+	protected final Property<INPUT_TYPE, ?> property;
 	// protected final Object propertyId;
 	private final AbstractComponent comp;
 
@@ -28,7 +27,7 @@ public class ObjectValueExtractor<INPUT_TYPE> implements FilteringRenderingCompo
 	private WhatOfObjectStatisticsToShow whatToRender = WhatOfObjectStatisticsToShow.cnt;
 
 	public ObjectValueExtractor(final Property<INPUT_TYPE, ?> nameType) {
-		this.nameType = nameType;
+		this.property = nameType;
 		// this.propertyId = nameType.propertyId;
 		final FormLayout formLayout = new FormLayout();
 
@@ -56,8 +55,8 @@ public class ObjectValueExtractor<INPUT_TYPE> implements FilteringRenderingCompo
 
 	@Override
 	public Collector<INPUT_TYPE, ObjectStatistics, ObjectStatistics> getAggregator() {
-		return Collector.of((Supplier<@NonNull ObjectStatistics>) () -> new ObjectStatistics(),
-				(os1, os2) -> os1.add(nameType.getValue(os2)), ObjectStatistics::mergeTo, Function.identity());
+		return Collector.of(() -> new ObjectStatistics(),
+				(os1, os2) -> os1.add(property.getValue(os2)), ObjectStatistics::mergeTo, Function.identity());
 	}
 
 	@SuppressWarnings("null")
@@ -80,7 +79,7 @@ public class ObjectValueExtractor<INPUT_TYPE> implements FilteringRenderingCompo
 
 	@Override
 	public String toString() {
-		return nameType.toString();
+		return property.toString();
 	}
 
 }

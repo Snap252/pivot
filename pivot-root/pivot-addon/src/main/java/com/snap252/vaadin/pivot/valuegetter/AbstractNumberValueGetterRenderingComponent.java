@@ -18,8 +18,8 @@ public abstract class AbstractNumberValueGetterRenderingComponent<INPUT_TYPE, @N
 		extends AbstractFilteringComponent<INPUT_TYPE, @Nullable T>
 		implements FilteringRenderingComponent<INPUT_TYPE, @Nullable NumberStatistics<T>> {
 
-	public AbstractNumberValueGetterRenderingComponent(final Property<INPUT_TYPE, @Nullable T> nameType) {
-		super(nameType);
+	public AbstractNumberValueGetterRenderingComponent(final Property<INPUT_TYPE, @Nullable T> property) {
+		super(property);
 	}
 
 	@Override

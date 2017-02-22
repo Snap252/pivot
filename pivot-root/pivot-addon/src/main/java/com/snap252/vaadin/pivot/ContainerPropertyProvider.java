@@ -23,11 +23,14 @@ public class ContainerPropertyProvider extends PropertyProvider<Item, ItemProper
 			this.itemPropertyId = itemPropertyId;
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public @Nullable OUTPUT_TYPE getValue(final Item o) {
 			final com.vaadin.data.Property<?> itemProperty = o.getItemProperty(itemPropertyId);
-			assert itemProperty != null;
-			return (@Nullable OUTPUT_TYPE) itemProperty.getValue();
+			assert itemProperty != null : itemPropertyId + ": does not exist.";
+			final Object rawValue = itemProperty.getValue();
+			assert rawValue == null || clazz.isAssignableFrom(rawValue.getClass());
+			return (@Nullable OUTPUT_TYPE) rawValue;
 		}
 	}
 
@@ -43,6 +46,7 @@ public class ContainerPropertyProvider extends PropertyProvider<Item, ItemProper
 		return c.getItemIds().stream().map(c::getItem);
 	}
 
+	@SuppressWarnings("null")
 	@Override
 	public Collection<ItemProperty<?>> getProperties() {
 		return c.getContainerPropertyIds().stream().map(propertyId -> {

@@ -57,7 +57,7 @@ public class DateFilteringComponent<INPUT_TYPE> extends AbstractFilteringCompone
 	}
 
 	@Override
-	public @Nullable String format(final Date date) {
+	public @Nullable String format(final @Nullable Date date) {
 		if (date == null)
 			return null;
 		return getDateFormat().format(date);

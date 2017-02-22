@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.vaadin.hene.popupbutton.PopupButton;
 import org.vaadin.hene.popupbutton.PopupButton.PopupVisibilityEvent;
 import org.vaadin.hene.popupbutton.PopupButton.PopupVisibilityListener;
@@ -18,7 +19,8 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-public class ValueGetterDnDHandler<INPUT_TYPE> extends DropHandlerImplementation<FilteringRenderingComponent<INPUT_TYPE, ?>> {
+public class ValueGetterDnDHandler<INPUT_TYPE>
+		extends DropHandlerImplementation<FilteringRenderingComponent<INPUT_TYPE, ?>> {
 
 	private final ValueFactory valueFactory = new ValueFactory();
 	private final Runnable upateAggregator;
@@ -32,9 +34,10 @@ public class ValueGetterDnDHandler<INPUT_TYPE> extends DropHandlerImplementation
 		this.upateRenderer = upateRenderer;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected FilteringRenderingComponent<INPUT_TYPE, ?> createNew(final Object data) {
-		return valueFactory.createFilter((Property<INPUT_TYPE, ?>) data);
+		return valueFactory.createFilter((Property<INPUT_TYPE, @Nullable ?>) data);
 	}
 
 	@Override

@@ -5,9 +5,10 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 @FunctionalInterface
-public interface PivotCriteria<F, T> extends Function<@NonNull F, @NonNull T>, Comparator<@NonNull T> {
+public interface PivotCriteria<F, T> extends Function<@NonNull F, @Nullable T>, Comparator<@NonNull T> {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
@@ -20,7 +21,7 @@ public interface PivotCriteria<F, T> extends Function<@NonNull F, @NonNull T>, C
 		return 0;
 	}
 
-	default String format(final T t) {
-		return Objects.toString(t);
+	default @Nullable String format(final T t) {
+		return t == null ? null : Objects.toString(t);
 	}
 }

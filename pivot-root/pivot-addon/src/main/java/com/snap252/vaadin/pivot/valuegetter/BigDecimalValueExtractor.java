@@ -173,7 +173,7 @@ public class BigDecimalValueExtractor<INPUT_TYPE>
 	// }
 
 	@Override
-	public RendererConverter<BigDecimal, ? extends NumberStatistics<BigDecimal>> createRendererConverter() {
+	public RendererConverter<@Nullable BigDecimal, ? extends NumberStatistics<BigDecimal>> createRendererConverter() {
 		final BigDecimalRenderer renderer = new BigDecimalRenderer("---");
 		final String numberFormat = numberFormatTextField.getValue();
 		assert numberFormat != null;

@@ -47,7 +47,7 @@ public abstract class Bucket<V> implements Predicate<@NonNull V> {
 		return (T) o;
 	}
 
-	public final String getFormattedBucketValue() {
+	public final @Nullable String getFormattedBucketValue() {
 		return extractor.format(cast(bucketValue));
 	}
 

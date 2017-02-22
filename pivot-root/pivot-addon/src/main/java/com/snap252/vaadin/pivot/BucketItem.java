@@ -25,15 +25,17 @@ final class BucketItem<INPUT_TYPE> implements Item {
 	 */
 	private final BucketContainer<INPUT_TYPE> bucketContainer;
 
-	final class CellProperty implements Property<PivotCellReference<?, ?>>, Property.ValueChangeNotifier {
+	final class CellProperty implements Property<PivotCellReference<?, INPUT_TYPE>>, Property.ValueChangeNotifier {
 
 		private final Bucket<INPUT_TYPE> colBucket;
 		@Nullable
-		private PivotCellReference<?, ?> cachedPivotCellReference;
+		private PivotCellReference<?, INPUT_TYPE> cachedPivotCellReference;
 
+		@SuppressWarnings("all")
 		public CellProperty(final Bucket<INPUT_TYPE> colBucket) {
 			this.colBucket = colBucket;
 			assert rowBucket != colBucket;
+			/*seems to be a bug in eclipse -> thats why suppress all*/
 			bucketContainer.propertyResetter.add(this);
 		}
 
@@ -67,7 +69,7 @@ final class BucketItem<INPUT_TYPE> implements Item {
 		}
 
 		@Override
-		public PivotCellReference<?, ?> getValue() {
+		public PivotCellReference<?, INPUT_TYPE> getValue() {
 			if (cachedPivotCellReference != null)
 				return cachedPivotCellReference;
 
@@ -79,12 +81,12 @@ final class BucketItem<INPUT_TYPE> implements Item {
 		}
 
 		@Override
-		public void setValue(@Nullable final PivotCellReference<?, ?> newValue) throws ReadOnlyException {
+		public void setValue(@Nullable final PivotCellReference<?, INPUT_TYPE> newValue) throws ReadOnlyException {
 			throw new ReadOnlyException();
 		}
 
 		@Override
-		public Class<PivotCellReference<?, Item>> getType() {
+		public Class<PivotCellReference<?, INPUT_TYPE>> getType() {
 			return ClassUtils.cast(PivotCellReference.class);
 		}
 
@@ -126,19 +128,20 @@ final class BucketItem<INPUT_TYPE> implements Item {
 		this.rowBucket = itemId;
 	}
 
-	private final Map<Bucket<INPUT_TYPE>, CellProperty> cache = new HashMap<>();
+	private final Map<Bucket<INPUT_TYPE>, CellProperty> colCache = new HashMap<>();
 
-	@SuppressWarnings({ "unchecked" })
+	@SuppressWarnings({ "unchecked", "null" })
 	@Override
 	public @NonNull Property<?> getItemProperty(final Object id) {
 		if (id == GridRenderer.COLLAPSE_COL_PROPERTY_ID) {
-			return new ObjectProperty<>(rowBucket.getFormattedBucketValue(), String.class);
+			return new ObjectProperty<@Nullable String>(rowBucket.getFormattedBucketValue(),
+					(String.class));
 		}
 		return getForColumn((Bucket<INPUT_TYPE>) id);
 	}
 
 	protected CellProperty getForColumn(final Bucket<INPUT_TYPE> id) {
-		return cache.computeIfAbsent(id, CellProperty::new);
+		return colCache.computeIfAbsent(id, CellProperty::new);
 	}
 
 	@SuppressWarnings("null")

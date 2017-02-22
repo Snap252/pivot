@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
 public class SubBucket<V> extends Bucket<V> {
@@ -31,24 +32,28 @@ public class SubBucket<V> extends Bucket<V> {
 			children = null;
 	}
 
-	protected <A> List<Bucket<V>> createChildren(
-			final List<? extends PivotCriteria<V, ?>> partitionCriterionsAndSubCriterions,
+	protected <@Nullable A> List<Bucket<V>> createChildren(
+			final List<? extends PivotCriteria<V, A>> partitionCriterionsAndSubCriterions,
 			@Nullable final SubBucket<V> parent, final Collection<V> values, final int level) {
-		@SuppressWarnings("unchecked")
-		final PivotCriteria<V, A> ownCriterion = (PivotCriteria<V, A>) partitionCriterionsAndSubCriterions.get(0);
 
-		@SuppressWarnings("null")
-		final Collector<V, ?, Map<A, List<V>>> groupingBy = Collectors.groupingBy(ownCriterion::apply);
-		final Map<A, List<V>> collect = values.stream().filter(this).collect(groupingBy);
+		@NonNull
+		final PivotCriteria<V, A> ownCriterion = partitionCriterionsAndSubCriterions.get(0);
+
+		final Collector<@NonNull V, ?, Map<@Nullable A, List<V>>> groupingBy = Collectors
+				.groupingBy(ownCriterion::apply);
+		final Map<@Nullable A, List<V>> collect = values.stream().filter(this).collect(groupingBy);
 
 		final List<? extends PivotCriteria<V, ?>> childCriterions = partitionCriterionsAndSubCriterions.subList(1,
 				partitionCriterionsAndSubCriterions.size());
 
 		assert childCriterions.size() == partitionCriterionsAndSubCriterions.size() - 1;
 
-		final List<Bucket<V>> children$ = collect.entrySet().stream().sorted(Entry.comparingByKey(ownCriterion))
-				.map(e -> new SubBucket<V>(e.getKey(), childCriterions, this, ownCriterion, e.getValue(), level + 1))
-				.collect(Collectors.toList());
+		final List<Bucket<V>> children$ = collect.entrySet().stream()
+				.sorted(Entry.comparingByKey(ownCriterion::compare)).map(e -> {
+					final Object key = e.getKey();
+					return new SubBucket<V>(key != null ? key : "---", childCriterions, this, ownCriterion,
+							e.getValue(), level + 1);
+				}).collect(Collectors.toList());
 
 		assert children$.stream().flatMap(c -> c.values.stream()).collect(toSet()).equals(new HashSet<V>(
 				values)) : parent/*

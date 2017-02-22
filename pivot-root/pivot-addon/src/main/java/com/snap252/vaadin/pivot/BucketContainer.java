@@ -44,7 +44,7 @@ class BucketContainer<INPUT_TYPE>
 	}
 
 	final Collection<ValueChangeListener> valueChangeListeners = new HashSet<>();
-	public final Collection<BucketItem<?>.CellProperty> propertyResetter = new HashSet<>();
+	public final Collection<BucketItem<INPUT_TYPE>.CellProperty> propertyResetter = new HashSet<>();
 
 	private void resetPropertiesAndFireValueChange() {
 		propertyResetter.forEach(CellProperty::resetValue);
@@ -336,6 +336,7 @@ class BucketContainer<INPUT_TYPE>
 
 	private void fireItemSetChanged() {
 		rowCache.clear();
+		propertyResetter.clear();
 		final ItemSetChangeEvent event = new ItemSetChangeEvent() {
 			@Override
 			public Container getContainer() {
@@ -349,6 +350,7 @@ class BucketContainer<INPUT_TYPE>
 
 	private void firePropertySetSetChanged() {
 		rowCache.clear();
+		propertyResetter.clear();
 		final PropertySetChangeEvent event = new PropertySetChangeEvent() {
 			@Override
 			public Container getContainer() {

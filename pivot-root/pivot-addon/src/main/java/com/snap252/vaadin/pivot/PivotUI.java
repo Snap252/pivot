@@ -150,6 +150,7 @@ public class PivotUI extends GridLayout {
 		return cloneContainer(origContainer, f -> f);
 	}
 
+	@SuppressWarnings("null")
 	public static Container cloneContainer(final Container origContainer,
 			final Function<@NonNull Object, @Nullable Object> f) {
 		final Map<Object, Class<?>> m0 = origContainer.getContainerPropertyIds().stream()

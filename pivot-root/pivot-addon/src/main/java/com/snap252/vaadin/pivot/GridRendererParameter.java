@@ -9,10 +9,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.stream.Collector;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -110,40 +108,38 @@ public final class GridRendererParameter<INPUT_TYPE, VALUE_TYPE> {
 	// return "";
 	// }
 
-	public <T> void setColFnkt(final List<? extends FilteringComponent<?, ?>> colFnkt) {
+	public <T> void setColFnkt(final List<? extends FilteringComponent<INPUT_TYPE, ?>> colFnkt) {
 		this.colFnkt.clear();
 
 		this.colFnkt.addAll(toPivotCriterias(colFnkt));
 		colFunctionsUpated();
 	}
 
-	@SuppressWarnings("unchecked")
-	private static <@Nullable T> T cast(final Object o) {
-		return (T) o;
+	private <@Nullable X> PivotCriteria<INPUT_TYPE, X> cast(final FilteringComponent<INPUT_TYPE, X> cf) {
+
+		final Property<INPUT_TYPE, X> property = cf.getProperty();
+
+		return new PivotCriteria<INPUT_TYPE, @Nullable X>() {
+			@Override
+			public @Nullable X apply(final INPUT_TYPE t) {
+				return cf.round(property.getValue(t));
+			}
+
+			@Override
+			public @Nullable String format(final X t) {
+				return cf.format(t);
+			}
+
+			@Override
+			public String toString() {
+				return property.getName();
+			}
+		};
 	}
 
-	private Collection<PivotCriteria<INPUT_TYPE, Object>> toPivotCriterias(
-			final List<? extends FilteringComponent<?, ?>> colFnkt) {
-		return colFnkt.stream().map((Function<FilteringComponent<?, ?>, PivotCriteria<INPUT_TYPE, Object>>) cf -> {
-			final Property<Object, ?> property = (Property<@NonNull Object, ?>) cf.getProperty();
-			final String name = String.valueOf(property);
-			return new PivotCriteria<INPUT_TYPE, Object>() {
-				@Override
-				public Object apply(final INPUT_TYPE t) {
-					return cf.round(cast(property.getValue(t)));
-				}
-
-				@Override
-				public String format(final Object t) {
-					return cf.format(cast(t));
-				}
-
-				@Override
-				public String toString() {
-					return name;
-				}
-			};
-		}).collect(toList());
+	private Collection<PivotCriteria<INPUT_TYPE, @Nullable ?>> toPivotCriterias(
+			final List<? extends FilteringComponent<INPUT_TYPE, @Nullable ?>> colFnkt) {
+		return colFnkt.stream().map(t -> cast(t)).collect(toList());
 	}
 
 	public RootBucket<INPUT_TYPE> creatRowBucket(final String SUM_TEXT) {
@@ -154,7 +150,7 @@ public final class GridRendererParameter<INPUT_TYPE, VALUE_TYPE> {
 		return new RootBucket<INPUT_TYPE>(SUM_TEXT, getValues(), colFnkt);
 	}
 
-	public void setRowFnkt(final List<? extends FilteringComponent<?, ?>> rowFnkt) {
+	public void setRowFnkt(final List<? extends FilteringComponent<INPUT_TYPE, ?>> rowFnkt) {
 		this.rowFnkt.clear();
 		this.rowFnkt.addAll(toPivotCriterias(rowFnkt));
 		rowFunctionsUpated();

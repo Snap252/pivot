@@ -2,6 +2,8 @@ package com.snap252.org.pivoting;
 
 import java.util.function.Function;
 
+import org.eclipse.jdt.annotation.Nullable;
+
 public class NamedPivotCriteria<F, T> implements PivotCriteria<F, T> {
 
 	private final String stringValue;
@@ -24,7 +26,7 @@ public class NamedPivotCriteria<F, T> implements PivotCriteria<F, T> {
 	}
 
 	@Override
-	public T apply(final F t) {
+	public @Nullable T apply(final F t) {
 		return f.apply(t);
 	}
 

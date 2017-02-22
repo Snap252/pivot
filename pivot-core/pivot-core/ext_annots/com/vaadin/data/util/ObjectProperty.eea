@@ -1,0 +1,4 @@
+class com/vaadin/data/util/ObjectProperty
+ObjectProperty
+ (TT;Ljava/lang/Class<TT;>;)V
+ (T0T;Ljava/lang/Class<T1T;>;)V

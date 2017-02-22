@@ -18,7 +18,7 @@ public interface ModelAggregtor<INPUT_TYPE, @Nullable DATA_TYPE> {
 
 	public RendererConverter<?, ? extends DATA_TYPE> createRendererConverter();
 
-	public static class RendererConverter<T, VALUE> {
+	public static class RendererConverter<@Nullable T, VALUE> {
 		private final PivotRenderer<T> renderer;
 		private final Converter<T, PivotCellReference<@Nullable VALUE, Item>> converter;
 
@@ -39,7 +39,7 @@ public interface ModelAggregtor<INPUT_TYPE, @Nullable DATA_TYPE> {
 
 				@Override
 				public T convertToPresentation(final PivotCellReference<@Nullable VALUE, Item> value,
-						final Class<? extends T> targetType, final Locale locale) {
+						final Class<? extends T> targetType, final @Nullable Locale locale) {
 					return value != null ? f.apply(value) : null;
 				}
 

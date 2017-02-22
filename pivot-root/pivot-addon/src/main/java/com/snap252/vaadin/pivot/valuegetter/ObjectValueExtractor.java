@@ -4,7 +4,6 @@ import static java.util.Objects.requireNonNull;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
@@ -19,19 +18,18 @@ import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
 
-public class ObjectValueExtractor
-		implements FilteringRenderingComponent<ObjectStatistics> {
-	protected final Property nameType;
-//	protected final Object propertyId;
+public class ObjectValueExtractor implements FilteringRenderingComponent<ObjectStatistics> {
+	protected final Property<Object> nameType;
+	// protected final Object propertyId;
 	private final AbstractComponent comp;
 
 	private final ComboBox howToRenderComboBox = new ComboBox("Anzeige",
 			Arrays.asList(WhatOfObjectStatisticsToShow.values()));
 	private WhatOfObjectStatisticsToShow whatToRender = WhatOfObjectStatisticsToShow.cnt;
 
-	public ObjectValueExtractor(final Property nameType) {
-		this.nameType = nameType;
-//		this.propertyId = nameType.propertyId;
+	public ObjectValueExtractor(final Property<?> nameType) {
+		this.nameType = (@NonNull Property<@NonNull Object>) nameType;
+		// this.propertyId = nameType.propertyId;
 		final FormLayout formLayout = new FormLayout();
 
 		howToRenderComboBox.setNullSelectionAllowed(false);
@@ -57,9 +55,9 @@ public class ObjectValueExtractor
 	}
 
 	@Override
-	public Collector<Object, ObjectStatistics, ObjectStatistics> getAggregator(final BiFunction<Object, Property, Object> f) {
+	public Collector<Object, ObjectStatistics, ObjectStatistics> getAggregator() {
 		return Collector.of((Supplier<@NonNull ObjectStatistics>) () -> new ObjectStatistics(),
-				(os1, os2) -> os1.add(f.apply(os2, nameType)), (os1, os2) -> os1.mergeTo(os2), Function.identity());
+				(os1, os2) -> os1.add(nameType.getValue(os2)), (os1, os2) -> os1.mergeTo(os2), Function.identity());
 	}
 
 	@SuppressWarnings("null")
@@ -79,7 +77,6 @@ public class ObjectValueExtractor
 		// TODO Auto-generated method stub
 
 	}
-
 
 	@Override
 	public String toString() {

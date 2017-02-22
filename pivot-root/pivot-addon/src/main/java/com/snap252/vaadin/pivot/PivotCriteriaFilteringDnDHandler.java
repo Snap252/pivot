@@ -35,7 +35,7 @@ public class PivotCriteriaFilteringDnDHandler extends DropHandlerImplementation<
 
 	@Override
 	protected FilteringComponent<?> createNew(final Object data) {
-		return filterFactory.createFilter((Property) data);
+		return filterFactory.createFilter((Property<?>) data);
 	}
 
 	@Override

@@ -49,7 +49,7 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 
 	private WhatOfNumberStatisticsToRender whatToRender = WhatOfNumberStatisticsToRender.sum;
 
-	public BigDecimalValueExtractor(final Property nameType) {
+	public BigDecimalValueExtractor(final Property<?> nameType) {
 		super(nameType);
 		roundingEnabledCheckBox = new CheckBox("Rundung", false);
 		final FormLayout formLayout = new FormLayout();

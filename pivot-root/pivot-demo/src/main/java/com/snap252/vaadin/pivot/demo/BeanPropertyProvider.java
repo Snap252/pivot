@@ -18,10 +18,10 @@ import com.snap252.vaadin.pivot.demo.BeanPropertyProvider.BeanProperty;
 import com.vaadin.data.util.BeanUtil;
 
 @NonNullByDefault
-public class BeanPropertyProvider<T> extends PropertyProvider<T, BeanProperty> {
-	private List<BeanProperty> beanPropertyDescriptor;
+public class BeanPropertyProvider<T> extends PropertyProvider<T, BeanProperty<T>> {
+	private List<BeanProperty<T>> beanPropertyDescriptor;
 
-	static class BeanProperty extends Property {
+	static class BeanProperty<T> extends Property<T> {
 
 		private Method readMethod;
 
@@ -33,7 +33,8 @@ public class BeanPropertyProvider<T> extends PropertyProvider<T, BeanProperty> {
 			this.readMethod = readMethod;
 		}
 
-		Object getValue(Object o) {
+		@Override
+		public Object getValue(T o) {
 			try {
 				return readMethod.invoke(o);
 			} catch (ReflectiveOperationException | IllegalArgumentException e) {
@@ -45,7 +46,7 @@ public class BeanPropertyProvider<T> extends PropertyProvider<T, BeanProperty> {
 
 	public BeanPropertyProvider(Class<T> clazz) {
 		try {
-			beanPropertyDescriptor = BeanUtil.getBeanPropertyDescriptor(clazz).stream().map(BeanProperty::new)
+			beanPropertyDescriptor = BeanUtil.getBeanPropertyDescriptor(clazz).stream().map(BeanProperty<T>::new)
 					.collect(toList());
 		} catch (IntrospectionException e) {
 			throw new AssertionError(e);
@@ -53,7 +54,7 @@ public class BeanPropertyProvider<T> extends PropertyProvider<T, BeanProperty> {
 	}
 
 	@Override
-	public Collection<BeanProperty> getProperties() {
+	public Collection<BeanProperty<T>> getProperties() {
 		return beanPropertyDescriptor;
 	}
 
@@ -61,10 +62,5 @@ public class BeanPropertyProvider<T> extends PropertyProvider<T, BeanProperty> {
 	public Stream<T> getItems() {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	@Override
-	public @Nullable Object getValue(T item, BeanProperty p) {
-		return p.getValue(item);
 	}
 }

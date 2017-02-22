@@ -5,13 +5,10 @@ import java.util.stream.Stream;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.jdt.annotation.Nullable;
 
 @NonNullByDefault
-public abstract class PropertyProvider<X,  @NonNull Z extends Property> {
+public abstract class PropertyProvider<X, @NonNull Z extends Property<X>> {
 	public abstract Collection<Z> getProperties();
 
 	public abstract Stream<X> getItems();
-
-	public abstract @Nullable Object getValue(X item, Z p);
 }

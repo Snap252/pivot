@@ -9,10 +9,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collector;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -25,7 +25,6 @@ import com.snap252.vaadin.pivot.valuegetter.ModelAggregtor;
 @NonNullByDefault
 public final class GridRendererParameter<LIST_INPUT_TYPE> {
 	private List<LIST_INPUT_TYPE> values = new ArrayList<>();
-	private final BiFunction<LIST_INPUT_TYPE, Property, Object> mappingFuncion;
 	private final PropertyProvider<LIST_INPUT_TYPE, ?> provider;
 
 	enum GridRendererChangeParameterKind {
@@ -34,12 +33,12 @@ public final class GridRendererParameter<LIST_INPUT_TYPE> {
 		;
 	}
 
-	public <Z extends Property> GridRendererParameter(final PropertyProvider<LIST_INPUT_TYPE, Z> provider) {
-		this.mappingFuncion = ((x, y) -> provider.getValue(x, (Z) y));
+	public <Z extends Property<LIST_INPUT_TYPE>> GridRendererParameter(
+			final PropertyProvider<LIST_INPUT_TYPE, Z> provider) {
 		this.provider = provider;
 	}
 
-	public Collection<? extends Property> getProperties(){
+	public Collection<? extends Property<LIST_INPUT_TYPE>> getProperties() {
 		return provider.getProperties();
 	}
 
@@ -86,10 +85,7 @@ public final class GridRendererParameter<LIST_INPUT_TYPE> {
 	}
 
 	public Collector<Object, ?, ?> getCollector() {
-		assert mappingFuncion != null;
-		@SuppressWarnings("unchecked")
-		final BiFunction<Object, Property, Object> mappingFuncion2 = (BiFunction<Object, Property, Object>) mappingFuncion;
-		return modelAggregator.getAggregator(mappingFuncion2);
+		return modelAggregator.getAggregator();
 	}
 
 	private final Map<GridRendererChangeParameterKind, Collection<ParameterChangeListener<LIST_INPUT_TYPE>>> listeners = new EnumMap<>(
@@ -121,24 +117,20 @@ public final class GridRendererParameter<LIST_INPUT_TYPE> {
 		colFunctionsUpated();
 	}
 
-	private <T> T mapTo(final LIST_INPUT_TYPE lit, final Property propertyId) {
-		return cast(mappingFuncion.apply(lit, propertyId));
-	}
-
 	@SuppressWarnings("unchecked")
-	private static <T> T cast(final Object o) {
+	private static <@Nullable T> T cast(final Object o) {
 		return (T) o;
 	}
 
 	private Collection<PivotCriteria<LIST_INPUT_TYPE, Object>> toPivotCriterias(
 			final List<? extends FilteringComponent<?>> colFnkt) {
 		return colFnkt.stream().map((Function<FilteringComponent<?>, PivotCriteria<LIST_INPUT_TYPE, Object>>) cf -> {
-			final Property property = cf.getProperty();
+			final Property<Object> property = (Property<@NonNull Object>) cf.getProperty();
 			final String name = String.valueOf(property);
 			return new PivotCriteria<LIST_INPUT_TYPE, Object>() {
 				@Override
 				public Object apply(final LIST_INPUT_TYPE t) {
-					return cf.round(mapTo(t, property));
+					return cf.round(cast(property.getValue(t)));
 				}
 
 				@Override

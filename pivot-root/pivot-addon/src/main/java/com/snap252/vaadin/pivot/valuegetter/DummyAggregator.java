@@ -1,20 +1,18 @@
 package com.snap252.vaadin.pivot.valuegetter;
 
 import java.math.BigDecimal;
-import java.util.function.BiFunction;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNull;
 
 import com.snap252.vaadin.pivot.PivotCellReference;
-import com.snap252.vaadin.pivot.Property;
 import com.snap252.vaadin.pivot.renderer.BigDecimalRenderer;
 
 public final class DummyAggregator implements ModelAggregtor<Object> {
 
 	@Override
-	public Collector<Object, ?, BigDecimal> getAggregator(final BiFunction<Object, Property, Object> _ignored) {
+	public Collector<Object, ?, BigDecimal> getAggregator() {
 		return Collectors.collectingAndThen(Collectors.counting(), BigDecimal::valueOf);
 	}
 

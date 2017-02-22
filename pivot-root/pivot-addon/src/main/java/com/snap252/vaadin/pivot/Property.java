@@ -1,9 +1,10 @@
 package com.snap252.vaadin.pivot;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 
 @NonNullByDefault
-public class Property {
+public abstract class Property<RawType> {
 	private final Class<?> clazz;
 	private final String name;
 
@@ -24,4 +25,6 @@ public class Property {
 	public final String toString() {
 		return name;
 	}
+
+	public abstract @Nullable Object getValue(RawType o);
 }

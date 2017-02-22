@@ -15,7 +15,7 @@ import com.vaadin.data.Item;
 @NonNullByDefault
 public class ContainerPropertyProvider extends PropertyProvider<Item, ItemProperty> {
 
-	static class ItemProperty extends Property {
+	static class ItemProperty extends Property<Item> {
 		private final Object itemPropertyId;
 
 		public ItemProperty(final Class<?> clazz, final String name, final Object itemPropertyId) {
@@ -23,6 +23,12 @@ public class ContainerPropertyProvider extends PropertyProvider<Item, ItemProper
 			this.itemPropertyId = itemPropertyId;
 		}
 
+		@Override
+		public @Nullable Object getValue(final Item o) {
+			final com.vaadin.data.Property<?> itemProperty = o.getItemProperty(itemPropertyId);
+			assert itemProperty != null;
+			return itemProperty.getValue();
+		}
 	}
 
 	private final Container c;
@@ -51,12 +57,4 @@ public class ContainerPropertyProvider extends PropertyProvider<Item, ItemProper
 	protected @Nullable String lookUpName(final Object o) {
 		return o.toString();
 	}
-
-	@Override
-	public @Nullable Object getValue(final Item item, final ItemProperty p) {
-		final com.vaadin.data.Property<?> itemProperty = item.getItemProperty(p.itemPropertyId);
-		assert itemProperty != null;
-		return itemProperty.getValue();
-	}
-
 }

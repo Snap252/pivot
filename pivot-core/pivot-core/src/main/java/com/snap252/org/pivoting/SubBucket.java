@@ -1,12 +1,12 @@
 package com.snap252.org.pivoting;
 
-import static java.util.stream.Collectors.toSet;
-
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -41,17 +41,18 @@ public class SubBucket<V> extends Bucket<V> {
 				.groupingBy(t -> Optional.ofNullable(ownCriterion.apply(t)), LinkedHashMap::new, Collectors.toList());
 		final Map<Optional<A>, List<V>> collect = values.stream().filter(this).collect(groupingBy);
 
-		// Function<Optional<Comparable<?>>, Comparable<?>> fo= x->x.get();
-		// final Comparator<Optional<Comparable<?>>> comp =
-		// Comparator.comparing((Optional<Comparable<?>> x) -> x.get());
-		// fixme: sorting
-		final List<Bucket<V>> children$ = collect.entrySet().stream()
-				/* .sorted(comparingByKey) */.map(e -> {
-					return new SubBucket<V>(e.getKey().orElse(null), childCriterions, this, ownCriterion, e.getValue(),
-							level + 1);
-				}).collect(Collectors.toList());
+		final Comparator<Optional<A>> nullsFirstOfOptional = Comparator.comparing(xx -> xx.orElse(null),
+				ownCriterion.nullsFirst());
 
-		assert children$.stream().flatMap(c -> c.values.stream()).collect(toSet())
+		@SuppressWarnings({ "null" })
+		final Comparator<Entry<Optional<@NonNull A>, List<V>>> comparingByKey = Map.Entry
+				.comparingByKey(nullsFirstOfOptional);
+		final List<Bucket<V>> children$ = collect.entrySet().stream().sorted(comparingByKey).map(e -> {
+			return new SubBucket<V>(e.getKey().orElse(null), childCriterions, this, ownCriterion, e.getValue(),
+					level + 1);
+		}).collect(Collectors.toList());
+
+		assert children$.stream().flatMap(c -> c.values.stream()).collect(Collectors.toSet())
 				.equals(new HashSet<V>(values)) : parent + "=> own: " + new HashSet<V>(values);
 		return children$;
 	}

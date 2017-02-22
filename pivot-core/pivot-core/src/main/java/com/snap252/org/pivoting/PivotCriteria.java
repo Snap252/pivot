@@ -21,6 +21,18 @@ public interface PivotCriteria<F, T> extends Function<@NonNull F, @Nullable T>, 
 		return 0;
 	}
 
+	@SuppressWarnings("null")
+	default Comparator<@Nullable T> nullsFirst() {
+		final Comparator<T> c = this;
+		return Comparator.nullsFirst(c);
+	}
+
+	@SuppressWarnings("null")
+	default Comparator<@Nullable T> nullsLast() {
+		final Comparator<T> c = this;
+		return Comparator.nullsLast(c);
+	}
+
 	default @Nullable String format(final T t) {
 		return t == null ? null : Objects.toString(t);
 	}

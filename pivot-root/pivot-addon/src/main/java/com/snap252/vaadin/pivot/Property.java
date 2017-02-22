@@ -4,16 +4,16 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
 @NonNullByDefault
-public abstract class Property<RawType> {
-	private final Class<?> clazz;
+public abstract class Property<INPUT_TYPE, @Nullable OUTPUT_TYPE> {
+	private final Class<@Nullable OUTPUT_TYPE> clazz;
 	private final String name;
 
-	public Property(final Class<?> clazz, final String name) {
+	public Property(final Class<@Nullable OUTPUT_TYPE> clazz, final String name) {
 		this.clazz = clazz;
 		this.name = name;
 	}
 
-	public Class<?> getType() {
+	public Class<@Nullable OUTPUT_TYPE> getType() {
 		return clazz;
 	}
 
@@ -26,5 +26,5 @@ public abstract class Property<RawType> {
 		return name;
 	}
 
-	public abstract @Nullable Object getValue(RawType o);
+	public abstract @Nullable OUTPUT_TYPE getValue(INPUT_TYPE o);
 }

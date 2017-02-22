@@ -2,6 +2,7 @@ package com.snap252.vaadin.pivot;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.AbstractComponent;
@@ -9,12 +10,13 @@ import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Slider;
 
 @NonNullByDefault
-public class NumberFilteringComponent<T extends Number> extends AbstractFilteringComponent<T> {
+public class NumberFilteringComponent<INPUT_TYPE, T extends Number>
+		extends AbstractFilteringComponent<INPUT_TYPE, @Nullable T> {
 	private final FormLayout comp;
 	private final Slider slider;
 	private int sliderValue;
 
-	public NumberFilteringComponent(final Property nameType) {
+	public NumberFilteringComponent(final Property<INPUT_TYPE, @Nullable T> nameType) {
 		super(nameType);
 		final FormLayout formLayout = new FormLayout();
 		slider = new Slider(0, 10);
@@ -23,7 +25,7 @@ public class NumberFilteringComponent<T extends Number> extends AbstractFilterin
 		formLayout.setWidth("200px");
 		this.comp = formLayout;
 		this.sliderValue = 0;
-		slider.addValueChangeListener(_ignore -> sliderValue = ((Number)_ignore.getProperty().getValue()).intValue());
+		slider.addValueChangeListener(_ignore -> sliderValue = ((Number) _ignore.getProperty().getValue()).intValue());
 	}
 
 	@Override
@@ -33,10 +35,13 @@ public class NumberFilteringComponent<T extends Number> extends AbstractFilterin
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public T round(final T ret) {
+	public @Nullable T round(final @Nullable T ret) {
+		if (ret == null)
+			return null;
+
 		if (sliderValue > 0) {
 			final int exp = (int) Math.pow(10, sliderValue);
-			final Integer i = ret.intValue() / exp * exp;
+			final Integer i = ((Number) ret).intValue() / exp * exp;
 			return (T) i;
 		}
 		return ret;

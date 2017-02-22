@@ -7,6 +7,7 @@ import java.util.Date;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.AbstractComponent;
@@ -14,11 +15,11 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
 
 @NonNullByDefault
-public class DateFilteringComponent extends AbstractFilteringComponent<Date> {
+public class DateFilteringComponent<INPUT_TYPE> extends AbstractFilteringComponent<INPUT_TYPE, @Nullable Date> {
 	private final FormLayout comp;
 	private final ComboBox c;
 
-	public DateFilteringComponent(final Property nt) {
+	public DateFilteringComponent(final Property<INPUT_TYPE, @Nullable Date> nt) {
 		super(nt);
 		final FormLayout formLayout = new FormLayout();
 		c = new ComboBox("Rundung", Arrays.asList(DateRounding.values()));
@@ -35,13 +36,15 @@ public class DateFilteringComponent extends AbstractFilteringComponent<Date> {
 		return comp;
 	}
 
-	//TODO: formatting
 	@Override
-	public Date round(final Date ret) {
+	public @Nullable Date round(final @Nullable Date ret) {
+		if (ret == null) {
+			return null;
+		}
 		final DateFormat dateFormat = getDateFormat();
 		try {
 			return dateFormat.parse(dateFormat.format(ret));
-		} catch ( final ParseException e) {
+		} catch (final ParseException e) {
 			throw new AssertionError();
 		}
 	}
@@ -52,23 +55,26 @@ public class DateFilteringComponent extends AbstractFilteringComponent<Date> {
 			value = DateRounding.DAY;
 		return value.df;
 	}
+
 	@Override
-	public String format(final Date date) {
+	public @Nullable String format(final Date date) {
+		if (date == null)
+			return null;
 		return getDateFormat().format(date);
 	}
 
-//	@Override
-//	public int compare(String f1, String f2) {
-//		DateRounding value = (DateRounding) c.getValue();
-//		if (value == null)
-//			value = DateRounding.DAY;
-//		SimpleDateFormat df = value.df;
-//		try {
-//			return df.parse(f1).compareTo(df.parse(f2));
-//		} catch (ParseException e) {
-//			throw new AssertionError();
-//		}
-//	}
+	// @Override
+	// public int compare(String f1, String f2) {
+	// DateRounding value = (DateRounding) c.getValue();
+	// if (value == null)
+	// value = DateRounding.DAY;
+	// SimpleDateFormat df = value.df;
+	// try {
+	// return df.parse(f1).compareTo(df.parse(f2));
+	// } catch (ParseException e) {
+	// throw new AssertionError();
+	// }
+	// }
 
 	@Override
 	public void addValueChangeListener(final ValueChangeListener l) {

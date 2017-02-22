@@ -13,10 +13,10 @@ import com.vaadin.data.Item;
 import com.vaadin.data.util.converter.Converter;
 import com.vaadin.ui.Grid.Column;
 
-public interface ModelAggregtor<VALUE> {
-	public Collector<Object, ?, ? extends VALUE> getAggregator();
+public interface ModelAggregtor<INPUT_TYPE, @Nullable DATA_TYPE> {
+	public Collector<INPUT_TYPE, ?, ? extends DATA_TYPE> getAggregator();
 
-	public RendererConverter<?, ? extends VALUE> createRendererConverter();
+	public RendererConverter<?, ? extends DATA_TYPE> createRendererConverter();
 
 	public static class RendererConverter<T, VALUE> {
 		private final PivotRenderer<T> renderer;

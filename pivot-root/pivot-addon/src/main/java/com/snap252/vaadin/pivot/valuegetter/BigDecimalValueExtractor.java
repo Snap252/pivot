@@ -31,7 +31,8 @@ import com.vaadin.ui.Slider;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.themes.ValoTheme;
 
-public class BigDecimalValueExtractor extends AbstractNumberValueGetterRenderingComponent<BigDecimal> {
+public class BigDecimalValueExtractor<INPUT_TYPE>
+		extends AbstractNumberValueGetterRenderingComponent<INPUT_TYPE, @Nullable BigDecimal> {
 	private final FormLayout comp;
 	private final Slider slider;
 	private final CheckBox roundingEnabledCheckBox;
@@ -49,7 +50,7 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 
 	private WhatOfNumberStatisticsToRender whatToRender = WhatOfNumberStatisticsToRender.sum;
 
-	public BigDecimalValueExtractor(final Property<?> nameType) {
+	public BigDecimalValueExtractor(final Property<INPUT_TYPE, @Nullable BigDecimal> nameType) {
 		super(nameType);
 		roundingEnabledCheckBox = new CheckBox("Rundung", false);
 		final FormLayout formLayout = new FormLayout();
@@ -105,7 +106,10 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 	}
 
 	@Override
-	public BigDecimal round(final BigDecimal ret) {
+	public @Nullable BigDecimal round(final @Nullable BigDecimal ret) {
+		if (ret == null)
+			return null;
+
 		if (roundingEnabled) {
 			return ret.setScale(sliderValue, RoundingMode.HALF_UP);// .setScale(-sliderValue,
 																	// RoundingMode.HALF_UP);
@@ -114,13 +118,13 @@ public class BigDecimalValueExtractor extends AbstractNumberValueGetterRendering
 		return ret;
 	}
 
-//	protected BigDecimal getValueIntern(final Item item) {
-//		return (BigDecimal) getValueFromItem(item);
-//	}
+	// protected BigDecimal getValueIntern(final Item item) {
+	// return (BigDecimal) getValueFromItem(item);
+	// }
 
-//	protected final Object getValueFromItem(final Item item) {
-//		return super.apply(item);
-//	}
+	// protected final Object getValueFromItem(final Item item) {
+	// return super.apply(item);
+	// }
 
 	@Override
 	public void addValueChangeListener(final ValueChangeListener l) {

@@ -18,28 +18,28 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 @NonNullByDefault
-public class PivotCriteriaFilteringDnDHandler extends DropHandlerImplementation<FilteringComponent<?>> {
+public class PivotCriteriaFilteringDnDHandler extends DropHandlerImplementation<FilteringComponent<?, ?>> {
 
 	private final FilterFactory filterFactory = new FilterFactory();
 	private final Runnable refererOfPropertyChanged;
 
 	public PivotCriteriaFilteringDnDHandler(final AbstractOrderedLayout cols, final boolean vertical,
-			final Consumer<List<FilteringComponent<?>>> refresher, final Runnable refererOfPropertyChanged) {
+			final Consumer<List<FilteringComponent<?, ?>>> refresher, final Runnable refererOfPropertyChanged) {
 		super(cols, vertical, refresher);
 		this.refererOfPropertyChanged = refererOfPropertyChanged;
 	}
 
-	private void refresh(){
+	private void refresh() {
 		refererOfPropertyChanged.run();
 	}
 
 	@Override
-	protected FilteringComponent<?> createNew(final Object data) {
-		return filterFactory.createFilter((Property<?>) data);
+	protected FilteringComponent<?, ?> createNew(final Object data) {
+		return filterFactory.createFilter((Property<?, ?>) data);
 	}
 
 	@Override
-	protected AbstractComponent createUIComponent(final FilteringComponent<?> createFilter) {
+	protected AbstractComponent createUIComponent(final FilteringComponent<?, ?> createFilter) {
 		final AbstractComponent component = createFilter.getComponent();
 
 		final Button b;

@@ -9,15 +9,15 @@ import com.snap252.vaadin.pivot.utils.ClassUtils;
 import com.vaadin.data.Property;
 
 @NonNullByDefault
-public class PivotCellReference<T, ITEM> {
+public class PivotCellReference<T, INPUT_TYPE> {
 
 	private final T value;
-	private final Bucket<ITEM> rowBucket2;
-	private final Bucket<ITEM> colBucket2;
-	private final BucketContainer<ITEM> container;
+	private final Bucket<INPUT_TYPE> rowBucket2;
+	private final Bucket<INPUT_TYPE> colBucket2;
+	private final BucketContainer<INPUT_TYPE> container;
 
-	public PivotCellReference(final T newValue, final Bucket<ITEM> rowBucket, final Bucket<ITEM> colBucket,
-			final BucketContainer<ITEM> container) {
+	public PivotCellReference(final T newValue, final Bucket<INPUT_TYPE> rowBucket, final Bucket<INPUT_TYPE> colBucket,
+			final BucketContainer<INPUT_TYPE> container) {
 		this.value = newValue;
 		rowBucket2 = rowBucket;
 		colBucket2 = colBucket;
@@ -28,30 +28,31 @@ public class PivotCellReference<T, ITEM> {
 		return ClassUtils.cast(PivotCellReference.class);
 	}
 
-	private PivotCellReference<T, ITEM> getReference(final Bucket<ITEM> rowBucket, final Bucket<ITEM> colBucket) {
+	private PivotCellReference<T, INPUT_TYPE> getReference(final Bucket<INPUT_TYPE> rowBucket,
+			final Bucket<INPUT_TYPE> colBucket) {
 		@SuppressWarnings("unchecked")
-		final Property<PivotCellReference<T, ITEM>> containerProperty = (Property<PivotCellReference<T, ITEM>>) container
+		final Property<PivotCellReference<T, INPUT_TYPE>> containerProperty = (Property<PivotCellReference<T, INPUT_TYPE>>) container
 				.getContainerProperty(rowBucket, colBucket);
 		assert containerProperty != null;
-		final PivotCellReference<T, ITEM> ret = Objects.requireNonNull(containerProperty.getValue());
+		final PivotCellReference<T, INPUT_TYPE> ret = Objects.requireNonNull(containerProperty.getValue());
 		assert ret.rowBucket2 == rowBucket;
 		assert ret.colBucket2 == colBucket;
 		return ret;
 	}
 
-	public PivotCellReference<T, ITEM> ofCol() {
+	public PivotCellReference<T, INPUT_TYPE> ofCol() {
 		return getReference(rowBucket2.getRoot(), colBucket2);
 	}
 
-	public PivotCellReference<T, ITEM> ofParentCol() {
+	public PivotCellReference<T, INPUT_TYPE> ofParentCol() {
 		return getReference(rowBucket2.getParentOrSelf(), colBucket2);
 	}
 
-	public PivotCellReference<T, ITEM> ofRow() {
+	public PivotCellReference<T, INPUT_TYPE> ofRow() {
 		return getReference(rowBucket2, colBucket2.getRoot());
 	}
 
-	public PivotCellReference<T, ITEM> ofParentRow() {
+	public PivotCellReference<T, INPUT_TYPE> ofParentRow() {
 		return getReference(rowBucket2, colBucket2.getParentOrSelf());
 	}
 

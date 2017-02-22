@@ -1,5 +1,6 @@
 package com.snap252.vaadin.pivot.valuegetter;
 
+import java.util.function.Function;
 import java.util.stream.Collector;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -13,20 +14,21 @@ import com.snap252.org.aggregators.PivotCollectors;
 import com.snap252.vaadin.pivot.AbstractFilteringComponent;
 import com.snap252.vaadin.pivot.Property;
 
-public abstract class AbstractNumberValueGetterRenderingComponent<T extends Number>
-		extends AbstractFilteringComponent<T> implements FilteringRenderingComponent<NumberStatistics<T>> {
+public abstract class AbstractNumberValueGetterRenderingComponent<INPUT_TYPE, @Nullable T extends @Nullable Number>
+		extends AbstractFilteringComponent<INPUT_TYPE, @Nullable T>
+		implements FilteringRenderingComponent<INPUT_TYPE, @Nullable NumberStatistics<T>> {
 
-	public AbstractNumberValueGetterRenderingComponent(final Property<?> nameType) {
+	public AbstractNumberValueGetterRenderingComponent(final Property<INPUT_TYPE, @Nullable T> nameType) {
 		super(nameType);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Collector<Object, MutableValue<@Nullable T>, @Nullable NumberStatistics<@Nullable T>> getAggregator() {
-		return PivotCollectors.<@NonNull Object, @Nullable T>getNumberReducer(x -> (@Nullable T) property.getValue(x),
-				new NullableArithmeticsWrapper<>(createArithmetics()));
+	public Collector<INPUT_TYPE, MutableValue<T>, @Nullable NumberStatistics<T>> getAggregator() {
+		final Function<INPUT_TYPE, T> f = property::getValue;
+		final Arithmetics<T> arithmetics = new NullableArithmeticsWrapper<>(createArithmetics());
+		return PivotCollectors.getNumberReducer(f, arithmetics);
 	}
 
-	protected abstract Arithmetics<T> createArithmetics();
+	protected abstract Arithmetics<@NonNull T> createArithmetics();
 
 }

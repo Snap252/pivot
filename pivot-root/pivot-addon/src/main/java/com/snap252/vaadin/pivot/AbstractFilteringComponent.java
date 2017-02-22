@@ -1,20 +1,21 @@
 package com.snap252.vaadin.pivot;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 
 @NonNullByDefault
-public abstract class AbstractFilteringComponent<T> implements FilteringComponent<T> {
+public abstract class AbstractFilteringComponent<INPUT_TYPE, @Nullable DATA_TYPE>
+		implements FilteringComponent<INPUT_TYPE, DATA_TYPE> {
 
-	protected final Property<Object> property;
+	protected final Property<INPUT_TYPE, @Nullable DATA_TYPE> property;
 
 	@Override
-	public Property<?> getProperty() {
+	public Property<INPUT_TYPE, DATA_TYPE> getProperty() {
 		return property;
 	}
 
-	public AbstractFilteringComponent(final Property<?> nameType) {
-		this.property = (@NonNull Property<@NonNull Object>) nameType;
+	public AbstractFilteringComponent(final Property<INPUT_TYPE, @Nullable DATA_TYPE> nameType) {
+		this.property = nameType;
 	}
 
 	@Override

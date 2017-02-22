@@ -33,7 +33,7 @@ public class DemoUI extends UI {
 	public static class Servlet extends VaadinServlet {
 	}
 
-	private final GridRendererParameter<Item> gridRendererParameter = new GridRendererParameter<>(xxx());
+	private final GridRendererParameter<Item, ?> gridRendererParameter = new GridRendererParameter<>(xxx());
 
 	@Override
 	protected void init(VaadinRequest request) {

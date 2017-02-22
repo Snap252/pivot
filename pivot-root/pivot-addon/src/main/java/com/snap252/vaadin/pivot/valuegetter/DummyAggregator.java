@@ -5,14 +5,15 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 import com.snap252.vaadin.pivot.PivotCellReference;
 import com.snap252.vaadin.pivot.renderer.BigDecimalRenderer;
 
-public final class DummyAggregator implements ModelAggregtor<Object> {
+public final class DummyAggregator<INPUT_TYPE> implements ModelAggregtor<INPUT_TYPE, @Nullable Object> {
 
 	@Override
-	public Collector<Object, ?, BigDecimal> getAggregator() {
+	public Collector<INPUT_TYPE, ?, BigDecimal> getAggregator() {
 		return Collectors.collectingAndThen(Collectors.counting(), BigDecimal::valueOf);
 	}
 

@@ -18,8 +18,8 @@ import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
 
-public class ObjectValueExtractor implements FilteringRenderingComponent<ObjectStatistics> {
-	protected final Property<Object> nameType;
+public class ObjectValueExtractor<INPUT_TYPE> implements FilteringRenderingComponent<INPUT_TYPE, ObjectStatistics> {
+	protected final Property<INPUT_TYPE, ?> nameType;
 	// protected final Object propertyId;
 	private final AbstractComponent comp;
 
@@ -27,8 +27,8 @@ public class ObjectValueExtractor implements FilteringRenderingComponent<ObjectS
 			Arrays.asList(WhatOfObjectStatisticsToShow.values()));
 	private WhatOfObjectStatisticsToShow whatToRender = WhatOfObjectStatisticsToShow.cnt;
 
-	public ObjectValueExtractor(final Property<?> nameType) {
-		this.nameType = (@NonNull Property<@NonNull Object>) nameType;
+	public ObjectValueExtractor(final Property<INPUT_TYPE, ?> nameType) {
+		this.nameType = nameType;
 		// this.propertyId = nameType.propertyId;
 		final FormLayout formLayout = new FormLayout();
 
@@ -55,9 +55,9 @@ public class ObjectValueExtractor implements FilteringRenderingComponent<ObjectS
 	}
 
 	@Override
-	public Collector<Object, ObjectStatistics, ObjectStatistics> getAggregator() {
+	public Collector<INPUT_TYPE, ObjectStatistics, ObjectStatistics> getAggregator() {
 		return Collector.of((Supplier<@NonNull ObjectStatistics>) () -> new ObjectStatistics(),
-				(os1, os2) -> os1.add(nameType.getValue(os2)), (os1, os2) -> os1.mergeTo(os2), Function.identity());
+				(os1, os2) -> os1.add(nameType.getValue(os2)), ObjectStatistics::mergeTo, Function.identity());
 	}
 
 	@SuppressWarnings("null")

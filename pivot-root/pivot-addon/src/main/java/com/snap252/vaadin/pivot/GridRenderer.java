@@ -29,13 +29,13 @@ final class GridRenderer {
 
 	static final String SUM_TEXT = "\u2211";
 
-	<X> GridRenderer(final GridRendererParameter<X> gridParameter, final Grid grid) throws IllegalArgumentException {
+	<X> GridRenderer(final GridRendererParameter<X, ?> gridParameter, final Grid grid) throws IllegalArgumentException {
 		final BucketContainer<X> bucketContainer = new BucketContainer<>(gridParameter);
 
 		gridParameter.addParameterChangeListener(GridRendererChangeParameterKind.AGGREGATOR,
 				_ignore -> updateGridColumns(grid, _ignore.gridParameter.getModelAggregator()));
 
-		//work around for : https://github.com/vaadin/framework/issues/8638
+		// work around for : https://github.com/vaadin/framework/issues/8638
 		final PropertySetChangeListener columnsChanged0 = _ignore -> {
 			cleanupGridHeader(grid);
 		};
@@ -50,7 +50,7 @@ final class GridRenderer {
 		bucketContainer.addPropertySetChangeListener(columnsChanged);
 	}
 
-	protected void updateGridColumns(final Grid grid, final ModelAggregtor<?> modelAggregator) {
+	protected void updateGridColumns(final Grid grid, final ModelAggregtor<?, ?> modelAggregator) {
 		grid.getColumns().forEach(column -> {
 			final Object columnPropertyId = column.getPropertyId();
 			if (columnPropertyId != COLLAPSE_COL_PROPERTY_ID) {

@@ -8,7 +8,7 @@ import com.vaadin.shared.ui.grid.ColumnResizeMode;
 @NonNullByDefault
 public class PivotGrid extends TreeGrid {
 
-	public PivotGrid(final GridRendererParameter<?> bucketParams) {
+	public PivotGrid(final GridRendererParameter<?, ?> bucketParams) {
 		setPrimaryStyleName("v-grid-tiny");
 
 		setSelectionMode(SelectionMode.NONE);
@@ -16,23 +16,25 @@ public class PivotGrid extends TreeGrid {
 		new GridRenderer(bucketParams, this);
 	}
 
-//	public @Nullable <@Nullable T> GridWriter<?, ?> setContainerDataSource(final BiBucketParameter<Item> bucketParams,
-//			@Nullable final GridWriter<?, ?> oldGridWriter) {
-//		try {
-//			setComponentError(null);
-//			final GridRenderer gridRenderer = new GridRenderer(bucketParams);
-//			final GridRenderer.GridWriter<Object, Object> gridWriter = gridRenderer.createGridWriter();
-//			gridWriter.writeGrid(this);
-//			if (oldGridWriter != null) {
-//				gridWriter.setModelAggregator(oldGridWriter.getModelAggregator());
-//				gridWriter.updateRenderer(this);
-//			}
-//			return gridWriter;
-//		} catch (final IllegalArgumentException e) {
-//			removeAllColumns();
-//			setContainerDataSource(new IndexedContainer());
-//			setComponentError(new UserError(e.getMessage()));
-//			return oldGridWriter;
-//		}
-//	}
+	// public @Nullable <@Nullable T> GridWriter<?, ?>
+	// setContainerDataSource(final BiBucketParameter<Item> bucketParams,
+	// @Nullable final GridWriter<?, ?> oldGridWriter) {
+	// try {
+	// setComponentError(null);
+	// final GridRenderer gridRenderer = new GridRenderer(bucketParams);
+	// final GridRenderer.GridWriter<Object, Object> gridWriter =
+	// gridRenderer.createGridWriter();
+	// gridWriter.writeGrid(this);
+	// if (oldGridWriter != null) {
+	// gridWriter.setModelAggregator(oldGridWriter.getModelAggregator());
+	// gridWriter.updateRenderer(this);
+	// }
+	// return gridWriter;
+	// } catch (final IllegalArgumentException e) {
+	// removeAllColumns();
+	// setContainerDataSource(new IndexedContainer());
+	// setComponentError(new UserError(e.getMessage()));
+	// return oldGridWriter;
+	// }
+	// }
 }

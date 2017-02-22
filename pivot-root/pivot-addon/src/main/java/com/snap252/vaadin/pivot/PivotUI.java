@@ -31,14 +31,14 @@ import fi.jasoft.dragdroplayouts.DDVerticalLayout;
 public class PivotUI extends GridLayout {
 
 	private final HorizontalLayout properties;
-	private final GridRendererParameter<?> gridRendererParameter;
+	private final GridRendererParameter<?, ?> gridRendererParameter;
 
-	public PivotUI(final GridRendererParameter<?> gridRendererParameter) {
+	public PivotUI(final GridRendererParameter<?, ?> gridRendererParameter) {
 		this(PivotGrid::new, gridRendererParameter);
 	}
 
-	public PivotUI(final Function<GridRendererParameter<?>, Component> f,
-			final GridRendererParameter<?> gridRendererParameter) {
+	public <INPUT_TYPE> PivotUI(final Function<GridRendererParameter<INPUT_TYPE, ?>, Component> f,
+			final GridRendererParameter<INPUT_TYPE, ?> gridRendererParameter) {
 		super(2, 3);
 		this.gridRendererParameter = gridRendererParameter;
 		addStyleName("pivot");
@@ -75,7 +75,7 @@ public class PivotUI extends GridLayout {
 			final DDVerticalLayout aggregator = new DDVerticalLayout();
 			aggregator.setSpacing(true);
 			final DragAndDropWrapper aggregatorDragAndDropWrapper = new DragAndDropWrapper(aggregator);
-			final DropHandler aggDopHandler = new ValueGetterDnDHandler(aggregator, true, i -> {
+			final DropHandler aggDopHandler = new ValueGetterDnDHandler<INPUT_TYPE>(aggregator, true, i -> {
 				gridRendererParameter.setModelAggregator(!i.isEmpty() ? i.get(0) : null);
 			}, gridRendererParameter::aggregatorUpated, gridRendererParameter::rendererUpated);
 

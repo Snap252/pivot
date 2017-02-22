@@ -23,9 +23,9 @@ import com.snap252.vaadin.pivot.valuegetter.DummyAggregator;
 import com.snap252.vaadin.pivot.valuegetter.ModelAggregtor;
 
 @NonNullByDefault
-public final class GridRendererParameter<LIST_INPUT_TYPE> {
-	private List<LIST_INPUT_TYPE> values = new ArrayList<>();
-	private final PropertyProvider<LIST_INPUT_TYPE, ?> provider;
+public final class GridRendererParameter<INPUT_TYPE, VALUE_TYPE> {
+	private List<INPUT_TYPE> values = new ArrayList<>();
+	private final PropertyProvider<INPUT_TYPE, ?> provider;
 
 	enum GridRendererChangeParameterKind {
 		ROW_FNKT, COL_FNKT, VALUES, AGGREGATOR, CONVERTER, RENDERER
@@ -33,32 +33,31 @@ public final class GridRendererParameter<LIST_INPUT_TYPE> {
 		;
 	}
 
-	public <Z extends Property<LIST_INPUT_TYPE>> GridRendererParameter(
-			final PropertyProvider<LIST_INPUT_TYPE, Z> provider) {
+	public GridRendererParameter(final PropertyProvider<INPUT_TYPE, ?> provider) {
 		this.provider = provider;
 	}
 
-	public Collection<? extends Property<LIST_INPUT_TYPE>> getProperties() {
+	public Collection<? extends Property<INPUT_TYPE, ?>> getProperties() {
 		return provider.getProperties();
 	}
 
 	@FunctionalInterface
-	public static interface ParameterChangeListener<LIST_INPUT_TYPE> {
-		static class ParametersChangedEventArgs<LIST_INPUT_TYPE> {
+	public static interface ParameterChangeListener<LIST_INPUT_TYPE, VALUE_TYPE> {
+		static class ParametersChangedEventArgs<LIST_INPUT_TYPE, VALUE_TYPE> {
 			public final GridRendererChangeParameterKind whatChanged;
-			public final GridRendererParameter<LIST_INPUT_TYPE> gridParameter;
+			public final GridRendererParameter<LIST_INPUT_TYPE, VALUE_TYPE> gridParameter;
 
 			private ParametersChangedEventArgs(final GridRendererChangeParameterKind whatChanged,
-					final GridRendererParameter<LIST_INPUT_TYPE> gridParameter) {
+					final GridRendererParameter<LIST_INPUT_TYPE, VALUE_TYPE> gridParameter) {
 				this.whatChanged = whatChanged;
 				this.gridParameter = gridParameter;
 			}
 		}
 
-		void parametersChanged(ParametersChangedEventArgs<LIST_INPUT_TYPE> args);
+		void parametersChanged(ParametersChangedEventArgs<LIST_INPUT_TYPE, VALUE_TYPE> args);
 	}
 
-	public void setValues(final List<LIST_INPUT_TYPE> values) {
+	public void setValues(final List<INPUT_TYPE> values) {
 		if (Objects.equals(this.values, values))
 			return;
 
@@ -67,32 +66,32 @@ public final class GridRendererParameter<LIST_INPUT_TYPE> {
 		fireEvent(GridRendererChangeParameterKind.COL_FNKT);
 	}
 
-	private List<LIST_INPUT_TYPE> getValues() {
+	private List<INPUT_TYPE> getValues() {
 		return values;
 	}
 
-	private final List<PivotCriteria<LIST_INPUT_TYPE, ?>> rowFnkt = new ArrayList<>();
-	private final List<PivotCriteria<LIST_INPUT_TYPE, ?>> colFnkt = new ArrayList<>();
+	private final List<PivotCriteria<INPUT_TYPE, ?>> rowFnkt = new ArrayList<>();
+	private final List<PivotCriteria<INPUT_TYPE, ?>> colFnkt = new ArrayList<>();
 
 	public int getColDepth() {
 		return colFnkt.size();
 	}
 
-	private ModelAggregtor<?> modelAggregator = new DummyAggregator();
+	private ModelAggregtor<INPUT_TYPE, ?> modelAggregator = new DummyAggregator<INPUT_TYPE>();
 
-	public ModelAggregtor<?> getModelAggregator() {
+	public ModelAggregtor<?, ?> getModelAggregator() {
 		return modelAggregator;
 	}
 
-	public Collector<Object, ?, ?> getCollector() {
+	public Collector<INPUT_TYPE, ?, ?> getCollector() {
 		return modelAggregator.getAggregator();
 	}
 
-	private final Map<GridRendererChangeParameterKind, Collection<ParameterChangeListener<LIST_INPUT_TYPE>>> listeners = new EnumMap<>(
+	private final Map<GridRendererChangeParameterKind, Collection<ParameterChangeListener<INPUT_TYPE, VALUE_TYPE>>> listeners = new EnumMap<>(
 			GridRendererChangeParameterKind.class);
 
 	public void addParameterChangeListener(final GridRendererChangeParameterKind kindOfChange,
-			final ParameterChangeListener<LIST_INPUT_TYPE> listener) {
+			final ParameterChangeListener<INPUT_TYPE, VALUE_TYPE> listener) {
 		this.listeners.computeIfAbsent(kindOfChange, x -> new LinkedList<>()).add(listener);
 		assert this.listeners.containsKey(kindOfChange);
 		assert this.listeners.get(kindOfChange) != null;
@@ -102,7 +101,8 @@ public final class GridRendererParameter<LIST_INPUT_TYPE> {
 		if (!listeners.containsKey(kindOfChange))
 			return;
 
-		final ParametersChangedEventArgs<LIST_INPUT_TYPE> args = new ParametersChangedEventArgs<>(kindOfChange, this);
+		final ParametersChangedEventArgs<INPUT_TYPE, VALUE_TYPE> args = new ParametersChangedEventArgs<>(kindOfChange,
+				this);
 		listeners.get(kindOfChange).forEach(listener -> listener.parametersChanged(args));
 	}
 
@@ -110,7 +110,7 @@ public final class GridRendererParameter<LIST_INPUT_TYPE> {
 	// return "";
 	// }
 
-	public <T> void setColFnkt(final List<? extends FilteringComponent<?>> colFnkt) {
+	public <T> void setColFnkt(final List<? extends FilteringComponent<?, ?>> colFnkt) {
 		this.colFnkt.clear();
 
 		this.colFnkt.addAll(toPivotCriterias(colFnkt));
@@ -122,14 +122,14 @@ public final class GridRendererParameter<LIST_INPUT_TYPE> {
 		return (T) o;
 	}
 
-	private Collection<PivotCriteria<LIST_INPUT_TYPE, Object>> toPivotCriterias(
-			final List<? extends FilteringComponent<?>> colFnkt) {
-		return colFnkt.stream().map((Function<FilteringComponent<?>, PivotCriteria<LIST_INPUT_TYPE, Object>>) cf -> {
-			final Property<Object> property = (Property<@NonNull Object>) cf.getProperty();
+	private Collection<PivotCriteria<INPUT_TYPE, Object>> toPivotCriterias(
+			final List<? extends FilteringComponent<?, ?>> colFnkt) {
+		return colFnkt.stream().map((Function<FilteringComponent<?, ?>, PivotCriteria<INPUT_TYPE, Object>>) cf -> {
+			final Property<Object, ?> property = (Property<@NonNull Object, ?>) cf.getProperty();
 			final String name = String.valueOf(property);
-			return new PivotCriteria<LIST_INPUT_TYPE, Object>() {
+			return new PivotCriteria<INPUT_TYPE, Object>() {
 				@Override
-				public Object apply(final LIST_INPUT_TYPE t) {
+				public Object apply(final INPUT_TYPE t) {
 					return cf.round(cast(property.getValue(t)));
 				}
 
@@ -146,15 +146,15 @@ public final class GridRendererParameter<LIST_INPUT_TYPE> {
 		}).collect(toList());
 	}
 
-	public RootBucket<LIST_INPUT_TYPE> creatRowBucket(final String SUM_TEXT) {
-		return new RootBucket<LIST_INPUT_TYPE>(SUM_TEXT, getValues(), rowFnkt);
+	public RootBucket<INPUT_TYPE> creatRowBucket(final String SUM_TEXT) {
+		return new RootBucket<INPUT_TYPE>(SUM_TEXT, getValues(), rowFnkt);
 	}
 
-	public RootBucket<LIST_INPUT_TYPE> creatColBucket(final String SUM_TEXT) {
-		return new RootBucket<LIST_INPUT_TYPE>(SUM_TEXT, getValues(), colFnkt);
+	public RootBucket<INPUT_TYPE> creatColBucket(final String SUM_TEXT) {
+		return new RootBucket<INPUT_TYPE>(SUM_TEXT, getValues(), colFnkt);
 	}
 
-	public void setRowFnkt(final List<? extends FilteringComponent<?>> rowFnkt) {
+	public void setRowFnkt(final List<? extends FilteringComponent<?, ?>> rowFnkt) {
 		this.rowFnkt.clear();
 		this.rowFnkt.addAll(toPivotCriterias(rowFnkt));
 		rowFunctionsUpated();
@@ -176,8 +176,8 @@ public final class GridRendererParameter<LIST_INPUT_TYPE> {
 		fireEvent(GridRendererChangeParameterKind.AGGREGATOR);
 	}
 
-	public void setModelAggregator(@Nullable final ModelAggregtor<?> aggregator) {
-		this.modelAggregator = aggregator != null ? aggregator : new DummyAggregator();
+	public void setModelAggregator(@Nullable final ModelAggregtor<INPUT_TYPE, ?> aggregator) {
+		this.modelAggregator = aggregator != null ? aggregator : new DummyAggregator<INPUT_TYPE>();
 		fireEvent(GridRendererChangeParameterKind.AGGREGATOR);
 	}
 

@@ -7,7 +7,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 @NonNullByDefault
-public abstract class PropertyProvider<X, @NonNull Z extends Property<X>> {
+public abstract class PropertyProvider<X, @NonNull Z extends Property<X, ?>> {
 	public abstract Collection<Z> getProperties();
 
 	public abstract Stream<X> getItems();

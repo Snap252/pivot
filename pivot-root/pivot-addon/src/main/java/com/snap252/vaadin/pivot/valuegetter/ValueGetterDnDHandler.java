@@ -18,14 +18,14 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-public class ValueGetterDnDHandler extends DropHandlerImplementation<FilteringRenderingComponent<?>> {
+public class ValueGetterDnDHandler<INPUT_TYPE> extends DropHandlerImplementation<FilteringRenderingComponent<INPUT_TYPE, ?>> {
 
 	private final ValueFactory valueFactory = new ValueFactory();
 	private final Runnable upateAggregator;
 	private final Runnable upateRenderer;
 
 	public ValueGetterDnDHandler(final AbstractOrderedLayout cols, final boolean vertical,
-			final Consumer<List<FilteringRenderingComponent<?>>> refresher, final Runnable upateAggregator,
+			final Consumer<List<FilteringRenderingComponent<INPUT_TYPE, ?>>> refresher, final Runnable upateAggregator,
 			final Runnable upateRenderer) {
 		super(cols, vertical, refresher);
 		this.upateAggregator = upateAggregator;
@@ -33,12 +33,12 @@ public class ValueGetterDnDHandler extends DropHandlerImplementation<FilteringRe
 	}
 
 	@Override
-	protected FilteringRenderingComponent<?> createNew(final Object data) {
-		return valueFactory.createFilter((Property) data);
+	protected FilteringRenderingComponent<INPUT_TYPE, ?> createNew(final Object data) {
+		return valueFactory.createFilter((Property<INPUT_TYPE, ?>) data);
 	}
 
 	@Override
-	protected AbstractComponent createUIComponent(final FilteringRenderingComponent<?> createFilter) {
+	protected AbstractComponent createUIComponent(final FilteringRenderingComponent<INPUT_TYPE, ?> createFilter) {
 		final AbstractComponent component = createFilter.getComponent();
 
 		final Button b;

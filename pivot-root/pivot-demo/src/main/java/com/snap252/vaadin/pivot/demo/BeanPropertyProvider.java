@@ -18,15 +18,15 @@ import com.snap252.vaadin.pivot.demo.BeanPropertyProvider.BeanProperty;
 import com.vaadin.data.util.BeanUtil;
 
 @NonNullByDefault
-public class BeanPropertyProvider<T> extends PropertyProvider<T, BeanProperty<T>> {
-	private List<BeanProperty<T>> beanPropertyDescriptor;
+public class BeanPropertyProvider<INPUT_TYPE> extends PropertyProvider<INPUT_TYPE, BeanProperty<INPUT_TYPE, ?>> {
+	private List<BeanProperty<INPUT_TYPE, ?>> beanPropertyDescriptor;
 
-	static class BeanProperty<T> extends Property<T> {
+	static class BeanProperty<INPUT_TYPE, OUTPUT_TYPE> extends Property<INPUT_TYPE, OUTPUT_TYPE> {
 
 		private Method readMethod;
 
 		public BeanProperty(PropertyDescriptor p) {
-			super(p.getPropertyType(), p.getDisplayName());
+			super((Class<@Nullable OUTPUT_TYPE>) p.getPropertyType(), p.getDisplayName());
 			Method readMethod = p.getReadMethod();
 			assert readMethod != null;
 			assert readMethod.getParameterCount() == 0;
@@ -34,9 +34,9 @@ public class BeanPropertyProvider<T> extends PropertyProvider<T, BeanProperty<T>
 		}
 
 		@Override
-		public Object getValue(T o) {
+		public OUTPUT_TYPE getValue(INPUT_TYPE o) {
 			try {
-				return readMethod.invoke(o);
+				return (OUTPUT_TYPE) readMethod.invoke(o);
 			} catch (ReflectiveOperationException | IllegalArgumentException e) {
 				throw new AssertionError(e);
 			}
@@ -44,22 +44,22 @@ public class BeanPropertyProvider<T> extends PropertyProvider<T, BeanProperty<T>
 
 	}
 
-	public BeanPropertyProvider(Class<T> clazz) {
+	public BeanPropertyProvider(Class<INPUT_TYPE> clazz) {
 		try {
-			beanPropertyDescriptor = BeanUtil.getBeanPropertyDescriptor(clazz).stream().map(BeanProperty<T>::new)
-					.collect(toList());
+			beanPropertyDescriptor = BeanUtil.getBeanPropertyDescriptor(clazz).stream()
+					.map(BeanProperty<INPUT_TYPE, Object>::new).collect(toList());
 		} catch (IntrospectionException e) {
 			throw new AssertionError(e);
 		}
 	}
 
 	@Override
-	public Collection<BeanProperty<T>> getProperties() {
+	public Collection<BeanProperty<INPUT_TYPE, ?>> getProperties() {
 		return beanPropertyDescriptor;
 	}
 
 	@Override
-	public Stream<T> getItems() {
+	public Stream<INPUT_TYPE> getItems() {
 		// TODO Auto-generated method stub
 		return null;
 	}

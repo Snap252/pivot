@@ -33,18 +33,18 @@ import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeListener;
 
 @NonNullByDefault
-class BucketContainer<X>
+class BucketContainer<INPUT_TYPE>
 		implements Indexed, Hierarchical, ItemSetChangeNotifier, PropertySetChangeNotifier, Collapsible {
-	private RootBucket<X> rowBucket;
-	private RootBucket<X> colBucket;
-	Collector<Object, ?, ?> aggregator;
+	private RootBucket<INPUT_TYPE> rowBucket;
+	private RootBucket<INPUT_TYPE> colBucket;
+	Collector<INPUT_TYPE, ?, ?> aggregator;
 
-	public RootBucket<X> getColBucket() {
+	public RootBucket<INPUT_TYPE> getColBucket() {
 		return colBucket;
 	}
 
 	final Collection<ValueChangeListener> valueChangeListeners = new HashSet<>();
-	public final Collection<BucketItem<X>.CellProperty> propertyResetter = new HashSet<>();
+	public final Collection<BucketItem<?>.CellProperty> propertyResetter = new HashSet<>();
 
 	private void resetPropertiesAndFireValueChange() {
 		propertyResetter.forEach(CellProperty::resetValue);
@@ -66,7 +66,7 @@ class BucketContainer<X>
 		}
 	}
 
-	public BucketContainer(final GridRendererParameter<X> gp) {
+	public BucketContainer(final GridRendererParameter<INPUT_TYPE, ?> gp) {
 		rowBucket = gp.creatRowBucket(GridRenderer.SUM_TEXT);
 		colBucket = gp.creatColBucket(GridRenderer.SUM_TEXT);
 
@@ -77,7 +77,7 @@ class BucketContainer<X>
 			{
 				expandedItemIds.clear();
 				visibleItemIds.clear();
-				final Collection<Bucket<X>> rootItemIds = rootItemIds();
+				final Collection<Bucket<INPUT_TYPE>> rootItemIds = rootItemIds();
 				final List<@NonNull ?> openIds = rootItemIds.stream().collect(toList());
 				expandedItemIds.addAll(openIds);
 				visibleItemIds.addAll(rootItemIds);
@@ -148,16 +148,16 @@ class BucketContainer<X>
 		return null;
 	}
 
-	private final Map<Bucket<X>, BucketItem<X>> rowCache = new HashMap<>();
+	private final Map<Bucket<INPUT_TYPE>, BucketItem<INPUT_TYPE>> rowCache = new HashMap<>();
 
 	@Override
-	public BucketItem<X> getItem(final Object itemId) {
+	public BucketItem<INPUT_TYPE> getItem(final Object itemId) {
 		return getForRow(itemId);
 	}
 
 	@SuppressWarnings("unchecked")
-	protected BucketItem<X> getForRow(final Object itemId) {
-		return rowCache.computeIfAbsent((Bucket<X>) itemId, x -> new BucketItem<X>(this, x));
+	protected BucketItem<INPUT_TYPE> getForRow(final Object itemId) {
+		return rowCache.computeIfAbsent((Bucket<INPUT_TYPE>) itemId, x -> new BucketItem<INPUT_TYPE>(this, x));
 	}
 
 	@Override
@@ -168,11 +168,11 @@ class BucketContainer<X>
 	}
 
 	@Override
-	public List<@NonNull Bucket<X>> getItemIds() {
+	public List<@NonNull Bucket<INPUT_TYPE>> getItemIds() {
 		return getItemIdStream().collect(toList());
 	}
 
-	protected Stream<? extends @NonNull Bucket<X>> getItemIdStream() {
+	protected Stream<? extends @NonNull Bucket<INPUT_TYPE>> getItemIdStream() {
 		return rowBucket.stream().filter(visibleItemIds::contains);
 	}
 
@@ -185,10 +185,10 @@ class BucketContainer<X>
 
 	@Override
 	public Class<?> getType(final Object propertyId) {
-		if (propertyId instanceof Bucket){
+		if (propertyId instanceof Bucket) {
 			return pivotCellReferenceClazz;
-		}
-		else return String.class;
+		} else
+			return String.class;
 	}
 
 	@Override
@@ -277,7 +277,7 @@ class BucketContainer<X>
 	}
 
 	@Override
-	public Collection<@NonNull Bucket<X>> rootItemIds() {
+	public Collection<@NonNull Bucket<INPUT_TYPE>> rootItemIds() {
 		assert isRoot(rowBucket);
 		return Collections.singleton(rowBucket);
 	}

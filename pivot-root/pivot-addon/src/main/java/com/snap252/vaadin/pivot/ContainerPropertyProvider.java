@@ -13,21 +13,21 @@ import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 
 @NonNullByDefault
-public class ContainerPropertyProvider extends PropertyProvider<Item, ItemProperty> {
+public class ContainerPropertyProvider extends PropertyProvider<Item, ItemProperty<?>> {
 
-	static class ItemProperty extends Property<Item> {
+	static class ItemProperty<OUTPUT_TYPE> extends Property<Item, @Nullable OUTPUT_TYPE> {
 		private final Object itemPropertyId;
 
-		public ItemProperty(final Class<?> clazz, final String name, final Object itemPropertyId) {
+		public ItemProperty(final Class<@Nullable OUTPUT_TYPE> clazz, final String name, final Object itemPropertyId) {
 			super(clazz, name);
 			this.itemPropertyId = itemPropertyId;
 		}
 
 		@Override
-		public @Nullable Object getValue(final Item o) {
+		public @Nullable OUTPUT_TYPE getValue(final Item o) {
 			final com.vaadin.data.Property<?> itemProperty = o.getItemProperty(itemPropertyId);
 			assert itemProperty != null;
-			return itemProperty.getValue();
+			return (@Nullable OUTPUT_TYPE) itemProperty.getValue();
 		}
 	}
 
@@ -44,12 +44,12 @@ public class ContainerPropertyProvider extends PropertyProvider<Item, ItemProper
 	}
 
 	@Override
-	public Collection<ItemProperty> getProperties() {
+	public Collection<ItemProperty<?>> getProperties() {
 		return c.getContainerPropertyIds().stream().map(propertyId -> {
 			assert propertyId != null;
 			final String lookUpName = lookUpName(propertyId);
 			if (lookUpName != null)
-				return new ItemProperty(c.getType(propertyId), lookUpName, propertyId);
+				return new ItemProperty<>(c.getType(propertyId), lookUpName, propertyId);
 			return null;
 		}).filter(p -> p != null).collect(toList());
 	}

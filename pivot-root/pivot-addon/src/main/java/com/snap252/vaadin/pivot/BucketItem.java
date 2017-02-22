@@ -19,19 +19,19 @@ import com.vaadin.data.Property;
 import com.vaadin.data.util.ObjectProperty;
 
 @NonNullByDefault
-final class BucketItem<X> implements Item {
+final class BucketItem<INPUT_TYPE> implements Item {
 	/**
 	 *
 	 */
-	private final BucketContainer<X> bucketContainer;
+	private final BucketContainer<INPUT_TYPE> bucketContainer;
 
 	final class CellProperty implements Property<PivotCellReference<?, ?>>, Property.ValueChangeNotifier {
 
-		private final Bucket<X> colBucket;
+		private final Bucket<INPUT_TYPE> colBucket;
 		@Nullable
 		private PivotCellReference<?, ?> cachedPivotCellReference;
 
-		public CellProperty(final Bucket<X> colBucket) {
+		public CellProperty(final Bucket<INPUT_TYPE> colBucket) {
 			this.colBucket = colBucket;
 			assert rowBucket != colBucket;
 			bucketContainer.propertyResetter.add(this);
@@ -42,17 +42,17 @@ final class BucketItem<X> implements Item {
 		}
 
 		@Nullable
-		private List<X> filterOwnValues;
+		private List<INPUT_TYPE> filterOwnValues;
 
-		private Collection<X> getOwnItems() {
+		private Collection<INPUT_TYPE> getOwnItems() {
 			if (filterOwnValues != null)
 				return filterOwnValues;
 
-			final Bucket<X> colParent = colBucket.parent;
+			final Bucket<INPUT_TYPE> colParent = colBucket.parent;
 			if (colParent != null) {
-				final Collection<X> itemsInParent = getForColumn(colParent).getOwnItems();
+				final Collection<INPUT_TYPE> itemsInParent = getForColumn(colParent).getOwnItems();
 				// TODO: maybe better get if from row parent
-				final List<X> filterOwnValues$;
+				final List<INPUT_TYPE> filterOwnValues$;
 				if (itemsInParent.isEmpty())
 					filterOwnValues$ = Collections.emptyList();
 				else
@@ -61,7 +61,7 @@ final class BucketItem<X> implements Item {
 				return filterOwnValues$;
 			}
 
-			final List<X> filterOwnValues$ = rowBucket.filterOwnValues(x -> true).collect(toList());
+			final List<INPUT_TYPE> filterOwnValues$ = rowBucket.filterOwnValues(x -> true).collect(toList());
 			filterOwnValues = filterOwnValues$;
 			return filterOwnValues$;
 		}
@@ -72,8 +72,8 @@ final class BucketItem<X> implements Item {
 				return cachedPivotCellReference;
 
 			final Object newValue0 = getOwnItems().stream().collect(bucketContainer.aggregator);
-			final PivotCellReference<?, X> newValue = new PivotCellReference<@Nullable Object, X>(newValue0, rowBucket,
-					colBucket, bucketContainer);
+			final PivotCellReference<?, INPUT_TYPE> newValue = new PivotCellReference<@Nullable Object, INPUT_TYPE>(
+					newValue0, rowBucket, colBucket, bucketContainer);
 			cachedPivotCellReference = newValue;
 			return newValue;
 		}
@@ -119,14 +119,14 @@ final class BucketItem<X> implements Item {
 		}
 	}
 
-	private final Bucket<X> rowBucket;
+	private final Bucket<INPUT_TYPE> rowBucket;
 
-	public BucketItem(final BucketContainer<X> bucketContainer, final Bucket<X> itemId) {
+	public BucketItem(final BucketContainer<INPUT_TYPE> bucketContainer, final Bucket<INPUT_TYPE> itemId) {
 		this.bucketContainer = bucketContainer;
 		this.rowBucket = itemId;
 	}
 
-	private final Map<Bucket<X>, CellProperty> cache = new HashMap<>();
+	private final Map<Bucket<INPUT_TYPE>, CellProperty> cache = new HashMap<>();
 
 	@SuppressWarnings({ "unchecked" })
 	@Override
@@ -134,16 +134,16 @@ final class BucketItem<X> implements Item {
 		if (id == GridRenderer.COLLAPSE_COL_PROPERTY_ID) {
 			return new ObjectProperty<>(rowBucket.getFormattedBucketValue(), String.class);
 		}
-		return getForColumn((Bucket<X>) id);
+		return getForColumn((Bucket<INPUT_TYPE>) id);
 	}
 
-	protected CellProperty getForColumn(final Bucket<X> id) {
+	protected CellProperty getForColumn(final Bucket<INPUT_TYPE> id) {
 		return cache.computeIfAbsent(id, CellProperty::new);
 	}
 
 	@SuppressWarnings("null")
 	@Override
-	public Collection<X> getItemPropertyIds() {
+	public Collection<INPUT_TYPE> getItemPropertyIds() {
 		assert false;
 		return null;
 	}

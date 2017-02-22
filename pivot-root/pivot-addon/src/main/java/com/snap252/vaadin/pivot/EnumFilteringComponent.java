@@ -7,8 +7,9 @@ import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.AbstractComponent;
 
 @NonNullByDefault
-public class EnumFilteringComponent<T extends Enum<T>> extends AbstractFilteringComponent<T> {
-	public EnumFilteringComponent(final Property nameType) {
+public class EnumFilteringComponent<INPUT_TYPE, T extends Enum<T>>
+		extends AbstractFilteringComponent<INPUT_TYPE, @Nullable T> {
+	public EnumFilteringComponent(final Property<INPUT_TYPE, @Nullable T> nameType) {
 		super(nameType);
 	}
 

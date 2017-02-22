@@ -19,7 +19,7 @@ public class SubBucket<V> extends Bucket<V> {
 	public final int depth;
 
 	public SubBucket(final Object bucketValue,
-			final List<? extends PivotCriteria<V, ?>> partitionCriterionsAndSubCriterions,
+			final List<? extends PivotCriteria<V, @Nullable ?>> partitionCriterionsAndSubCriterions,
 			@Nullable final SubBucket<V> parent, final PivotCriteria<V, ?> extractor, final Collection<V> values,
 			final int level) {
 		super(bucketValue, parent, extractor, values, level);
@@ -32,21 +32,13 @@ public class SubBucket<V> extends Bucket<V> {
 			children = null;
 	}
 
-	protected <@Nullable A> List<Bucket<V>> createChildren(
-			final List<? extends PivotCriteria<V, A>> partitionCriterionsAndSubCriterions,
-			@Nullable final SubBucket<V> parent, final Collection<V> values, final int level) {
-
-		@NonNull
-		final PivotCriteria<V, A> ownCriterion = partitionCriterionsAndSubCriterions.get(0);
+	private <@Nullable A> List<Bucket<V>> createChildren(final PivotCriteria<V, A> ownCriterion,
+			final List<? extends PivotCriteria<V, ?>> childCriterions, @Nullable final SubBucket<V> parent,
+			final Collection<V> values, final int level) {
 
 		final Collector<@NonNull V, ?, Map<@Nullable A, List<V>>> groupingBy = Collectors
 				.groupingBy(ownCriterion::apply);
 		final Map<@Nullable A, List<V>> collect = values.stream().filter(this).collect(groupingBy);
-
-		final List<? extends PivotCriteria<V, ?>> childCriterions = partitionCriterionsAndSubCriterions.subList(1,
-				partitionCriterionsAndSubCriterions.size());
-
-		assert childCriterions.size() == partitionCriterionsAndSubCriterions.size() - 1;
 
 		final List<Bucket<V>> children$ = collect.entrySet().stream()
 				.sorted(Entry.comparingByKey(ownCriterion::compare)).map(e -> {
@@ -62,6 +54,18 @@ public class SubBucket<V> extends Bucket<V> {
 									 */
 						+ "=> own: " + new HashSet<V>(values);
 		return children$;
+	}
+
+	private List<Bucket<V>> createChildren(
+			final List<? extends PivotCriteria<V, @Nullable ?>> partitionCriterionsAndSubCriterions,
+			@Nullable final SubBucket<V> parent, final Collection<V> values, final int level) {
+
+		@NonNull
+		final PivotCriteria<V, @Nullable ?> ownCriterion = partitionCriterionsAndSubCriterions.get(0);
+		final List<? extends PivotCriteria<V, ?>> childCriterions = partitionCriterionsAndSubCriterions.subList(1,
+				partitionCriterionsAndSubCriterions.size());
+		assert childCriterions.size() == partitionCriterionsAndSubCriterions.size() - 1;
+		return createChildren(ownCriterion, childCriterions, parent, values, level);
 	}
 
 	@Override

@@ -5,11 +5,12 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 public class RootBucket<V> extends SubBucket<V> {
 
 	public RootBucket(final String prefix, final List<V> values,
-			final List<? extends PivotCriteria<V, ?>> partitionCriterionsAndSubCriterions) {
+			final List<? extends PivotCriteria<V, @Nullable ?>> partitionCriterionsAndSubCriterions) {
 		super(prefix, partitionCriterionsAndSubCriterions, null, createUniquePivotCriteria(), values, 0);
 	}
 

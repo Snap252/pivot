@@ -25,6 +25,7 @@ public class BeanPropertyProvider<INPUT_TYPE> extends PropertyProvider<INPUT_TYP
 
 		private Method readMethod;
 
+		@SuppressWarnings("unchecked")
 		public BeanProperty(PropertyDescriptor p) {
 			super((Class<@Nullable OUTPUT_TYPE>) p.getPropertyType(), p.getDisplayName());
 			Method readMethod = p.getReadMethod();
@@ -33,6 +34,7 @@ public class BeanPropertyProvider<INPUT_TYPE> extends PropertyProvider<INPUT_TYP
 			this.readMethod = readMethod;
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public OUTPUT_TYPE getValue(INPUT_TYPE o) {
 			try {

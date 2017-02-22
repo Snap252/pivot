@@ -17,12 +17,12 @@ public final class DummyAggregator<INPUT_TYPE> implements ModelAggregtor<INPUT_T
 		return Collectors.collectingAndThen(Collectors.counting(), BigDecimal::valueOf);
 	}
 
-	@SuppressWarnings("null")
 	@Override
 	public RendererConverter<?, ? extends @NonNull BigDecimal> createRendererConverter() {
 		final BigDecimalRenderer renderer = new BigDecimalRenderer("-");
 		renderer.setFormat("0");
 
-		return new RendererConverter<BigDecimal, BigDecimal>(renderer, PivotCellReference::getValue, BigDecimal.class);
+		return new RendererConverter<@Nullable BigDecimal, BigDecimal>(renderer, PivotCellReference::getValue,
+				BigDecimal.class);
 	}
 }

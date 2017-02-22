@@ -55,8 +55,8 @@ public class ObjectValueExtractor<INPUT_TYPE> implements FilteringRenderingCompo
 
 	@Override
 	public Collector<INPUT_TYPE, ObjectStatistics, ObjectStatistics> getAggregator() {
-		return Collector.of(() -> new ObjectStatistics(),
-				(os1, os2) -> os1.add(property.getValue(os2)), ObjectStatistics::mergeTo, Function.identity());
+		return Collector.of(() -> new ObjectStatistics(), (os1, os2) -> os1.add(property.getValue(os2)),
+				ObjectStatistics::mergeTo, Function.identity());
 	}
 
 	@SuppressWarnings("null")
@@ -67,8 +67,8 @@ public class ObjectValueExtractor<INPUT_TYPE> implements FilteringRenderingCompo
 		final Function<@Nullable ObjectStatistics, BigDecimal> singleExtractor = t -> t == null ? null
 				: whatToRender.getValueAsBigDecimal(t);
 
-		return new RendererConverter<BigDecimal, ObjectStatistics>(renderer, x -> singleExtractor.apply(x.getValue()),
-				BigDecimal.class);
+		return new RendererConverter<@Nullable BigDecimal, ObjectStatistics>(renderer,
+				x -> singleExtractor.apply(x.getValue()), BigDecimal.class);
 	}
 
 	@Override

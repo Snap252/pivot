@@ -69,65 +69,6 @@ public final class MutableValue<N extends Number> {
 				+ ", arithmetics=" + arithmetics + "]";
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((arithmetics == null) ? 0 : arithmetics.hashCode());
-		result = prime * result + cnt;
-		result = prime * result + ((max != null) ? max.hashCode() : 0);
-		result = prime * result + ((min != null) ? min.hashCode() : 0);
-		result = prime * result + ((sqrSum != null) ? sqrSum.hashCode() : 0);
-		result = prime * result + ((sum != null) ? sum.hashCode() : 0);
-		return result;
-	}
-
-	@Override
-	public boolean equals(final @Nullable Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		@SuppressWarnings("rawtypes")
-		final MutableValue other = (MutableValue) obj;
-
-		if (!arithmetics.equals(other.arithmetics))
-			return false;
-		if (cnt != other.cnt)
-			return false;
-		@Nullable
-		final N max$ = max;
-		if (max$ == null) {
-			if (other.max != null)
-				return false;
-		} else if (!max$.equals(other.max))
-			return false;
-		@Nullable
-		final N min$ = min;
-		if (min$ == null) {
-			if (other.min != null)
-				return false;
-		} else if (!min$.equals(other.min))
-			return false;
-		@Nullable
-		final N sqrSum$ = sqrSum;
-		if (sqrSum$ == null) {
-			if (other.sqrSum != null)
-				return false;
-		} else if (!sqrSum$.equals(other.sqrSum))
-			return false;
-		@Nullable
-		final N sum$ = sum;
-		if (sum$ == null) {
-			if (other.sum != null)
-				return false;
-		} else if (!sum$.equals(other.sum))
-			return false;
-		return true;
-	}
-
 	private void doMax(@Nullable final N otherMax) {
 		if (max == null) {
 			max = otherMax;

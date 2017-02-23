@@ -1,10 +1,12 @@
-package com.snap252.org.pivoting;
+package com.snap252.org.testing.rendering;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
+
+import com.snap252.org.pivoting.PivotCriteria;
 
 public final class BiBucketParameter<V> {
 	public final List<V> values;

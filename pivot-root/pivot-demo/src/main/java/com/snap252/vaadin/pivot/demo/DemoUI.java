@@ -8,6 +8,8 @@ import javax.servlet.annotation.WebServlet;
 import com.snap252.org.testing.RandomDataGenerator;
 import com.snap252.org.testing.RandomDataGenerator.Person;
 import com.snap252.vaadin.pivot.ContainerPropertyProvider;
+import com.snap252.vaadin.pivot.ExtractOncePropertyProvider;
+import com.snap252.vaadin.pivot.ExtractOncePropertyProvider.PropertyOnceItem;
 import com.snap252.vaadin.pivot.GridRendererParameter;
 import com.snap252.vaadin.pivot.PivotGrid;
 import com.snap252.vaadin.pivot.PivotUI;
@@ -15,7 +17,6 @@ import com.snap252.vaadin.pivot.PropertyProvider;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.annotations.VaadinServletConfiguration;
-import com.vaadin.data.Item;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
@@ -33,7 +34,7 @@ public class DemoUI extends UI {
 	public static class Servlet extends VaadinServlet {
 	}
 
-	private final GridRendererParameter<Item, ?> gridRendererParameter = new GridRendererParameter<>(xxx());
+	private final GridRendererParameter<PropertyOnceItem, ?> gridRendererParameter = new GridRendererParameter<>(xxx());
 
 	@Override
 	protected void init(VaadinRequest request) {
@@ -63,11 +64,11 @@ public class DemoUI extends UI {
 		gridRendererParameter.setValues(xxx().getItems().collect(Collectors.toList()));
 	}
 
-	private PropertyProvider<Item, ?> xxx() {
+	private PropertyProvider<PropertyOnceItem, ?> xxx() {
 		List<Person> personen = RandomDataGenerator.createPersons(4000);
 		BeanItemContainer<Person> container = new BeanItemContainer<>(Person.class);
 		container.addAll(personen);
-		return new ContainerPropertyProvider(PivotUI.cloneContainer(container));
+		return new ExtractOncePropertyProvider<>(new ContainerPropertyProvider(container));
 	}
 
 }

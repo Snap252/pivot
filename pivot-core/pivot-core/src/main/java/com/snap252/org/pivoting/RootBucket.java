@@ -30,7 +30,7 @@ public class RootBucket<V> extends SubBucket<V> {
 	}
 
 	@Override
-	protected Collection<V> filter(final Collection<V> l) {
+	public Collection<V> filter(final Collection<V> l) {
 		return l;
 	}
 }

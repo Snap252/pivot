@@ -1,4 +1,4 @@
-package com.snap252.org.pivoting;
+package com.snap252.org.testing.rendering;
 
 import static java.util.stream.Collectors.toList;
 
@@ -14,6 +14,9 @@ import java.util.stream.Collector;
 import java.util.stream.Stream;
 
 import org.eclipse.jdt.annotation.Nullable;
+
+import com.snap252.org.pivoting.Bucket;
+import com.snap252.org.pivoting.RootBucket;
 
 public class BiBucket<RAW> {
 
@@ -35,8 +38,8 @@ public class BiBucket<RAW> {
 				final Collector<V, W, W> collectorWithoutFinisher,
 				final Collector<W, W, W> collectorWithoutTransformer) {
 			this.rowBucket = rowBucket;
-			this.cells = colBucket.createBucketWithNewValues(rowBucket.values, collectorWithoutFinisher,
-					collectorWithoutTransformer);
+			this.cells = new CopyBucket<>(colBucket, rowBucket.filterOwnValues(colBucket).collect(toList()),
+					collectorWithoutFinisher, collectorWithoutTransformer, null);
 
 			assert colBucket.stream().allMatch(r -> cells.getChild(r) != null);
 		}

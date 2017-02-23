@@ -25,9 +25,9 @@ import com.snap252.org.aggregators.BigDecimalArithmetics;
 import com.snap252.org.aggregators.MutableValue;
 import com.snap252.org.aggregators.NumberStatistics;
 import com.snap252.org.aggregators.PivotCollectors;
-import com.snap252.org.pivoting.BiBucket;
-import com.snap252.org.pivoting.BiBucketParameter;
 import com.snap252.org.pivoting.NamedPivotCriteria;
+import com.snap252.org.testing.rendering.BiBucket;
+import com.snap252.org.testing.rendering.BiBucketParameter;
 
 public class RandomDataGenerator {
 	private static final Random RANDOM = new Random();

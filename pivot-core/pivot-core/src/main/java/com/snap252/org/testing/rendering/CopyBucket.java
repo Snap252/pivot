@@ -1,4 +1,4 @@
-package com.snap252.org.pivoting;
+package com.snap252.org.testing.rendering;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -11,6 +11,9 @@ import java.util.Map;
 import java.util.stream.Collector;
 
 import org.eclipse.jdt.annotation.Nullable;
+
+import com.snap252.org.pivoting.Bucket;
+import com.snap252.org.pivoting.PivotCriteria;
 
 public class CopyBucket<V, W> extends Bucket<V> {
 

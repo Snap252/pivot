@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
-import java.util.stream.Collector;
 import java.util.stream.Stream;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -101,7 +100,7 @@ public abstract class Bucket<V> implements Predicate<@NonNull V> {
 
 	public abstract @Nullable List<@NonNull ? extends Bucket<V>> getChildren();
 
-	protected Collection<V> filter(final Collection<V> l) {
+	public Collection<V> filter(final Collection<V> l) {
 		if (l.isEmpty()) {
 			return l;
 		}
@@ -112,11 +111,6 @@ public abstract class Bucket<V> implements Predicate<@NonNull V> {
 
 	public int getLevel() {
 		return level;
-	}
-
-	public <W> CopyBucket<V, W> createBucketWithNewValues(final Collection<V> newValuesBase,
-			final Collector<V, W, W> collectorWithoutFinisher, final Collector<W, W, W> collectorWithoutTransformer) {
-		return new CopyBucket<>(this, newValuesBase, collectorWithoutFinisher, collectorWithoutTransformer, null);
 	}
 
 	public final Bucket<V> getParentOrSelf() {

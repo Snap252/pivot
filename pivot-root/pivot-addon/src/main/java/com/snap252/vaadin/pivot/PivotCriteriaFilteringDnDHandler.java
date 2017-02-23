@@ -44,11 +44,12 @@ public class PivotCriteriaFilteringDnDHandler<INPUT_TYPE>
 
 	@Override
 	protected AbstractComponent createUIComponent(final FilteringComponent<INPUT_TYPE, ?> createFilter) {
-		final AbstractComponent component = createFilter.getComponent();
+		final UIConfigurable uiConfigurable = createUIConfigurable(createFilter);
+		final AbstractComponent component = uiConfigurable.getComponent();
 
 		final Button b;
 		if (component != null) {
-			final PopupButton popupButton = new PopupButton(createFilter.toString());
+			final PopupButton popupButton = new PopupButton(uiConfigurable.toString());
 			final Button deleteButton = new Button("Entfernen", evt -> {
 				removeFromList(Objects.requireNonNull(popupButton.getParent()), createFilter, this);
 				popupButton.setPopupVisible(false);
@@ -70,19 +71,23 @@ public class PivotCriteriaFilteringDnDHandler<INPUT_TYPE>
 					refresh();
 					/* we need a this-context here */
 					popupButton.removePopupVisibilityListener(this);
-					popupButton.setCaption(createFilter.toString());
-					popupButton.addStyleName(createFilter.getButtonStyles());
+					popupButton.setCaption(uiConfigurable.toString());
+					popupButton.addStyleName(uiConfigurable.getButtonStyles());
 				}
 			};
 
-			createFilter.addValueChangeListener(_ignore -> {
+			uiConfigurable.addValueChangeListener(_ignore -> {
 				popupButton.removePopupVisibilityListener(listener);
 				popupButton.addPopupVisibilityListener(listener);
 			});
 			b = popupButton;
 		} else
-			b = new Button(createFilter.toString());
+			b = new Button(uiConfigurable.toString());
 		b.addStyleName(ValoTheme.BUTTON_SMALL);
 		return b;
+	}
+
+	protected UIConfigurable createUIConfigurable(final FilteringComponent<INPUT_TYPE, ?> filteringComponent) {
+		return (UIConfigurable) filteringComponent;
 	}
 }

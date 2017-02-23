@@ -16,7 +16,7 @@ public class RelativeWrapperAggregator<X> extends Aggregator<@Nullable X, @Nulla
 	RelativeWrapperAggregator(final Aggregator<@Nullable X, @Nullable Number> aggregator) {
 		this.aggregator = aggregator;
 	}
-	
+
 	@Override
 	public @Nullable BigDecimal getConvertedValue(@Nullable final X value) {
 		return null;

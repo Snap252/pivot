@@ -6,7 +6,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
 @NonNullByDefault
-public interface FilteringComponent<INPUT_TYPE, @Nullable DATA_TYPE> extends UIConfigurable {
+public interface FilteringComponent<INPUT_TYPE, @Nullable DATA_TYPE>  {
 	Property<INPUT_TYPE, @Nullable DATA_TYPE> getProperty();
 
 	default DATA_TYPE round(final DATA_TYPE t) {

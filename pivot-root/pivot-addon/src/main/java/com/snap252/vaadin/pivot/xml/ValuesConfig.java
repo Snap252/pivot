@@ -20,7 +20,7 @@ public class ValuesConfig {
 			@XmlElement(name = "string", type = StringAttribute.class)
 
 	})
-	public List<Attribute> attributes = new ArrayList<>();
+	public List<Attribute<?>> attributes = new ArrayList<>();
 
 	@XmlAttribute
 	public boolean colorize = false;

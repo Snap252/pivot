@@ -38,7 +38,7 @@ public enum DateRounding {
 	ALL(new SimpleDateFormat("HH:mm dd.MM.yyyy"), null),
 
 	;
-	final SimpleDateFormat df;
+	public final SimpleDateFormat df;
 	final @Nullable String s;
 
 	DateRounding(final SimpleDateFormat df, @Nullable final String s) {

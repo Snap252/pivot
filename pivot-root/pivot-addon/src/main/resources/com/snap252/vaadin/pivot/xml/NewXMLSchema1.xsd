@@ -138,7 +138,7 @@
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:complexType name="configDateFormat">
+  <xs:complexType name="configDateFormat" abstract="true">
     <xs:sequence/>
   </xs:complexType>
 
@@ -155,7 +155,7 @@
     <xs:complexContent>
       <xs:extension base="attribute">
         <xs:sequence/>
-        <xs:attribute name="sub-string" type="xs:int"/>
+        <xs:attribute name="substring" type="xs:int"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -207,6 +207,7 @@
       <xs:enumeration value="max"/>
       <xs:enumeration value="min"/>
       <xs:enumeration value="sum"/>
+      <xs:enumeration value="var"/>
       <xs:enumeration value="cnt"/>
     </xs:restriction>
   </xs:simpleType>

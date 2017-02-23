@@ -5,7 +5,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 @NonNullByDefault
 public abstract class AbstractFilteringComponent<INPUT_TYPE, @Nullable DATA_TYPE>
-		implements FilteringComponent<INPUT_TYPE, DATA_TYPE> {
+		implements FilteringComponent<INPUT_TYPE, DATA_TYPE>, UIConfigurable {
 
 	protected final Property<INPUT_TYPE, DATA_TYPE> property;
 

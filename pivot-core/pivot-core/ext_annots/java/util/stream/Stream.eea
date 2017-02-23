@@ -13,7 +13,7 @@ flatMap
  <R:Ljava/lang/Object;>(Ljava/util/function/Function<-TT;+Ljava/util/stream/Stream<+TR;>;>;)L1java/util/stream/Stream<TR;>;
 map
  <R:Ljava/lang/Object;>(Ljava/util/function/Function<-TT;+TR;>;)Ljava/util/stream/Stream<TR;>;
- <R:Ljava/lang/Object;>(L1java/util/function/Function<-TT;+TR;>;)Ljava/util/stream/Stream<TR;>;
+ <R:Ljava/lang/Object;>(L1java/util/function/Function<-TT;+TR;>;)L1java/util/stream/Stream<TR;>;
 of
  <T:Ljava/lang/Object;>(TT;)Ljava/util/stream/Stream<TT;>;
  <T:Ljava/lang/Object;>(TT;)L1java/util/stream/Stream<TT;>;

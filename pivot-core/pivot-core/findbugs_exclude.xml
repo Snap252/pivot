@@ -1,0 +1,14 @@
+<FindBugsFilter>
+	<Match>
+		<!-- NP_NONNULL, NP_STORE_INTO_NONNULL_FIELD ... wird schon sehr gut von Eclipse getestet. Diese Bug Pattern liefern allerdings
+			falsche Fehlermeldungen beim Aufruf des Findbugs-Eclipse-Plugins -->
+		<Bug
+			pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE,NP_STORE_INTO_NONNULL_FIELD,NP_NONNULL_PARAM_VIOLATION,NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE,NP_NONNULL_RETURN_VIOLATION,NP_NULL_PARAM_DEREF,NP_NULL_PARAM_DEREF_NONVIRTUAL,NP_NONNULL_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR,RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"/>
+	</Match>
+	<Match>
+		<Bug pattern="SE_BAD_FIELD"/> 	<!-- liefert "non-transient non-serializable instance field"-Warnungen, die uns nicht interessieren. -->
+	</Match>
+	<Match>
+		<Bug pattern="SE_BAD_FIELD_STORE"/> <!-- benötigen wir nicht -->
+	</Match>
+</FindBugsFilter>

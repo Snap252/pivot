@@ -13,7 +13,12 @@ public interface FilteringComponent<INPUT_TYPE, @Nullable DATA_TYPE> extends UIC
 		return t;
 	}
 
+	default DATA_TYPE rounded(final INPUT_TYPE o) {
+		return round(getProperty().getValue(o));
+	}
+
 	default @Nullable String format(final DATA_TYPE t) {
 		return t == null ? null : Objects.toString(t);
 	}
+
 }

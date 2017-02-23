@@ -122,7 +122,7 @@ public final class GridRendererParameter<INPUT_TYPE, VALUE_TYPE> {
 		return new PivotCriteria<INPUT_TYPE, @Nullable X>() {
 			@Override
 			public @Nullable X apply(final INPUT_TYPE t) {
-				return cf.round(property.getValue(t));
+				return cf.rounded(t);
 			}
 
 			@Override

@@ -9,7 +9,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
-import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
@@ -75,11 +74,6 @@ public class DateFilteringComponent<INPUT_TYPE> extends AbstractFilteringCompone
 	// throw new AssertionError();
 	// }
 	// }
-
-	@Override
-	public void addValueChangeListener(final ValueChangeListener l) {
-		c.addValueChangeListener(l);
-	}
 
 	@Override
 	public String toString() {

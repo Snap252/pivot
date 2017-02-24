@@ -6,12 +6,15 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import javax.xml.bind.JAXBException;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.vaadin.miki.mapcontainer.MapContainer;
 
 import com.snap252.vaadin.pivot.valuegetter.ValueGetterDnDHandler;
+import com.snap252.vaadin.pivot.xml.Config;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.event.dd.DropHandler;
@@ -21,7 +24,6 @@ import com.vaadin.ui.DragAndDropWrapper;
 import com.vaadin.ui.DragAndDropWrapper.DragStartMode;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.themes.ValoTheme;
 
 import fi.jasoft.dragdroplayouts.DDHorizontalLayout;
@@ -31,22 +33,32 @@ import fi.jasoft.dragdroplayouts.DDVerticalLayout;
 public class PivotUI extends GridLayout {
 
 	private final HorizontalLayout properties;
-	private final GridRendererParameter<?, ?> gridRendererParameter;
+	// private final GridRendererParameter<?, ?> gridRendererParameter;
+	private @NonNull Config config;
 
 	public PivotUI(final GridRendererParameter<?, ?> gridRendererParameter) {
 		this(PivotGrid::new, gridRendererParameter);
 	}
 
 	public <INPUT_TYPE> PivotUI(final Function<GridRendererParameter<INPUT_TYPE, ?>, Component> f,
-			final GridRendererParameter<INPUT_TYPE, ?> gridRendererParameter) {
+			final GridRendererParameter<INPUT_TYPE, ?> gridRendererParameterx) {
 		super(2, 3);
-		this.gridRendererParameter = gridRendererParameter;
+		// this.gridRendererParameter = gridRendererParameter;
+		this.config = gridRendererParameterx.config;
 		addStyleName("pivot");
 
 		setSpacing(true);
-		final Component pivotGrid$ = f.apply(gridRendererParameter);
+
 		{
-			final Component renderer = new Label("");
+			final Component renderer = new Button("xml in console", (_ignore) -> {
+				try {
+					System.err.println(config.toXml());
+				} catch (final JAXBException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			});
+
 			renderer.setSizeUndefined();
 			properties = new HorizontalLayout();
 			properties.setCaption("properties");
@@ -55,7 +67,7 @@ public class PivotUI extends GridLayout {
 			addComponents(renderer, rowDndWrapper);
 
 			{
-				final Component[] labels = gridRendererParameter.getProperties().stream().map(propertyId -> {
+				final Component[] labels = gridRendererParameterx.getProperties().stream().map(propertyId -> {
 					assert propertyId != null;
 					final Component button = new Button(propertyId.toString());
 					button.addStyleName(ValoTheme.BUTTON_SMALL);
@@ -75,17 +87,16 @@ public class PivotUI extends GridLayout {
 			final DDVerticalLayout aggregator = new DDVerticalLayout();
 			aggregator.setSpacing(true);
 			final DragAndDropWrapper aggregatorDragAndDropWrapper = new DragAndDropWrapper(aggregator);
-			final DropHandler aggDopHandler = new ValueGetterDnDHandler<INPUT_TYPE>(aggregator, true, i -> {
-				gridRendererParameter.setModelAggregator(!i.isEmpty() ? i.get(0) : null);
-			}, gridRendererParameter::aggregatorUpated, gridRendererParameter::rendererUpated);
+			final DropHandler aggDopHandler = new ValueGetterDnDHandler<INPUT_TYPE>(aggregator, true,
+					config.getRendererAsNotifyingList());
 
 			aggregator.setDropHandler(aggDopHandler);
 			aggregatorDragAndDropWrapper.setDropHandler(aggDopHandler);
 
 			final DDHorizontalLayout cols = new DDHorizontalLayout();
 			cols.addStyleName("pivot-ui-cols");
-			final DropHandler dropHandler = new PivotCriteriaFilteringDnDHandler<INPUT_TYPE>(cols, false,
-					gridRendererParameter::setColFnkt, gridRendererParameter::colFunctionsUpated);
+			final DropHandler dropHandler = new PivotCriteriaFilteringDnDHandler(cols, false,
+					config.columns.attributes);
 			cols.setDropHandler(dropHandler);
 			cols.setSpacing(true);
 
@@ -97,8 +108,9 @@ public class PivotUI extends GridLayout {
 		{
 			final DDVerticalLayout rows = new DDVerticalLayout();
 			rows.addStyleName("pivot-ui-rows");
-			final DropHandler dropHandler = new PivotCriteriaFilteringDnDHandler<INPUT_TYPE>(rows, true,
-					gridRendererParameter::setRowFnkt, gridRendererParameter::rowFunctionsUpated);
+
+			final DropHandler dropHandler = new PivotCriteriaFilteringDnDHandler(rows, true, config.rows.attributes);
+
 			rows.setDropHandler(dropHandler);
 			rows.setSpacing(true);
 
@@ -107,6 +119,7 @@ public class PivotUI extends GridLayout {
 			rowDnDWrapper.setWidth(150, Unit.PIXELS);
 			rowDnDWrapper.setHeight("100%");
 
+			final Component pivotGrid$ = f.apply(gridRendererParameterx);
 			pivotGrid$.setSizeFull();
 			addComponents(rowDnDWrapper, pivotGrid$);
 		}
@@ -114,37 +127,6 @@ public class PivotUI extends GridLayout {
 		setRowExpandRatio(2, 1);
 		setColumnExpandRatio(1, 1);
 	}
-
-	public void updateUI() {
-		final Component[] labels = gridRendererParameter.getProperties().stream().map(propertyId -> {
-			assert propertyId != null;
-			final Component button = new Button(propertyId.toString());
-			button.addStyleName(ValoTheme.BUTTON_SMALL);
-			button.setEnabled(false);
-			final DragAndDropWrapper wrapper = new DragAndDropWrapper(button);
-			wrapper.setDragStartMode(DragStartMode.COMPONENT);
-			wrapper.setData(propertyId);
-			return wrapper;
-		}).toArray(i -> new Component[i]);
-		properties.removeAllComponents();
-		properties.addComponents(labels);
-	}
-
-	// public <X> List<X> setContainerDataSource(final PropertyProvider<X, ?>
-	// provider) {
-	//
-	//
-	// // p = new
-	// //
-	// BiBucketParameter<>(c.getItemIds().stream().map(c::getItem).collect(toList()),
-	// // Collections.emptyList(),
-	// // Collections.emptyList());
-	//
-	//
-	//
-	// return provider.getItems().collect(toList());
-	//
-	// }
 
 	public static Container cloneContainer(final Container origContainer) {
 		return cloneContainer(origContainer, f -> f);

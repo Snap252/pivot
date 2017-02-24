@@ -49,11 +49,6 @@ public class ObjectValueExtractor<INPUT_TYPE> implements FilteringRenderingCompo
 	}
 
 	@Override
-	public void addValueChangeListener(final ValueChangeListener valueChangeListener) {
-		howToRenderComboBox.addValueChangeListener(valueChangeListener);
-	}
-
-	@Override
 	public Collector<INPUT_TYPE, ObjectStatistics, ObjectStatistics> getAggregator() {
 		return Collector.of(() -> new ObjectStatistics(), (os1, os2) -> os1.add(property.getValue(os2)),
 				ObjectStatistics::mergeTo, Function.identity());

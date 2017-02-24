@@ -6,7 +6,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.snap252.vaadin.pivot.UIConfigurable;
-import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Slider;
@@ -21,7 +20,7 @@ public class StringAttribute extends Attribute<@Nullable String> {
 	}
 
 	@Override
-	protected UIConfigurable createUIConfigurable() {
+	public @NonNull UIConfigurable createUIConfigurable() {
 		return new StringUIConfigurable();
 	}
 
@@ -42,11 +41,6 @@ public class StringAttribute extends Attribute<@Nullable String> {
 		@Override
 		public @NonNull AbstractComponent getComponent() {
 			return comp;
-		}
-
-		@Override
-		public void addValueChangeListener(@NonNull final ValueChangeListener valueChangeListener) {
-
 		}
 
 	}

@@ -1,6 +1,7 @@
 package com.snap252.vaadin.pivot.xml.bucketextractors;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -9,11 +10,14 @@ import com.snap252.vaadin.pivot.FilteringComponent;
 import com.snap252.vaadin.pivot.Property;
 import com.snap252.vaadin.pivot.PropertyProvider;
 import com.snap252.vaadin.pivot.UIConfigurable;
+import com.snap252.vaadin.pivot.xml.data.ChangeNotifier;
+import com.snap252.vaadin.pivot.xml.data.ChangeNotifierImpl;
+import com.snap252.vaadin.pivot.xml.data.ChangeNotifierSupplier;
 import com.snap252.vaadin.pivot.xml.data.DataExtractor;
 import com.snap252.vaadin.pivot.xml.data.FilteringComponentImpl;
-import com.vaadin.data.Property.ValueChangeListener;
 
-public abstract class Attribute<@Nullable DATA_TYPE> implements DataExtractor<DATA_TYPE> {
+public abstract class Attribute<@Nullable DATA_TYPE>
+		implements DataExtractor<DATA_TYPE>, ChangeNotifierSupplier<Attribute<?>> {
 	@XmlAttribute(name = "name", required = true)
 	public String attributeName = "";
 
@@ -24,24 +28,45 @@ public abstract class Attribute<@Nullable DATA_TYPE> implements DataExtractor<DA
 		return input != null ? roundImpl(input) : null;
 	}
 
+	protected final String format(final DATA_TYPE input) {
+		return input != null ? formatImpl(input) : "";
+	}
+
 	protected abstract @NonNull DATA_TYPE roundImpl(@NonNull DATA_TYPE input);
 
+	protected String formatImpl(@NonNull final DATA_TYPE input) {
+		return input.toString();
+	}
+
 	@Override
-	public final <A> FilteringComponent<A, DATA_TYPE> createFilteringComonent(
-			final PropertyProvider<A, ? extends Property<A, DATA_TYPE>> pp) {
+	public final <INPUT_TYPE> FilteringComponent<INPUT_TYPE, DATA_TYPE> createFilteringComonent(
+			final PropertyProvider<INPUT_TYPE, ?> pp) {
 		assert !attributeName.isEmpty();
-		final Property<A, DATA_TYPE> property = pp.getProperty(attributeName);
+		@SuppressWarnings("unchecked")
+		final Property<INPUT_TYPE, DATA_TYPE> property = (Property<INPUT_TYPE, @Nullable DATA_TYPE>) pp
+				.getProperty(attributeName);
+		// TODO: assert type
 
-		return new FilteringComponentImpl<>(property, createUIConfigurable());
+		return new FilteringComponentImpl<>(property, this::createUIConfigurable, this::round, this::format);
 	}
 
-	protected abstract UIConfigurable createUIConfigurable();
+	public abstract UIConfigurable createUIConfigurable();
 
+	@XmlTransient
+	public String getDisplayName() {
+		return attributeName;
+	}
 
-	protected final void fireValueChange(){
-		System.out.println("Attribute.fireValueChange()");
+	@XmlTransient
+	@Override
+	public ChangeNotifier<Attribute<?>> getChangeNotifierSupplier() {
+		return cn;
 	}
-	public final void addValueChangeListener(final ValueChangeListener valueChangeListener) {
-		System.err.println(valueChangeListener);
+
+	private final ChangeNotifierImpl<Attribute<?>> cn = new ChangeNotifierImpl<>();
+
+	protected final void fireChange() {
+		cn.fireChange(this);
 	}
+
 }

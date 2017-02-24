@@ -4,11 +4,9 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
-import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Slider;
-import com.vaadin.ui.themes.ValoTheme;
 
 @NonNullByDefault
 public class StringFilteringComponent<INPUT_TYPE> extends AbstractFilteringComponent<INPUT_TYPE, @Nullable String> {
@@ -42,23 +40,10 @@ public class StringFilteringComponent<INPUT_TYPE> extends AbstractFilteringCompo
 	}
 
 	@Override
-	public void addValueChangeListener(final ValueChangeListener l) {
-		slider.addValueChangeListener(l);
-	}
-
-	@Override
 	public @NonNull String toString() {
 		final Double v = slider.getValue();
 		if (v == null || v.intValue() == 0)
 			return super.toString();
 		return super.toString() + " (" + v.intValue() + ")";
-	}
-
-	@Override
-	public @NonNull String getButtonStyles() {
-		final Double v = slider.getValue();
-		if (v == null || v.intValue() == 0)
-			return super.getButtonStyles();
-		return ValoTheme.BUTTON_FRIENDLY;
 	}
 }

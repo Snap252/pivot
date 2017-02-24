@@ -4,7 +4,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
-import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Slider;
@@ -45,11 +44,6 @@ public class NumberFilteringComponent<INPUT_TYPE, T extends Number>
 			return (T) i;
 		}
 		return ret;
-	}
-
-	@Override
-	public void addValueChangeListener(final ValueChangeListener l) {
-		slider.addValueChangeListener(l);
 	}
 
 	@Override

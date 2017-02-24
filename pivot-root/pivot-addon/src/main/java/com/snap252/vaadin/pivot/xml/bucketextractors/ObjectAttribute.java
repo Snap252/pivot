@@ -4,7 +4,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.snap252.vaadin.pivot.UIConfigurable;
-import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Label;
 
@@ -16,7 +15,7 @@ public class ObjectAttribute extends Attribute<@Nullable Object> {
 	}
 
 	@Override
-	protected @NonNull UIConfigurable createUIConfigurable() {
+	public @NonNull UIConfigurable createUIConfigurable() {
 		return new DummyUIConfigurable();
 	}
 
@@ -27,10 +26,5 @@ public class ObjectAttribute extends Attribute<@Nullable Object> {
 			return new Label();
 		}
 
-		@Override
-		public void addValueChangeListener(@NonNull final ValueChangeListener valueChangeListener) {
-			// TODO Auto-generated method stub
-
-		}
 	}
 }

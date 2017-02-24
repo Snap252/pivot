@@ -5,18 +5,27 @@ import java.math.BigDecimal;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.snap252.vaadin.pivot.Property;
+import com.snap252.vaadin.pivot.xml.renderers.DecimalValueField;
+import com.snap252.vaadin.pivot.xml.renderers.IntegerValueField;
+import com.snap252.vaadin.pivot.xml.renderers.ObjectValueField;
+import com.snap252.vaadin.pivot.xml.renderers.ValueField;
 
 public class ValueFactory {
-	@SuppressWarnings({ "unchecked" })
-	protected <INPUT_TYPE> FilteringRenderingComponent<INPUT_TYPE, @Nullable ?> createFilter(
-			final Property<INPUT_TYPE, @Nullable ?> n) {
+	protected ValueField<?> createFilter(final Property<?, @Nullable ?> n) {
+		final ValueField<?> ret = createImpl(n);
+		ret.attributeName = n.getName();
+		return ret;
+	}
+
+	private final ValueField<?> createImpl(final Property<?, ?> n) {
 
 		if (BigDecimal.class.isAssignableFrom(n.getType()))
-			return new BigDecimalValueExtractor<>((Property<INPUT_TYPE, @Nullable BigDecimal>) n);
+			return new DecimalValueField();
 
 		if (Integer.class.isAssignableFrom(n.getType()))
-			return new IntValueExtractor<>((Property<INPUT_TYPE, @Nullable BigDecimal>) n);
+			return new IntegerValueField();
 
-		return new ObjectValueExtractor<>((Property<INPUT_TYPE, @Nullable Object>) n);
+		return new ObjectValueField();
+
 	}
 }

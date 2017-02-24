@@ -29,7 +29,6 @@ import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Slider;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.themes.ValoTheme;
 
 public class BigDecimalValueExtractor<INPUT_TYPE>
 		extends AbstractNumberValueGetterRenderingComponent<INPUT_TYPE, @Nullable BigDecimal> {
@@ -127,29 +126,11 @@ public class BigDecimalValueExtractor<INPUT_TYPE>
 	// }
 
 	@Override
-	public void addValueChangeListener(final ValueChangeListener l) {
-		howToRenderComboBox.addValueChangeListener(l);
-		roundingEnabledCheckBox.addValueChangeListener(l);
-		slider.addValueChangeListener(l);
-		relativeCheckBox.addValueChangeListener(l);
-		numberFormatTextField.addValueChangeListener(l);
-		nullRepresentationTextField.addValueChangeListener(l);
-	}
-
-	@Override
 	public void addRendererChangeListener(final ValueChangeListener l) {
 		// howToRenderComboBox.addValueChangeListener(l);
 		numberFormatTextField.addValueChangeListener(l);
 		nullRepresentationTextField.addValueChangeListener(l);
 		relativeCheckBox.addValueChangeListener(l);
-	}
-
-	@Override
-	public String getButtonStyles() {
-		if (roundingEnabled)
-			return ValoTheme.BUTTON_FRIENDLY;
-
-		return super.getButtonStyles();
 	}
 
 	@Override

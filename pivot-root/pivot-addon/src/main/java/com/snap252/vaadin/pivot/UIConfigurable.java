@@ -1,19 +1,23 @@
 package com.snap252.vaadin.pivot;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
-import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.AbstractComponent;
+import com.vaadin.ui.AbstractOrderedLayout;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.VerticalLayout;
 
 @NonNullByDefault
 public interface UIConfigurable {
 	@Nullable
-	abstract AbstractComponent getComponent();
+	AbstractComponent getComponent();
 
-	abstract void addValueChangeListener(ValueChangeListener valueChangeListener);
-
-	default String getButtonStyles() {
-		return "";
+	default AbstractOrderedLayout getWrapper(final String caption, final @NonNull Component... children) {
+		final VerticalLayout verticalLayout = new VerticalLayout(children);
+		verticalLayout.setCaption(caption);
+		verticalLayout.setMargin(true);
+		return verticalLayout;
 	}
 }

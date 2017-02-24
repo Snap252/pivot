@@ -17,7 +17,7 @@ public abstract class Property<INPUT_TYPE, @Nullable OUTPUT_TYPE> {
 		return clazz;
 	}
 
-	String getName() {
+	public final String getName() {
 		return name;
 	}
 

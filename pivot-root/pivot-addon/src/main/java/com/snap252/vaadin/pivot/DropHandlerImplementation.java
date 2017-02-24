@@ -1,6 +1,5 @@
 package com.snap252.vaadin.pivot;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -29,15 +28,13 @@ public abstract class DropHandlerImplementation<T> implements DropHandler {
 
 	private final AbstractOrderedLayout cols;
 	private final boolean vertical;
-	private final Consumer<List<T>> refresherOfSetChanged;
-	private final List<T> pivotCriteriaList;
+	private final List<T> currentElements;
 
 	public DropHandlerImplementation(final AbstractOrderedLayout cols, final boolean vertical,
-			final Consumer<List<T>> refresherOfSetChanged) {
+			final List<T> currentElements) {
 		this.cols = cols;
 		this.vertical = vertical;
-		this.refresherOfSetChanged = refresherOfSetChanged;
-		this.pivotCriteriaList = new ArrayList<T>();
+		this.currentElements = currentElements;
 	}
 
 	@Override
@@ -96,9 +93,8 @@ public abstract class DropHandlerImplementation<T> implements DropHandler {
 		pivotCriteriaList.cols.removeComponent(sourceComponent);
 		pivotCriteriaList.updateAllComponentIndices();
 
-		final boolean changed = pivotCriteriaList.pivotCriteriaList.remove(data2);
+		final boolean changed = pivotCriteriaList.currentElements.remove(data2);
 		assert changed;
-		pivotCriteriaList.fireListChanged();
 	}
 
 	private void updateAllComponentIndices(){
@@ -132,18 +128,8 @@ public abstract class DropHandlerImplementation<T> implements DropHandler {
 			uiComponent.setWidth("100%");
 		}
 		if (index == -1)
-			pivotCriteriaList.add(createFilter);
+			currentElements.add(createFilter);
 		else
-			pivotCriteriaList.add(index, createFilter);
-
-		fireListChanged();
+			currentElements.add(index, createFilter);
 	}
-
-	private void fireListChanged() {
-		refresherOfSetChanged.accept(pivotCriteriaList);
-	}
-
-//	protected final void refresh() {
-//		refresherOfPropertyChanged.run();
-//	}
 }

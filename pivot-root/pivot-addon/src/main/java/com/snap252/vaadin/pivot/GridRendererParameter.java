@@ -1,7 +1,5 @@
 package com.snap252.vaadin.pivot;
 
-import static java.util.stream.Collectors.toList;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
@@ -9,7 +7,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -19,6 +19,8 @@ import com.snap252.org.pivoting.RootBucket;
 import com.snap252.vaadin.pivot.GridRendererParameter.ParameterChangeListener.ParametersChangedEventArgs;
 import com.snap252.vaadin.pivot.valuegetter.DummyAggregator;
 import com.snap252.vaadin.pivot.valuegetter.ModelAggregtor;
+import com.snap252.vaadin.pivot.xml.Config;
+import com.snap252.vaadin.pivot.xml.bucketextractors.Attribute;
 
 @NonNullByDefault
 public final class GridRendererParameter<INPUT_TYPE, VALUE_TYPE> {
@@ -26,13 +28,20 @@ public final class GridRendererParameter<INPUT_TYPE, VALUE_TYPE> {
 	private final PropertyProvider<INPUT_TYPE, ?> provider;
 
 	enum GridRendererChangeParameterKind {
-		ROW_FNKT, COL_FNKT, VALUES, AGGREGATOR, CONVERTER, RENDERER
+		ROW_FNKT, COL_FNKT, VALUES, AGGREGATOR/* , CONVERTER, RENDERER */
 
 		;
 	}
 
+	public final Config config = new Config();
+
 	public GridRendererParameter(final PropertyProvider<INPUT_TYPE, ?> provider) {
 		this.provider = provider;
+
+		config.rows.attributes.addChangeListener(_l -> fireEvent(GridRendererChangeParameterKind.ROW_FNKT));
+		config.columns.attributes.addChangeListener(_l -> fireEvent(GridRendererChangeParameterKind.COL_FNKT));
+		config.getRendererAsNotifyingList()
+				.addChangeListener(_l -> fireEvent(GridRendererChangeParameterKind.AGGREGATOR));
 	}
 
 	public Collection<? extends Property<INPUT_TYPE, ?>> getProperties() {
@@ -60,7 +69,8 @@ public final class GridRendererParameter<INPUT_TYPE, VALUE_TYPE> {
 			return;
 
 		this.values = values;
-		rowFunctionsUpated();
+		// TODO: maybe exchange
+		fireEvent(GridRendererChangeParameterKind.ROW_FNKT);
 		fireEvent(GridRendererChangeParameterKind.COL_FNKT);
 	}
 
@@ -68,11 +78,13 @@ public final class GridRendererParameter<INPUT_TYPE, VALUE_TYPE> {
 		return values;
 	}
 
-	private final List<PivotCriteria<INPUT_TYPE, ?>> rowFnkt = new ArrayList<>();
-	private final List<PivotCriteria<INPUT_TYPE, ?>> colFnkt = new ArrayList<>();
+	// private final List<PivotCriteria<INPUT_TYPE, ?>> rowFnkt = new
+	// ArrayList<>();
+	// private final List<PivotCriteria<INPUT_TYPE, ?>> colFnkt = new
+	// ArrayList<>();
 
 	public int getColDepth() {
-		return colFnkt.size();
+		return config.columns.attributes.size();
 	}
 
 	private ModelAggregtor<INPUT_TYPE, ?> modelAggregator = new DummyAggregator<INPUT_TYPE>();
@@ -108,11 +120,13 @@ public final class GridRendererParameter<INPUT_TYPE, VALUE_TYPE> {
 	// return "";
 	// }
 
+	@Deprecated
 	public <T> void setColFnkt(final List<? extends FilteringComponent<INPUT_TYPE, ?>> colFnkt) {
-		this.colFnkt.clear();
-
-		this.colFnkt.addAll(toPivotCriterias(colFnkt));
-		colFunctionsUpated();
+		System.out.println("GridRendererParameter.setColFnkt()");
+		// this.colFnkt.clear();
+		//
+		// this.colFnkt.addAll(toPivotCriterias(colFnkt));
+		// colFunctionsUpated();
 	}
 
 	private <@Nullable X> PivotCriteria<INPUT_TYPE, X> cast(final FilteringComponent<INPUT_TYPE, X> cf) {
@@ -139,38 +153,51 @@ public final class GridRendererParameter<INPUT_TYPE, VALUE_TYPE> {
 
 	private Collection<PivotCriteria<INPUT_TYPE, @Nullable ?>> toPivotCriterias(
 			final List<? extends FilteringComponent<INPUT_TYPE, @Nullable ?>> colFnkt) {
-		return colFnkt.stream().map(t -> cast(t)).collect(toList());
+		return colFnkt.stream().map(t -> cast(t)).collect(Collectors.toList());
 	}
 
 	public RootBucket<INPUT_TYPE> creatRowBucket(final String SUM_TEXT) {
-		return new RootBucket<INPUT_TYPE>(SUM_TEXT, getValues(), rowFnkt);
+		final Function<Attribute<?>, FilteringComponent<INPUT_TYPE, ?>> mapper = x -> x
+				.createFilteringComonent(provider);
+
+		final List<PivotCriteria<INPUT_TYPE, ?>> collect = config.rows.attributes.stream()
+				.map(mapper.andThen(this::cast)).collect(Collectors.toList());
+		return new RootBucket<INPUT_TYPE>(SUM_TEXT, getValues(), collect);
 	}
 
 	public RootBucket<INPUT_TYPE> creatColBucket(final String SUM_TEXT) {
-		return new RootBucket<INPUT_TYPE>(SUM_TEXT, getValues(), colFnkt);
+		final Function<Attribute<?>, FilteringComponent<INPUT_TYPE, ?>> mapper = x -> x
+				.createFilteringComonent(provider);
+		final List<PivotCriteria<INPUT_TYPE, ?>> collect = config.columns.attributes.stream()
+				.map(mapper.andThen(this::cast)).collect(Collectors.toList());
+		return new RootBucket<INPUT_TYPE>(SUM_TEXT, getValues(), collect);
+
 	}
 
+	@Deprecated
 	public void setRowFnkt(final List<? extends FilteringComponent<INPUT_TYPE, ?>> rowFnkt) {
-		this.rowFnkt.clear();
-		this.rowFnkt.addAll(toPivotCriterias(rowFnkt));
-		rowFunctionsUpated();
+		System.out.println("GridRendererParameter.setRowFnkt()");
+		//
+		// this.rowFnkt.clear();
+		// this.rowFnkt.addAll(toPivotCriterias(rowFnkt));
+		// rowFunctionsUpated();
 	}
 
-	public void rowFunctionsUpated() {
-		fireEvent(GridRendererChangeParameterKind.ROW_FNKT);
-	}
+	// public void rowFunctionsUpated() {
+	// fireEvent(GridRendererChangeParameterKind.ROW_FNKT);
+	// }
+	//
+	// public void colFunctionsUpated() {
+	// fireEvent(GridRendererChangeParameterKind.COL_FNKT);
+	// }
 
-	public void colFunctionsUpated() {
-		fireEvent(GridRendererChangeParameterKind.COL_FNKT);
-	}
+	// public void rendererUpated() {
+	// fireEvent(GridRendererChangeParameterKind.RENDERER);
+	// }
 
-	public void rendererUpated() {
-		fireEvent(GridRendererChangeParameterKind.RENDERER);
-	}
-
-	public void aggregatorUpated() {
-		fireEvent(GridRendererChangeParameterKind.AGGREGATOR);
-	}
+	// public void aggregatorUpated() {
+	// fireEvent(GridRendererChangeParameterKind.AGGREGATOR);
+	// }
 
 	public void setModelAggregator(@Nullable final ModelAggregtor<INPUT_TYPE, ?> aggregator) {
 		this.modelAggregator = aggregator != null ? aggregator : new DummyAggregator<INPUT_TYPE>();

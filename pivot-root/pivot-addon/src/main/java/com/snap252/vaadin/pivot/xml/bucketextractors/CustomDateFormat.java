@@ -6,12 +6,21 @@ import java.text.SimpleDateFormat;
 import javax.xml.bind.annotation.XmlAttribute;
 
 public class CustomDateFormat extends ConfigDateFormat {
+
+	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+
 	@XmlAttribute(name = "date-format")
-	public String dateFormat = "dd.MM.yyyy HH:mm";
+	public void setDateFormatString(final String textFormat) {
+		this.dateFormat = new SimpleDateFormat(textFormat);
+	}
+	public String getDateFormatString() {
+		return dateFormat.toPattern();
+	}
+
 
 	@Override
 	protected DateFormat getDateformat() {
-		//FIXME: do this in setter
-		return new SimpleDateFormat(dateFormat);
+		return dateFormat;
 	}
+
 }

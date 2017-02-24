@@ -7,9 +7,8 @@ import org.eclipse.jdt.annotation.NonNull;
 
 import com.snap252.vaadin.pivot.UIConfigurable;
 
-public class IntegerValueField extends ValueField<Integer> {
-
-	public IntegerValueField() {
+public class ObjectValueField extends ValueField<Object> {
+	public ObjectValueField() {
 		super(new CountingAggregator());
 	}
 
@@ -17,11 +16,15 @@ public class IntegerValueField extends ValueField<Integer> {
 	@Override
 	public void setAggregator(@NonNull final Aggregator<?, ?> agg) {
 		this.agg = agg;
-
 	}
 
 	@Override
-	protected @NonNull Integer roundImpl(@NonNull final Integer input) {
+	public Aggregator<?, ?> getAggregator() {
+		return super.getAggregator();
+	}
+
+	@Override
+	protected @NonNull Object roundImpl(@NonNull final Object input) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -31,5 +34,4 @@ public class IntegerValueField extends ValueField<Integer> {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }

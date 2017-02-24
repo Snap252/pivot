@@ -1,7 +1,5 @@
 package com.snap252.vaadin.pivot.xml.bucketextractors;
 
-import javax.xml.bind.annotation.XmlAttribute;
-
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -12,12 +10,10 @@ import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Slider;
 
-public class NumberAttribute extends Attribute<@Nullable Number> {
-	@XmlAttribute(name = "rounding")
-	public int rounding = 2;
+public class EnumAttribute extends Attribute<@Nullable Enum<?>> {
 
 	@Override
-	protected Number roundImpl(final Number input) {
+	protected Enum<?> roundImpl(final @Nullable Enum<?> input) {
 		return input;
 	}
 

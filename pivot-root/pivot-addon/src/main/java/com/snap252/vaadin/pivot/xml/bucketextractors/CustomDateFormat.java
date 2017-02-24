@@ -13,10 +13,10 @@ public class CustomDateFormat extends ConfigDateFormat {
 	public void setDateFormatString(final String textFormat) {
 		this.dateFormat = new SimpleDateFormat(textFormat);
 	}
+
 	public String getDateFormatString() {
 		return dateFormat.toPattern();
 	}
-
 
 	@Override
 	protected DateFormat getDateformat() {

@@ -1,14 +1,14 @@
 package com.snap252.vaadin.pivot;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.vaadin.treegrid.TreeGrid;
 
 import com.vaadin.shared.ui.grid.ColumnResizeMode;
-import com.vaadin.ui.Grid;
 
 @NonNullByDefault
-public class PivotGrid extends Grid {
+public class PivotTreeGrid extends TreeGrid {
 
-	public PivotGrid(final GridRendererParameter<?, ?> bucketParams) {
+	public PivotTreeGrid(final GridRendererParameter<?, ?> bucketParams) {
 		setPrimaryStyleName("v-grid-tiny");
 
 		setSelectionMode(SelectionMode.NONE);

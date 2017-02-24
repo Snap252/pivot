@@ -35,6 +35,7 @@ public abstract class DropHandlerImplementation<T> implements DropHandler {
 		this.cols = cols;
 		this.vertical = vertical;
 		this.currentElements = currentElements;
+		currentElements.forEach(element -> updateUi(element, -1));
 	}
 
 	@Override
@@ -97,10 +98,11 @@ public abstract class DropHandlerImplementation<T> implements DropHandler {
 		assert changed;
 	}
 
-	private void updateAllComponentIndices(){
+	private void updateAllComponentIndices() {
 		final HasComponents hc = cols;
 		hc.forEach(new Consumer<Component>() {
 			int index = 1;
+
 			@Override
 			public void accept(final Component c) {
 				c.setStyleName("index-" + index++);
@@ -110,7 +112,15 @@ public abstract class DropHandlerImplementation<T> implements DropHandler {
 
 	protected abstract AbstractComponent createUIComponent(T createFilter);
 
-	protected final void doWithFilteringComponent(final T createFilter, final int index) {
+	private final void doWithFilteringComponent(final T createFilter, final int index) {
+		updateUi(createFilter, index);
+		if (index == -1)
+			currentElements.add(createFilter);
+		else
+			currentElements.add(index, createFilter);
+	}
+
+	private void updateUi(final T createFilter, final int index) {
 		final AbstractComponent uiComponent = createUIComponent(createFilter);
 
 		final DragAndDropWrapper moveWrapper = new DragAndDropWrapper(uiComponent);
@@ -127,9 +137,5 @@ public abstract class DropHandlerImplementation<T> implements DropHandler {
 		if (vertical) {
 			uiComponent.setWidth("100%");
 		}
-		if (index == -1)
-			currentElements.add(createFilter);
-		else
-			currentElements.add(index, createFilter);
 	}
 }

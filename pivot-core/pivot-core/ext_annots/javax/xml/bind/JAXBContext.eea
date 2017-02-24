@@ -1,0 +1,4 @@
+class javax/xml/bind/JAXBContext
+newInstance
+ ([Ljava/lang/Class;)Ljavax/xml/bind/JAXBContext;
+ ([Ljava/lang/Class;)L1javax/xml/bind/JAXBContext;

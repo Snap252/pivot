@@ -9,6 +9,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import com.snap252.vaadin.pivot.xml.bucketextractors.Attribute;
 import com.snap252.vaadin.pivot.xml.bucketextractors.DateAttribute;
+import com.snap252.vaadin.pivot.xml.bucketextractors.EnumAttribute;
 import com.snap252.vaadin.pivot.xml.bucketextractors.NumberAttribute;
 import com.snap252.vaadin.pivot.xml.bucketextractors.ObjectAttribute;
 import com.snap252.vaadin.pivot.xml.bucketextractors.StringAttribute;
@@ -20,6 +21,7 @@ public class ValuesConfig implements ChangeNotifierSupplier<List<Attribute<?>>> 
 	@XmlElements({ @XmlElement(name = "date", type = DateAttribute.class),
 			@XmlElement(name = "object", type = ObjectAttribute.class),
 			@XmlElement(name = "number", type = NumberAttribute.class),
+			@XmlElement(name = "enum", type = EnumAttribute.class),
 			@XmlElement(name = "string", type = StringAttribute.class)
 
 	})

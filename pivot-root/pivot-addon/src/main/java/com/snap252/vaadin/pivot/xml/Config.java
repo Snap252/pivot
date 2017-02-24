@@ -1,5 +1,6 @@
 package com.snap252.vaadin.pivot.xml;
 
+import java.io.StringReader;
 import java.io.StringWriter;
 
 import javax.xml.bind.JAXBContext;
@@ -21,6 +22,54 @@ import com.snap252.vaadin.pivot.xml.renderers.ValueField;
 
 @XmlRootElement(name = "config")
 public class Config {
+
+	@XmlAttribute(name = "display-name")
+	public String displayName = "New Config";
+
+	@XmlElements({ @XmlElement(name = "object", type = ObjectValueField.class),
+			@XmlElement(name = "decimal", type = DecimalValueField.class),
+			@XmlElement(name = "integer", type = IntegerValueField.class),
+
+	})
+	public ValueField<?> renderer = new ObjectValueField();
+
+	@XmlElement(name = "columns")
+	public ValuesConfig columns = new ValuesConfig();
+
+	@XmlElement(name = "rows")
+	public ValuesConfig rows = new ValuesConfig();
+
+	public String toXml() throws JAXBException {
+		final StringWriter sw = new StringWriter();
+		jaxbContext.createMarshaller().marshal(this, sw);
+		return sw.toString();
+	}
+
+	private static final JAXBContext jaxbContext;
+	static {
+		try {
+			jaxbContext = JAXBContext.newInstance(Config.class);
+		} catch (final JAXBException e) {
+			throw new AssertionError(e);
+		}
+	}
+
+	@SuppressWarnings("null")
+	public static Config fromXml(final String xml) {
+		try {
+			return (@NonNull Config) jaxbContext.createUnmarshaller().unmarshal(new StringReader(xml));
+		} catch (final JAXBException e) {
+			//FIXME:
+			throw new AssertionError(e);
+		}
+	}
+
+	@XmlTransient
+	public NotifyingList<ValueField<?>> getRendererAsNotifyingList() {
+		return rendererList;
+	}
+
+	private final SingleNotifyingList rendererList = new SingleNotifyingList();
 
 	private final class SingleNotifyingList extends NotifyingList<ValueField<?>> {
 		@Override
@@ -72,34 +121,4 @@ public class Config {
 			return renderer;
 		}
 	}
-
-	@XmlAttribute(name = "display-name")
-	public String displayName = "New Config";
-
-	@XmlElements({ @XmlElement(name = "object", type = ObjectValueField.class),
-			@XmlElement(name = "decimal", type = DecimalValueField.class),
-			@XmlElement(name = "integer", type = IntegerValueField.class),
-
-	})
-	public ValueField<?> renderer = new ObjectValueField();
-
-	@XmlElement(name = "columns")
-	public ValuesConfig columns = new ValuesConfig();
-
-	@XmlElement(name = "rows")
-	public ValuesConfig rows = new ValuesConfig();
-
-	public String toXml() throws JAXBException {
-		final JAXBContext jaxbContext = JAXBContext.newInstance(Config.class);
-		final StringWriter sw = new StringWriter();
-		jaxbContext.createMarshaller().marshal(this, sw);
-		return sw.toString();
-	}
-
-	@XmlTransient
-	public NotifyingList<ValueField<?>> getRendererAsNotifyingList() {
-		return rendererList;
-	}
-
-	private final SingleNotifyingList rendererList = new SingleNotifyingList();
 }

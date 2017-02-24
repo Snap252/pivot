@@ -21,8 +21,17 @@ public abstract class Attribute<@Nullable DATA_TYPE>
 	@XmlAttribute(name = "name", required = true)
 	public String attributeName = "";
 
+	@XmlAttribute(name = "display-name")
+	@Nullable
+	public String displayName;
+
+	@Nullable
 	@XmlAttribute(name = "subtotal")
-	public Boolean subtotal = true;
+	public Boolean subtotal;
+
+	@Nullable
+	@XmlAttribute(name = "sort")
+	public Boolean sort;
 
 	protected final DATA_TYPE round(final DATA_TYPE input) {
 		return input != null ? roundImpl(input) : null;
@@ -54,7 +63,7 @@ public abstract class Attribute<@Nullable DATA_TYPE>
 
 	@XmlTransient
 	public String getDisplayName() {
-		return attributeName;
+		return displayName != null && !displayName.isEmpty() ? displayName : attributeName;
 	}
 
 	@XmlTransient

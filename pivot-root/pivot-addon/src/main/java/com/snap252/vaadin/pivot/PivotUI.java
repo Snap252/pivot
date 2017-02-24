@@ -34,7 +34,7 @@ public class PivotUI extends GridLayout {
 
 	private final HorizontalLayout properties;
 	// private final GridRendererParameter<?, ?> gridRendererParameter;
-	private @NonNull Config config;
+	private Config config;
 
 	public PivotUI(final GridRendererParameter<?, ?> gridRendererParameter) {
 		this(PivotGrid::new, gridRendererParameter);

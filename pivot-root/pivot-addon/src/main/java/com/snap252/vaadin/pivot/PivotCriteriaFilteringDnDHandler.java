@@ -22,12 +22,8 @@ public class PivotCriteriaFilteringDnDHandler extends DropHandlerImplementation<
 	private final AttributeFactory filterFactory = new AttributeFactory();
 
 	public PivotCriteriaFilteringDnDHandler(final AbstractOrderedLayout cols, final boolean vertical,
-			final List<Attribute<?>> refresher) {
-		super(cols, vertical, refresher);
-	}
-
-	private void refresh() {
-		// refererOfPropertyChanged.run();
+			final List<Attribute<?>> currentElements) {
+		super(cols, vertical, currentElements);
 	}
 
 	@Override
@@ -46,7 +42,6 @@ public class PivotCriteriaFilteringDnDHandler extends DropHandlerImplementation<
 			final Button deleteButton = new Button("Entfernen", evt -> {
 				removeFromList(Objects.requireNonNull(popupButton.getParent()), createFilter, this);
 				popupButton.setPopupVisible(false);
-				refresh();
 			});
 			final Button closeButton = new Button("Schließen", evt -> popupButton.setPopupVisible(false));
 
@@ -61,7 +56,9 @@ public class PivotCriteriaFilteringDnDHandler extends DropHandlerImplementation<
 
 			b = popupButton;
 		} else
-			b = new Button(uiConfigurable.toString());
+			b = new Button(createFilter.getDisplayName());
+
+		createFilter.addChangeListener(cl -> b.setCaption(cl.getDisplayName()));
 		b.addStyleName(ValoTheme.BUTTON_SMALL);
 		return b;
 	}

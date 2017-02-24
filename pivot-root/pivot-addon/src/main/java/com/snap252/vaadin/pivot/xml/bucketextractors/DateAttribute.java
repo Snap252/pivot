@@ -64,8 +64,7 @@ public class DateAttribute extends Attribute<@Nullable Date> {
 			ts.addComponents(getWrapper("Vorgegebenes Format", combobox),
 					getWrapper("Benutzerdefiniertes Format", textfield));
 			{
-				combobox.setNullSelectionItemId(DateRounding.DAY);
-				combobox.setNullSelectionAllowed(false);
+				combobox.setNullSelectionAllowed(true);
 
 				combobox.addValueChangeListener(valueChangeEvent -> {
 					final DateRounding rounding = (DateRounding) valueChangeEvent.getProperty().getValue();
@@ -78,6 +77,7 @@ public class DateAttribute extends Attribute<@Nullable Date> {
 			}
 
 			{
+
 				textfield.setInputPrompt("dd.MM.yyyy");
 				textfield.setImmediate(false);
 				// TODO: do this with converter!!

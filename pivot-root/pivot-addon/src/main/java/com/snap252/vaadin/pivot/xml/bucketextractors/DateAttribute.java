@@ -55,7 +55,15 @@ public class DateAttribute extends Attribute<@Nullable Date> {
 		private final TabSheet comp;
 
 		public DateConfigurable() {
+			final TabSheet allTabSheet = new TabSheet();
 
+			allTabSheet.addComponents(getWrapper("Allgemein", createForDisplayName(DateAttribute.this)),
+					getWrapper("Format", getDateFormatConfig()));
+			allTabSheet.setWidth("500px");
+			this.comp = allTabSheet;
+		}
+
+		private TabSheet getDateFormatConfig() {
 			final TabSheet ts = new TabSheet();
 			final ComboBox combobox = new ComboBox("Auswahl", Arrays.asList(DateRounding.values()));
 			// TODO: "apply from rounding to custom" - button
@@ -72,7 +80,6 @@ public class DateAttribute extends Attribute<@Nullable Date> {
 					pdf.dateRounding = Optional.ofNullable(rounding).orElse(DateRounding.DAY);
 					dateFormat = pdf;
 					fireChange();
-
 				});
 			}
 
@@ -110,8 +117,7 @@ public class DateAttribute extends Attribute<@Nullable Date> {
 				final PredefinedDateFormat predefinedDateFormat = (PredefinedDateFormat) dateFormat;
 				combobox.select(predefinedDateFormat);
 			}
-
-			this.comp = ts;
+			return ts;
 		}
 
 		@Override

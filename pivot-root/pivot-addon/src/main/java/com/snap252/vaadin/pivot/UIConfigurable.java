@@ -17,6 +17,7 @@ public interface UIConfigurable {
 	default AbstractOrderedLayout getWrapper(final String caption, final @NonNull Component... children) {
 		final VerticalLayout verticalLayout = new VerticalLayout(children);
 		verticalLayout.setCaption(caption);
+//		verticalLayout.setSpacing(true);
 		verticalLayout.setMargin(true);
 		return verticalLayout;
 	}

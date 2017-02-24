@@ -15,6 +15,8 @@ import com.snap252.vaadin.pivot.xml.data.ChangeNotifierImpl;
 import com.snap252.vaadin.pivot.xml.data.ChangeNotifierSupplier;
 import com.snap252.vaadin.pivot.xml.data.DataExtractor;
 import com.snap252.vaadin.pivot.xml.data.FilteringComponentImpl;
+import com.vaadin.ui.AbstractComponent;
+import com.vaadin.ui.TextField;
 
 public abstract class Attribute<@Nullable DATA_TYPE>
 		implements DataExtractor<DATA_TYPE>, ChangeNotifierSupplier<Attribute<?>> {
@@ -76,6 +78,16 @@ public abstract class Attribute<@Nullable DATA_TYPE>
 
 	protected final void fireChange() {
 		cn.fireChange(this);
+	}
+
+	protected static AbstractComponent createForDisplayName(final Attribute<?> att) {
+		final TextField tf = new TextField("Anzeige-Name", att.displayName);
+		tf.addValueChangeListener(v -> {
+			final String name = (String) v.getProperty().getValue();
+			att.displayName = name;
+			att.fireChange();
+		});
+		return tf;
 	}
 
 }

@@ -11,7 +11,7 @@ import com.snap252.vaadin.pivot.ContainerPropertyProvider;
 import com.snap252.vaadin.pivot.ExtractOncePropertyProvider;
 import com.snap252.vaadin.pivot.ExtractOncePropertyProvider.PropertyOnceItem;
 import com.snap252.vaadin.pivot.GridRendererParameter;
-import com.snap252.vaadin.pivot.PivotGrid;
+import com.snap252.vaadin.pivot.PivotTreeGrid;
 import com.snap252.vaadin.pivot.PivotUI;
 import com.snap252.vaadin.pivot.PropertyProvider;
 import com.vaadin.annotations.Theme;
@@ -40,7 +40,7 @@ public class DemoUI extends UI {
 	protected void init(VaadinRequest request) {
 
 		// Initialize our new UI component
-		final PivotUI pivotGrid = new PivotUI(PivotGrid::new, gridRendererParameter);
+		final PivotUI pivotGrid = new PivotUI(PivotTreeGrid::new, gridRendererParameter);
 		pivotGrid.setSizeFull();
 
 		setDS(pivotGrid);

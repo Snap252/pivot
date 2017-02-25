@@ -29,11 +29,11 @@
 		<Vaadin-Addon>${project.artifactId}-${project.version}.jar</Vaadin-Addon>
 	</properties>
 
-	<!-- <organization> <name>My Name</name> <url>https://github.com/mygithubaccount/PivotGrid/</url>
-		</organization> <scm> <url>git://github.com/mygithubaccount/PivotGrid.git</url>
-		<connection>scm:git:git://github.com/mygithubaccount/PivotGrid.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com:/mygithubaccount/${componentClassName}.git</developerConnection>
-		<tag>PivotGrid add-on for Vaadin</tag> </scm> <issueManagement> <system>GitHub</system>
+	<!-- <organization> <name>My Name</name> <url>https://github.com/mygithubaccount/PivotGrid/</url> 
+		</organization> <scm> <url>git://github.com/mygithubaccount/PivotGrid.git</url> 
+		<connection>scm:git:git://github.com/mygithubaccount/PivotGrid.git</connection> 
+		<developerConnection>scm:git:ssh://git@github.com:/mygithubaccount/${componentClassName}.git</developerConnection> 
+		<tag>PivotGrid add-on for Vaadin</tag> </scm> <issueManagement> <system>GitHub</system> 
 		<url>https://github.com/mygithubaccount/PivotGrid/issues</url> </issueManagement> -->
 
 	<licenses>
@@ -52,6 +52,12 @@
 	</repositories>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-collections4</artifactId>
+			<version>4.1</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.vaadin.addons</groupId>
 			<artifactId>dragdroplayouts</artifactId>
@@ -94,7 +100,7 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- This can be replaced with TestNG or some other test framework supported
+		<!-- This can be replaced with TestNG or some other test framework supported 
 			by the surefire plugin -->
 		<dependency>
 			<groupId>junit</groupId>

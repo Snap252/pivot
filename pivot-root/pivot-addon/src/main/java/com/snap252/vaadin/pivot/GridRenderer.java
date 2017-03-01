@@ -130,9 +130,6 @@ final class GridRenderer {
 		if (g.getColumns().isEmpty())
 			return;
 
-		final Column column = g.getColumn(b);
-		// assert column != null : g.getColumns();
-
 		final HeaderRow headerRow = g.getHeaderRow(depth);
 		assert headerRow != null;
 
@@ -160,7 +157,11 @@ final class GridRenderer {
 			meAndMyChildren.setStyleName("depth-" + depth);
 		}
 		for (int i = depth + 1; i < g.getHeaderRowCount(); i++) {
-			g.getHeaderRow(i).getCell(b).setStyleName("depth-" + depth);
+			final HeaderCell cell = g.getHeaderRow(i).getCell(b);
+			if (cell == null) {
+				break;
+			}
+			cell.setStyleName("depth-" + depth);
 		}
 	}
 

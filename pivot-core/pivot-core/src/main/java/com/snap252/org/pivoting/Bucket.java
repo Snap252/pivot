@@ -76,7 +76,6 @@ public abstract class Bucket<V> implements Predicate<@NonNull V> {
 		if (showSubtotal == null)
 			return children$.stream().flatMap(Bucket::stream);
 
-		System.out.println("Bucket.stream()" + showSubtotal + "@" + this);
 		switch (showSubtotal) {
 		case After:
 			return Stream.concat(children$.stream().flatMap(Bucket::stream), Stream.of(this));

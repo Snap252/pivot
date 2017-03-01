@@ -21,6 +21,10 @@ public interface PivotCriteria<F, T> extends Function<@NonNull F, @Nullable T>, 
 		return 0;
 	}
 
+	default @Nullable ShowingSubtotal showSubtotal() {
+		return ShowingSubtotal.Before;
+	}
+
 	@SuppressWarnings("null")
 	default Comparator<@Nullable T> nullsFirst() {
 		final Comparator<T> c = this;

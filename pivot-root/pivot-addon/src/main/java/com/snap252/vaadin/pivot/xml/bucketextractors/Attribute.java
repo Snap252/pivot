@@ -1,12 +1,15 @@
 package com.snap252.vaadin.pivot.xml.bucketextractors;
 
+import java.util.Arrays;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
-import com.snap252.vaadin.pivot.FilteringComponent;
+import com.snap252.org.pivoting.PivotCriteria;
+import com.snap252.org.pivoting.ShowingSubtotal;
 import com.snap252.vaadin.pivot.Property;
 import com.snap252.vaadin.pivot.PropertyProvider;
 import com.snap252.vaadin.pivot.UIConfigurable;
@@ -14,8 +17,10 @@ import com.snap252.vaadin.pivot.xml.data.ChangeNotifier;
 import com.snap252.vaadin.pivot.xml.data.ChangeNotifierImpl;
 import com.snap252.vaadin.pivot.xml.data.ChangeNotifierSupplier;
 import com.snap252.vaadin.pivot.xml.data.DataExtractor;
-import com.snap252.vaadin.pivot.xml.data.FilteringComponentImpl;
+import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.ui.AbstractComponent;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.TextField;
 
 public abstract class Attribute<@Nullable DATA_TYPE>
@@ -29,7 +34,7 @@ public abstract class Attribute<@Nullable DATA_TYPE>
 
 	@Nullable
 	@XmlAttribute(name = "subtotal")
-	public Boolean subtotal;
+	public ShowingSubtotal subtotal = ShowingSubtotal.After;
 
 	@Nullable
 	@XmlAttribute(name = "sort")
@@ -50,22 +55,42 @@ public abstract class Attribute<@Nullable DATA_TYPE>
 	}
 
 	@Override
-	public final <INPUT_TYPE> FilteringComponent<INPUT_TYPE, DATA_TYPE> createFilteringComonent(
+	public <INPUT_TYPE> PivotCriteria<INPUT_TYPE, DATA_TYPE> createPivotCriteria(
 			final PropertyProvider<INPUT_TYPE, ?> pp) {
 		assert !attributeName.isEmpty();
 		@SuppressWarnings("unchecked")
 		final Property<INPUT_TYPE, DATA_TYPE> property = (Property<INPUT_TYPE, @Nullable DATA_TYPE>) pp
 				.getProperty(attributeName);
-		// TODO: assert type
 
-		return new FilteringComponentImpl<>(property, this::createUIConfigurable, this::round, this::format);
+		return new PivotCriteria<INPUT_TYPE, DATA_TYPE>() {
+			@Override
+			public @Nullable DATA_TYPE apply(final INPUT_TYPE t) {
+				return round(property.getValue(t));
+			}
+
+			@Override
+			public @Nullable String format(final DATA_TYPE t) {
+				return Attribute.this.format(t);
+			}
+
+			@Override
+			public String toString() {
+				return property.getName();
+			}
+
+			@Override
+			public @Nullable ShowingSubtotal showSubtotal() {
+				return subtotal;
+			}
+		};
 	}
 
 	public abstract UIConfigurable createUIConfigurable();
 
 	@XmlTransient
 	public String getDisplayName() {
-		return displayName != null && !displayName.isEmpty() ? displayName : attributeName;
+		final String displayName$ = displayName;
+		return displayName$ != null && !displayName$.isEmpty() ? displayName$ : attributeName;
 	}
 
 	@XmlTransient
@@ -87,7 +112,24 @@ public abstract class Attribute<@Nullable DATA_TYPE>
 			att.displayName = name;
 			att.fireChange();
 		});
-		return tf;
+
+		final ComboBox cb = new ComboBox("Zwischensumme", Arrays.asList(ShowingSubtotal.values()));
+		cb.setValue(att.subtotal);
+		
+		cb.setNullSelectionAllowed(true);
+		cb.addValueChangeListener(vce -> {
+			final ShowingSubtotal sst = (ShowingSubtotal) vce.getProperty().getValue();
+			if (att.subtotal == sst)
+				return;
+			
+			att.subtotal = sst;
+			att.fireChange();
+			
+		});
+		final FormLayout fl = new FormLayout(tf, cb);
+//		fl.setSizeUndefined();
+		fl.setWidth(500, Unit.PIXELS);
+		return fl;
 	}
 
 }

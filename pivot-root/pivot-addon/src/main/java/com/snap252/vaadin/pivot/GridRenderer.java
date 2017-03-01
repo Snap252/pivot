@@ -130,7 +130,8 @@ final class GridRenderer {
 		if (g.getColumns().isEmpty())
 			return;
 
-		assert g.getColumn(b) != null : g.getColumns();
+		final Column column = g.getColumn(b);
+		// assert column != null : g.getColumns();
 
 		final HeaderRow headerRow = g.getHeaderRow(depth);
 		assert headerRow != null;
@@ -147,14 +148,17 @@ final class GridRenderer {
 				final HeaderRow childRow = g.getHeaderRow(childDepth);
 				// childRow.getCell(b).setText(SUM_TEXT);
 				final HeaderCell ownCellInChildRow = childRow.getCell(b);
-				ownCellInChildRow.setComponent(
-						createChildCollapseButton(g, b.stream().filter(b0 -> b0 != b).collect(toList()), SUM_TEXT));
+				if (ownCellInChildRow != null)
+					ownCellInChildRow.setComponent(
+							createChildCollapseButton(g, b.stream().filter(b0 -> b0 != b).collect(toList()), SUM_TEXT));
 			}
 		} else {
 			meAndMyChildren = headerRow.getCell(b);
 		}
-		meAndMyChildren.setText(b.getFormattedBucketValue());
-		meAndMyChildren.setStyleName("depth-" + depth);
+		if (meAndMyChildren != null) {
+			meAndMyChildren.setText(b.getFormattedBucketValue());
+			meAndMyChildren.setStyleName("depth-" + depth);
+		}
 		for (int i = depth + 1; i < g.getHeaderRowCount(); i++) {
 			g.getHeaderRow(i).getCell(b).setStyleName("depth-" + depth);
 		}

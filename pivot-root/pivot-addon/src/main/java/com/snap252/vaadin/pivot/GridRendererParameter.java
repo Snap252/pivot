@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -20,7 +19,6 @@ import com.snap252.vaadin.pivot.GridRendererParameter.ParameterChangeListener.Pa
 import com.snap252.vaadin.pivot.valuegetter.DummyAggregator;
 import com.snap252.vaadin.pivot.valuegetter.ModelAggregtor;
 import com.snap252.vaadin.pivot.xml.Config;
-import com.snap252.vaadin.pivot.xml.bucketextractors.Attribute;
 
 @NonNullByDefault
 public final class GridRendererParameter<INPUT_TYPE, VALUE_TYPE> {
@@ -145,47 +143,16 @@ public final class GridRendererParameter<INPUT_TYPE, VALUE_TYPE> {
 		// colFunctionsUpated();
 	}
 
-	private <@Nullable X> PivotCriteria<INPUT_TYPE, X> cast(final FilteringComponent<INPUT_TYPE, X> cf) {
-
-		final Property<INPUT_TYPE, X> property = cf.getProperty();
-
-		return new PivotCriteria<INPUT_TYPE, @Nullable X>() {
-			@Override
-			public @Nullable X apply(final INPUT_TYPE t) {
-				return cf.rounded(t);
-			}
-
-			@Override
-			public @Nullable String format(final X t) {
-				return cf.format(t);
-			}
-
-			@Override
-			public String toString() {
-				return property.getName();
-			}
-		};
-	}
-
-	private Collection<PivotCriteria<INPUT_TYPE, @Nullable ?>> toPivotCriterias(
-			final List<? extends FilteringComponent<INPUT_TYPE, @Nullable ?>> colFnkt) {
-		return colFnkt.stream().map(t -> cast(t)).collect(Collectors.toList());
-	}
-
 	public RootBucket<INPUT_TYPE> creatRowBucket(final String SUM_TEXT) {
-		final Function<Attribute<?>, FilteringComponent<INPUT_TYPE, ?>> mapper = x -> x
-				.createFilteringComonent(provider);
 
 		final List<PivotCriteria<INPUT_TYPE, ?>> collect = config.rows.attributes.stream()
-				.map(mapper.andThen(this::cast)).collect(Collectors.toList());
+				.map(x -> x.createPivotCriteria(provider)).collect(Collectors.toList());
 		return new RootBucket<INPUT_TYPE>(SUM_TEXT, getValues(), collect);
 	}
 
 	public RootBucket<INPUT_TYPE> creatColBucket(final String SUM_TEXT) {
-		final Function<Attribute<?>, FilteringComponent<INPUT_TYPE, ?>> mapper = x -> x
-				.createFilteringComonent(provider);
 		final List<PivotCriteria<INPUT_TYPE, ?>> collect = config.columns.attributes.stream()
-				.map(mapper.andThen(this::cast)).collect(Collectors.toList());
+				.map(x -> x.createPivotCriteria(provider)).collect(Collectors.toList());
 		return new RootBucket<INPUT_TYPE>(SUM_TEXT, getValues(), collect);
 
 	}

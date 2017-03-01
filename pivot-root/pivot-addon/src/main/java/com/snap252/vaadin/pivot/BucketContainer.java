@@ -162,7 +162,7 @@ class BucketContainer<INPUT_TYPE>
 
 	@Override
 	public Collection<@NonNull ?> getContainerPropertyIds() {
-		final List<Object> collect = colBucket.reverseStream().collect(toList());
+		final List<Object> collect = colBucket.stream().collect(toList());
 		collect.add(0, GridRenderer.COLLAPSE_COL_PROPERTY_ID);
 		return collect;
 	}

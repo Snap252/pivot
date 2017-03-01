@@ -77,9 +77,9 @@ public abstract class Bucket<V> implements Predicate<@NonNull V> {
 			return children$.stream().flatMap(Bucket::stream);
 
 		switch (showSubtotal) {
-		case After:
+		case AFTER:
 			return Stream.concat(children$.stream().flatMap(Bucket::stream), Stream.of(this));
-		case Before:
+		case BEFORE:
 			return Stream.concat(Stream.of(this), children$.stream().flatMap(Bucket::stream));
 		default:
 			throw new AssertionError(showSubtotal);

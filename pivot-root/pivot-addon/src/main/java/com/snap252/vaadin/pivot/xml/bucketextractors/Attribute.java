@@ -34,7 +34,7 @@ public abstract class Attribute<@Nullable DATA_TYPE>
 
 	@Nullable
 	@XmlAttribute(name = "subtotal")
-	public ShowingSubtotal subtotal = ShowingSubtotal.After;
+	public ShowingSubtotal subtotal = ShowingSubtotal.AFTER;
 
 	@Nullable
 	@XmlAttribute(name = "sort")

@@ -22,7 +22,7 @@ public interface PivotCriteria<F, T> extends Function<@NonNull F, @Nullable T>, 
 	}
 
 	default @Nullable ShowingSubtotal showSubtotal() {
-		return ShowingSubtotal.Before;
+		return ShowingSubtotal.AFTER;
 	}
 
 	@SuppressWarnings("null")

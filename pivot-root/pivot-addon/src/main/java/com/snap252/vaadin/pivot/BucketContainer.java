@@ -138,15 +138,13 @@ class BucketContainer<INPUT_TYPE>
 
 	@Override
 	public @Nullable Object addItemAfter(final Object previousItemId) throws UnsupportedOperationException {
-		assert false;
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public @Nullable Item addItemAfter(final Object previousItemId, final Object newItemId)
 			throws UnsupportedOperationException {
-		assert false;
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	private final Map<Bucket<INPUT_TYPE>, BucketItem<INPUT_TYPE>> rowCache = new HashMap<>();

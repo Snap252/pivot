@@ -36,11 +36,14 @@ public abstract class DropHandlerImplementation<T> implements DropHandler {
 		this.orderedLayout = cols;
 		this.vertical = vertical;
 		this.currentElements = currentElements;
-		updateUIElementsFromList(currentElements);
+		updateUIElementsFromList(currentElements, true);
 		currentElements.addChangeListener(this::updateUIElementsFromList);
 	}
 
-	protected void updateUIElementsFromList(final List<T> list) {
+	protected void updateUIElementsFromList(final List<T> list, final boolean self) {
+		if (!self)
+			return;
+
 		this.orderedLayout.removeAllComponents();
 		list.forEach(this::updateUi);
 		updateAllComponentIndices();

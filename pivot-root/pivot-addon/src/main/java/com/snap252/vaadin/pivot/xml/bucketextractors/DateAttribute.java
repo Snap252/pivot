@@ -79,7 +79,7 @@ public class DateAttribute extends Attribute<@Nullable Date> {
 				ts.setSelectedTab(0);
 
 				final PredefinedDateFormat predefinedDateFormat = (PredefinedDateFormat) dateFormat;
-				combobox.select(predefinedDateFormat);
+				combobox.select(predefinedDateFormat.dateRounding);
 			}
 
 			{

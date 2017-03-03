@@ -118,6 +118,8 @@ final class GridRenderer {
 		grid.setRowDescriptionGenerator(null);
 
 		doHeader(grid, colBucket, 0);
+		//TODO: better not to add it
+		grid.removeHeaderRow(0);
 	}
 
 	private void cleanupGridHeader(final Grid grid) {
@@ -127,16 +129,26 @@ final class GridRenderer {
 	}
 
 	protected void doHeader(final Grid g, final Bucket<?> b, final int depth) {
-		if (g.getColumns().isEmpty())
-			return;
-
-		final HeaderRow headerRow = g.getHeaderRow(depth);
-		assert headerRow != null;
 
 		final Object @NonNull [] children = b.stream().toArray();
-		final HeaderCell meAndMyChildren;
+
+		if (depth != 0) {
+			final HeaderRow headerRow = g.getHeaderRow(depth);
+			assert headerRow != null;
+			final HeaderCell meAndMyChildren;
+			if (children.length > 1) {
+				meAndMyChildren = headerRow.join(children);
+
+			} else
+				meAndMyChildren = headerRow.getCell(b);
+
+			if (meAndMyChildren != null) {
+				meAndMyChildren.setText(b.getFormattedBucketValue());
+				meAndMyChildren.setStyleName("depth-" + depth);
+			}
+		}
+
 		if (children.length > 1) {
-			meAndMyChildren = headerRow.join(children);
 			@Nullable
 			final List<? extends Bucket<?>> children$ = b.getChildren();
 			if (children$ != null) {
@@ -149,13 +161,8 @@ final class GridRenderer {
 					ownCellInChildRow.setComponent(
 							createChildCollapseButton(g, b.stream().filter(b0 -> b0 != b).collect(toList()), SUM_TEXT));
 			}
-		} else {
-			meAndMyChildren = headerRow.getCell(b);
 		}
-		if (meAndMyChildren != null) {
-			meAndMyChildren.setText(b.getFormattedBucketValue());
-			meAndMyChildren.setStyleName("depth-" + depth);
-		}
+
 		for (int i = depth + 1; i < g.getHeaderRowCount(); i++) {
 			final HeaderCell cell = g.getHeaderRow(i).getCell(b);
 			if (cell == null) {

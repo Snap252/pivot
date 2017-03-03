@@ -25,6 +25,8 @@ final class BucketItem<INPUT_TYPE> implements Item {
 	 */
 	private final BucketContainer<INPUT_TYPE> bucketContainer;
 
+	private final Class<PivotCellReference<?, INPUT_TYPE>> pivotCellReferenceClass = ClassUtils.cast(PivotCellReference.class);
+
 	final class CellProperty implements Property<PivotCellReference<?, INPUT_TYPE>>, Property.ValueChangeNotifier {
 
 		private final Bucket<INPUT_TYPE> colBucket;
@@ -87,7 +89,7 @@ final class BucketItem<INPUT_TYPE> implements Item {
 
 		@Override
 		public Class<PivotCellReference<?, INPUT_TYPE>> getType() {
-			return ClassUtils.cast(PivotCellReference.class);
+			return pivotCellReferenceClass;
 		}
 
 		@Override

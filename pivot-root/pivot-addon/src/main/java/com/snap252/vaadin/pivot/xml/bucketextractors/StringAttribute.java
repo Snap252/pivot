@@ -16,6 +16,8 @@ public class StringAttribute extends Attribute<@Nullable String> {
 
 	@Override
 	protected String roundImpl(final String input) {
+		if (subString != 0 && input.length() > subString)
+			return input.substring(0, subString);
 		return input;
 	}
 
@@ -35,6 +37,15 @@ public class StringAttribute extends Attribute<@Nullable String> {
 			slider.setCaption("SubString");
 			formLayout.addComponent(slider);
 			formLayout.setWidth("200px");
+
+			slider.addValueChangeListener(vce -> {
+				final int i = ((Number)vce.getProperty().getValue()).intValue();
+				if (i == subString)
+					return;
+				subString = i;
+				fireChange();
+			});
+			slider.setValue(subString.doubleValue());
 			this.comp = formLayout;
 		}
 

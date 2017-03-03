@@ -54,34 +54,32 @@ public class PivotUI extends GridLayout {
 		setSpacing(true);
 
 		{
-			final PopupButton renderer = new PopupButton();
+			final PopupButton renderer = new PopupButton("Export/Import");
 			{
+				renderer.setClosePopupOnOutsideClick(true);
+
 				final VerticalLayout l = new VerticalLayout();
 				final TextArea textArea = new TextArea();
 				textArea.setRows(20);
 				textArea.setColumns(50);
-				final Component toXmlButton = new Button("In Xml", _ignore -> {
+				renderer.addPopupVisibilityListener(_ignore -> {
 					try {
 						textArea.setValue(config.toXml());
 					} catch (final JAXBException e) {
 						e.printStackTrace();
 					}
 				});
-				final Component fromXmlButton = new Button("Aus Xml", _ignore -> {
-					final Config config2 = Config.fromXml(Objects.requireNonNull(textArea.getValue()));
-					config.columns.attributes.setAll(config2.columns.attributes);
+				final Component fromXmlButton = new Button("Aus Xml",
+						_ignore -> config.setAll(Config.fromXml(Objects.requireNonNull(textArea.getValue()))));
 
-					config.rows.attributes.setAll(config2.rows.attributes);
-				});
-
-				final HorizontalLayout horizontalLayout = new HorizontalLayout(toXmlButton, fromXmlButton);
+				final HorizontalLayout horizontalLayout = new HorizontalLayout(fromXmlButton);
 				horizontalLayout.setComponentAlignment(fromXmlButton, Alignment.BOTTOM_RIGHT);
 				horizontalLayout.setSizeFull();
 				l.addComponents(textArea, horizontalLayout);
 				renderer.setContent(l);
 			}
 
-			renderer.setSizeUndefined();
+			renderer.setSizeFull();
 			properties = new HorizontalLayout();
 			properties.setCaption("properties");
 			properties.setSpacing(true);

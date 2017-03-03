@@ -54,6 +54,7 @@ public class Config {
 			final Transformer transformer = TransformerFactory.newInstance().newTransformer();
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 			// initialize StreamResult with File object to save to file
 			final StreamResult result = new StreamResult(new StringWriter());
 			final Source source = new StreamSource(new StringReader(sw.toString()));
@@ -140,5 +141,11 @@ public class Config {
 			assert renderer != null;
 			return renderer;
 		}
+	}
+
+	@XmlTransient
+	public void setAll(final Config newconfig) {
+		columns.attributes.setAll(newconfig.columns.attributes);
+		rows.attributes.setAll(newconfig.rows.attributes);
 	}
 }

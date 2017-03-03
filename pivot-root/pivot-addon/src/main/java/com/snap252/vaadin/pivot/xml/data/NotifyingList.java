@@ -15,15 +15,16 @@ public class NotifyingList<T> extends AbstractListDecorator<T> implements Change
 	}
 
 	@NonNull
-	private final ChangeNotifierImpl<@NonNull List<T>> i = new ChangeNotifierImpl<>();
+	private final ChangeNotifierImpl<@NonNull List<T>> changeNotifier = new ChangeNotifierImpl<>();
 
 	@Override
 	public ChangeNotifier<@NonNull List<T>> getChangeNotifierSupplier() {
-		return i;
+		return changeNotifier;
 	}
 
 	@NonNull
-	private final ChangeListener<? super Object> cl = _ignore -> fireChange();
+	private final ChangeListener<? super Object> elementChangeListener = (_ignore, self) -> changeNotifier
+			.fireChange(this, self);
 
 	@Override
 	public boolean add(final T t) {
@@ -35,14 +36,14 @@ public class NotifyingList<T> extends AbstractListDecorator<T> implements Change
 	}
 
 	protected void fireChange() {
-		i.fireChange(this);
+		changeNotifier.fireChange(this);
 	}
 
 	private void addListenerIfSupported(final T t) {
 		if (t instanceof ChangeNotifier) {
 			@SuppressWarnings({ "unchecked", "rawtypes" })
 			final ChangeNotifier<? super Object> changeNotifier = (ChangeNotifier) t;
-			changeNotifier.addChangeListener(cl);
+			changeNotifier.addChangeListener(elementChangeListener);
 		}
 	}
 
@@ -50,7 +51,7 @@ public class NotifyingList<T> extends AbstractListDecorator<T> implements Change
 		if (t instanceof ChangeNotifier) {
 			@SuppressWarnings({ "unchecked", "rawtypes" })
 			final ChangeNotifier<? super Object> changeNotifier = (ChangeNotifier) t;
-			changeNotifier.removeChangeListener(cl);
+			changeNotifier.removeChangeListener(elementChangeListener);
 		}
 	}
 
@@ -65,11 +66,12 @@ public class NotifyingList<T> extends AbstractListDecorator<T> implements Change
 	public boolean remove(final Object object) {
 		final boolean changed = super.remove(object);
 		// TODO:maybe some assertions here..?
-		if (changed) {
-			removeListenerIfSupported(object);
-			fireChange();
-		}
-		return changed;
+		if (!changed)
+			return false;
+
+		removeListenerIfSupported(object);
+		fireChange();
+		return true;
 	}
 
 	@Override

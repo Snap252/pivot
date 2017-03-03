@@ -36,10 +36,10 @@ public final class GridRendererParameter<INPUT_TYPE, VALUE_TYPE> {
 	public GridRendererParameter(final PropertyProvider<INPUT_TYPE, ?> provider) {
 		this.provider = provider;
 
-		config.rows.attributes.addChangeListener(_l -> fireEvent(GridRendererChangeParameterKind.ROW_FNKT));
-		config.columns.attributes.addChangeListener(_l -> fireEvent(GridRendererChangeParameterKind.COL_FNKT));
+		config.rows.attributes.addChangeListener((_l, self) -> fireEvent(GridRendererChangeParameterKind.ROW_FNKT));
+		config.columns.attributes.addChangeListener((_l, self) -> fireEvent(GridRendererChangeParameterKind.COL_FNKT));
 		config.getRendererAsNotifyingList()
-				.addChangeListener(_l -> fireEvent(GridRendererChangeParameterKind.AGGREGATOR));
+				.addChangeListener((_l, self) -> fireEvent(GridRendererChangeParameterKind.AGGREGATOR));
 	}
 
 	public Collection<? extends Property<INPUT_TYPE, ?>> getProperties() {

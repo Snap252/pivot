@@ -70,7 +70,8 @@ public class ValueGetterDnDHandler<INPUT_TYPE> extends DropHandlerImplementation
 			b = popupButton;
 		} else
 			b = new Button(createFilter.getDisplayName());
-		createFilter.addChangeListener(cl -> b.setCaption(cl.getDisplayName()));
+		//TODO: check self?
+		createFilter.addChangeListener((cl, self) -> b.setCaption(cl.getDisplayName()));
 		b.addStyleName(ValoTheme.BUTTON_SMALL);
 		return b;
 	}

@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -55,22 +56,32 @@ public class DateAttribute extends Attribute<@Nullable Date> {
 		private final TabSheet comp;
 
 		public DateConfigurable() {
-			final TabSheet allTabSheet = new TabSheet();
-
-			allTabSheet.addComponents(getWrapper("Allgemein", createForDisplayName(DateAttribute.this)),
+			final TabSheet allTabSheet = new TabSheet(getWrapper("Allgemein", createForDisplayName(DateAttribute.this)),
 					getWrapper("Format", getDateFormatConfig()));
 			allTabSheet.setWidth("500px");
 			this.comp = allTabSheet;
 		}
 
 		private TabSheet getDateFormatConfig() {
-			final TabSheet ts = new TabSheet();
 			final ComboBox combobox = new ComboBox("Auswahl", Arrays.asList(DateRounding.values()));
 			// TODO: "apply from rounding to custom" - button
 			final TextField textfield = new TextField("Eingabe");
 
-			ts.addComponents(getWrapper("Vorgegebenes Format", combobox),
+			final TabSheet ts = new TabSheet(getWrapper("Vorgegebenes Format", combobox),
 					getWrapper("Benutzerdefiniertes Format", textfield));
+
+			if (dateFormat instanceof CustomDateFormat) {
+				ts.setSelectedTab(1);
+
+				final CustomDateFormat customDateFormat = (CustomDateFormat) dateFormat;
+				textfield.setValue(customDateFormat.getDateFormatString());
+			} else if (dateFormat instanceof PredefinedDateFormat) {
+				ts.setSelectedTab(0);
+
+				final PredefinedDateFormat predefinedDateFormat = (PredefinedDateFormat) dateFormat;
+				combobox.select(predefinedDateFormat);
+			}
+
 			{
 				combobox.setNullSelectionAllowed(true);
 
@@ -78,6 +89,9 @@ public class DateAttribute extends Attribute<@Nullable Date> {
 					final DateRounding rounding = (DateRounding) valueChangeEvent.getProperty().getValue();
 					final PredefinedDateFormat pdf = new PredefinedDateFormat();
 					pdf.dateRounding = Optional.ofNullable(rounding).orElse(DateRounding.DAY);
+					if (dateFormat == pdf)
+						return;
+
 					dateFormat = pdf;
 					fireChange();
 				});
@@ -101,22 +115,14 @@ public class DateAttribute extends Attribute<@Nullable Date> {
 					assert textFormat != null;
 					final CustomDateFormat cdf = new CustomDateFormat();
 					cdf.setDateFormatString(textFormat);
+					if (Objects.equals(dateFormat, cdf))
+						return;
+
 					dateFormat = cdf;
 					fireChange();
 				});
 			}
 
-			if (dateFormat instanceof CustomDateFormat) {
-				ts.setSelectedTab(1);
-
-				final CustomDateFormat customDateFormat = (CustomDateFormat) dateFormat;
-				textfield.setValue(customDateFormat.getDateFormatString());
-			} else if (dateFormat instanceof PredefinedDateFormat) {
-				ts.setSelectedTab(0);
-
-				final PredefinedDateFormat predefinedDateFormat = (PredefinedDateFormat) dateFormat;
-				combobox.select(predefinedDateFormat);
-			}
 			return ts;
 		}
 

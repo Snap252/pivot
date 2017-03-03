@@ -1,27 +1,25 @@
 package com.snap252.org.pivoting;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
 public class RootBucket<V> extends SubBucket<V> {
 
+	private final ShowingSubtotal subTotal;
+
 	public RootBucket(final String prefix, final List<V> values,
-			final List<? extends PivotCriteria<V, @Nullable ?>> partitionCriterionsAndSubCriterions) {
+			final List<? extends PivotCriteria<V, @Nullable ?>> partitionCriterionsAndSubCriterions,
+			final boolean showBefore) {
 		super(prefix, partitionCriterionsAndSubCriterions, null, createUniquePivotCriteria(), values, 0);
+		this.subTotal = showBefore ? ShowingSubtotal.BEFORE : ShowingSubtotal.AFTER;
 	}
 
 	public static <V> NamedPivotCriteria<V, @Nullable String> createUniquePivotCriteria() {
 		return new NamedPivotCriteria<V, @Nullable String>(_ignore -> "", "r");
-	}
-
-	@SafeVarargs
-	public RootBucket(final String prefix, final List<V> values,
-			@NonNull final PivotCriteria<V, ?>... partitionCriterionsAndSubCriterions) {
-		this(prefix, values, Arrays.asList(partitionCriterionsAndSubCriterions));
 	}
 
 	@Override
@@ -34,8 +32,19 @@ public class RootBucket<V> extends SubBucket<V> {
 		return l;
 	}
 
+	/**
+	 * Used for inheritance
+	 */
 	@Override
-	protected @NonNull ShowingSubtotal getSubTotal() {
-		return ShowingSubtotal.AFTER;
+	protected ShowingSubtotal getSubTotal() {
+		return subTotal;
+	}
+
+	/**
+	 * Always stream for having self at the end.
+	 */
+	@Override
+	public Stream<@NonNull ? extends Bucket<V>> stream() {
+		return streamWithSubTotals(ShowingSubtotal.AFTER);
 	}
 }

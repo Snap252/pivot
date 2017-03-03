@@ -25,9 +25,9 @@ public class BiBucket<RAW> {
 	public final int maxRowDepth;
 
 	public BiBucket(final BiBucketParameter<RAW> p) {
-		rowBucket = new RootBucket<>("row", p.values, p.rowFnkt);
+		rowBucket = new RootBucket<>("row", p.values, p.rowFnkt, true);
 		this.maxRowDepth = p.rowFnkt.size();
-		colBucket = new RootBucket<>("col", p.values, p.colFnkt);
+		colBucket = new RootBucket<>("col", p.values, p.colFnkt, false);
 	}
 
 	public static class RowBucketWrapper<V, W> {

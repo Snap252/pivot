@@ -68,26 +68,37 @@ public abstract class Bucket<V> implements Predicate<@NonNull V> {
 
 	public abstract int getSize(int forSelf);
 
-	public final Stream<@NonNull ? extends Bucket<V>> stream() {
+	public Stream<@NonNull ? extends Bucket<V>> stream() {
+		return streamWithSubTotals(getSubTotal());
+	}
+
+	protected Stream<@NonNull ? extends Bucket<V>> streamWithSubTotals(final ShowingSubtotal showSubtotal)
+			throws AssertionError {
 		final @Nullable List<? extends @NonNull Bucket<V>> children$ = getChildren();
 		if (children$ == null)
-			return Stream.of(this);
-		final ShowingSubtotal showSubtotal = getSubTotal();
-
-		switch (showSubtotal) {
-		case DONT_SHOW:
-			return children$.stream().flatMap(Bucket::stream);
-		case AFTER:
-			return Stream.concat(children$.stream().flatMap(Bucket::stream), Stream.of(this));
-		case BEFORE:
-			return Stream.concat(Stream.of(this), children$.stream().flatMap(Bucket::stream));
-		default:
-			throw new AssertionError(showSubtotal);
-		}
+			switch (showSubtotal) {
+			case DONT_SHOW:
+				return Stream.of();
+			case AFTER:
+			case BEFORE:
+				return Stream.of(this);
+			default:
+				throw new AssertionError(showSubtotal);
+			}
+		else
+			switch (showSubtotal) {
+			case DONT_SHOW:
+				return children$.stream().flatMap(Bucket::stream);
+			case AFTER:
+				return Stream.concat(children$.stream().flatMap(Bucket::stream), Stream.of(this));
+			case BEFORE:
+				return Stream.concat(Stream.of(this), children$.stream().flatMap(Bucket::stream));
+			default:
+				throw new AssertionError(showSubtotal);
+			}
 	}
 
 	protected ShowingSubtotal getSubTotal() {
-		@Nullable
 		final ShowingSubtotal showSubtotal = extractor.showSubtotal();
 		if (showSubtotal != ShowingSubtotal.INHERIT) {
 			return showSubtotal;

@@ -117,7 +117,6 @@ public abstract class Attribute<@Nullable DATA_TYPE>
 		cb.setNullSelectionAllowed(false);
 		cb.setValue(att.subtotal);
 
-		cb.setNullSelectionAllowed(true);
 		cb.addValueChangeListener(valueChangeEvent -> {
 			final ShowingSubtotal showSubTotal = (ShowingSubtotal) valueChangeEvent.getProperty().getValue();
 			assert showSubTotal != null;

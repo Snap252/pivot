@@ -35,7 +35,7 @@ final class BucketItem<INPUT_TYPE> implements Item {
 		public CellProperty(final Bucket<INPUT_TYPE> colBucket) {
 			this.colBucket = colBucket;
 			assert rowBucket != colBucket;
-			/*seems to be a bug in eclipse -> thats why suppress all*/
+			/* seems to be a bug in eclipse -> thats why suppress all */
 			bucketContainer.propertyResetter.add(this);
 		}
 
@@ -134,8 +134,7 @@ final class BucketItem<INPUT_TYPE> implements Item {
 	@Override
 	public @NonNull Property<?> getItemProperty(final Object id) {
 		if (id == GridRenderer.COLLAPSE_COL_PROPERTY_ID) {
-			return new ObjectProperty<@Nullable String>(rowBucket.getFormattedBucketValue(),
-					(String.class));
+			return new ObjectProperty<String>(rowBucket.getFormattedBucketValue(), String.class);
 		}
 		return getForColumn((Bucket<INPUT_TYPE>) id);
 	}

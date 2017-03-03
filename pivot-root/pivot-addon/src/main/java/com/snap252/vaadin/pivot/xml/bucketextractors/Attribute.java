@@ -1,6 +1,7 @@
 package com.snap252.vaadin.pivot.xml.bucketextractors;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
@@ -106,10 +107,13 @@ public abstract class Attribute<@Nullable DATA_TYPE>
 
 	protected static AbstractComponent createForDisplayName(final Attribute<?> att) {
 		final TextField tf = new TextField("Anzeige-Name", att.displayName);
+		tf.setValue(att.getDisplayName());
 		tf.addValueChangeListener(v -> {
 			final String name = (String) v.getProperty().getValue();
-			att.displayName = name;
-			att.fireChange();
+			if (!Objects.equals(att.getDisplayName(), name)) {
+				att.displayName = name;
+				att.fireChange();
+			}
 		});
 
 		final ComboBox cb = new ComboBox("Zwischensumme", Arrays.asList(ShowingSubtotal.values()));
@@ -128,7 +132,7 @@ public abstract class Attribute<@Nullable DATA_TYPE>
 
 		});
 		final FormLayout fl = new FormLayout(tf, cb);
-//		fl.setSizeUndefined();
+		// fl.setSizeUndefined();
 		fl.setWidth(500, Unit.PIXELS);
 		return fl;
 	}

@@ -31,35 +31,15 @@ public final class GridRendererParameter<INPUT_TYPE, VALUE_TYPE> {
 		;
 	}
 
-	public final Config config;
+	public final Config config = new Config();
 
 	public GridRendererParameter(final PropertyProvider<INPUT_TYPE, ?> provider) {
 		this.provider = provider;
-
-		if (true)
-			config = new Config();
-		else
-			try {
-				config = Config.fromXml("<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\r\n"
-						+ "<config display-name='New Config'>\r\n" + "	<object name=''>\r\n"
-						+ "		<aggregator xsi:type='countingAggregator' mode='cnt' null-representation='-' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'/>\r\n"
-						+ "		<counting mode='cnt' null-representation='-'/>\r\n" + "	</object>\r\n"
-						+ "	<columns colorize='false'><enum name='e2' display-name='2. Spalte!'/></columns>\r\n"
-						+ "	<rows colorize='false'>\r\n"
-						+ "		<enum name='e1' display-name='1. Spalte!'/><enum name='e3' display-name='3. Spalte!'/>\r\n"
-						+ "	</rows>\r\n" + "</config>\r\n" + "");
-			} catch (final Exception e) {
-				throw new AssertionError(e);
-			}
 
 		config.rows.attributes.addChangeListener(_l -> fireEvent(GridRendererChangeParameterKind.ROW_FNKT));
 		config.columns.attributes.addChangeListener(_l -> fireEvent(GridRendererChangeParameterKind.COL_FNKT));
 		config.getRendererAsNotifyingList()
 				.addChangeListener(_l -> fireEvent(GridRendererChangeParameterKind.AGGREGATOR));
-	}
-
-	public void setConfig() {
-
 	}
 
 	public Collection<? extends Property<INPUT_TYPE, ?>> getProperties() {

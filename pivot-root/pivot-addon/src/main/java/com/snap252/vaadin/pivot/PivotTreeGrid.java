@@ -14,6 +14,7 @@ public class PivotTreeGrid extends TreeGrid {
 		setSelectionMode(SelectionMode.NONE);
 		setColumnResizeMode(ColumnResizeMode.SIMPLE);
 		new GridRenderer(bucketParams, this);
+		setFrozenColumnCount(1);
 	}
 
 	// public @Nullable <@Nullable T> GridWriter<?, ?>

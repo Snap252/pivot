@@ -156,11 +156,14 @@ final class GridRenderer {
 				children$.forEach(c -> doHeader(g, c, childDepth));
 				final HeaderRow childRow = g.getHeaderRow(childDepth);
 
-				if (depth == 0)
-					childRow.getCell(b).setText(SUM_TEXT);
-				else
-					childRow.getCell(b).setComponent(
-							createChildCollapseButton(g, b.stream().filter(b0 -> b0 != b).collect(toList()), SUM_TEXT));
+				final HeaderCell cell = childRow.getCell(b);
+				if (cell != null) {
+					if (depth == 0) {
+						cell.setText(SUM_TEXT);
+					} else
+						cell.setComponent(createChildCollapseButton(g,
+								b.stream().filter(b0 -> b0 != b).collect(toList()), SUM_TEXT));
+				}
 			}
 		}
 

@@ -17,7 +17,7 @@ public abstract class ValueField<DATA_TYPE> extends Attribute<@Nullable DATA_TYP
 	@XmlTransient
 	protected Aggregator<?, ?> agg;
 
-	@XmlAttribute(name = "name", required = true)
+	@XmlAttribute(name = "attribute-name", required = true)
 	public String name = "";
 
 	@XmlElement

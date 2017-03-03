@@ -11,6 +11,7 @@ import javax.xml.bind.JAXBException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.vaadin.hene.popupbutton.PopupButton;
 import org.vaadin.miki.mapcontainer.MapContainer;
 
 import com.snap252.vaadin.pivot.valuegetter.ValueGetterDnDHandler;
@@ -18,12 +19,15 @@ import com.snap252.vaadin.pivot.xml.Config;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.event.dd.DropHandler;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.DragAndDropWrapper;
 import com.vaadin.ui.DragAndDropWrapper.DragStartMode;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.TextArea;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 import fi.jasoft.dragdroplayouts.DDHorizontalLayout;
@@ -34,7 +38,7 @@ public class PivotUI extends GridLayout {
 
 	private final HorizontalLayout properties;
 	// private final GridRendererParameter<?, ?> gridRendererParameter;
-	private Config config;
+	private final Config config;
 
 	public PivotUI(final GridRendererParameter<?, ?> gridRendererParameter) {
 		this(PivotGrid::new, gridRendererParameter);
@@ -50,14 +54,32 @@ public class PivotUI extends GridLayout {
 		setSpacing(true);
 
 		{
-			final Component renderer = new Button("xml in console", (_ignore) -> {
-				try {
-					System.err.println(config.toXml());
-				} catch (final JAXBException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			});
+			final PopupButton renderer = new PopupButton();
+			{
+				final VerticalLayout l = new VerticalLayout();
+				final TextArea textArea = new TextArea();
+				textArea.setRows(20);
+				textArea.setColumns(50);
+				final Component toXmlButton = new Button("In Xml", _ignore -> {
+					try {
+						textArea.setValue(config.toXml());
+					} catch (final JAXBException e) {
+						e.printStackTrace();
+					}
+				});
+				final Component fromXmlButton = new Button("Aus Xml", _ignore -> {
+					final Config config2 = Config.fromXml(Objects.requireNonNull(textArea.getValue()));
+					config.columns.attributes.setAll(config2.columns.attributes);
+
+					config.rows.attributes.setAll(config2.rows.attributes);
+				});
+
+				final HorizontalLayout horizontalLayout = new HorizontalLayout(toXmlButton, fromXmlButton);
+				horizontalLayout.setComponentAlignment(fromXmlButton, Alignment.BOTTOM_RIGHT);
+				horizontalLayout.setSizeFull();
+				l.addComponents(textArea, horizontalLayout);
+				renderer.setContent(l);
+			}
 
 			renderer.setSizeUndefined();
 			properties = new HorizontalLayout();
@@ -76,7 +98,7 @@ public class PivotUI extends GridLayout {
 					wrapper.setDragStartMode(DragStartMode.COMPONENT);
 					wrapper.setData(propertyId);
 					return wrapper;
-				}).toArray(i -> new Component[i]);
+				}).toArray(Component[]::new);
 				properties.removeAllComponents();
 				properties.addComponents(labels);
 			}

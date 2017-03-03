@@ -1,6 +1,5 @@
 package com.snap252.vaadin.pivot.valuegetter;
 
-import java.util.List;
 import java.util.Objects;
 
 import org.vaadin.hene.popupbutton.PopupButton;
@@ -9,6 +8,7 @@ import org.vaadin.hene.popupbutton.PopupButton.PopupVisibilityListener;
 
 import com.snap252.vaadin.pivot.DropHandlerImplementation;
 import com.snap252.vaadin.pivot.Property;
+import com.snap252.vaadin.pivot.xml.data.NotifyingList;
 import com.snap252.vaadin.pivot.xml.renderers.ValueField;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.AbstractOrderedLayout;
@@ -23,7 +23,7 @@ public class ValueGetterDnDHandler<INPUT_TYPE> extends DropHandlerImplementation
 	private final ValueFactory valueFactory = new ValueFactory();
 
 	public ValueGetterDnDHandler(final AbstractOrderedLayout cols, final boolean vertical,
-			final List<ValueField<?>> refresher) {
+			final NotifyingList<ValueField<?>> refresher) {
 		super(cols, vertical, refresher);
 	}
 

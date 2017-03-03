@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
+import com.snap252.vaadin.pivot.xml.data.NotifyingList;
 import com.vaadin.event.dd.DragAndDropEvent;
 import com.vaadin.event.dd.DropHandler;
 import com.vaadin.event.dd.TargetDetails;
@@ -26,16 +27,23 @@ import fi.jasoft.dragdroplayouts.DDVerticalLayout.VerticalLayoutTargetDetails;
 @NonNullByDefault
 public abstract class DropHandlerImplementation<T> implements DropHandler {
 
-	private final AbstractOrderedLayout cols;
+	private final AbstractOrderedLayout orderedLayout;
 	private final boolean vertical;
 	private final List<T> currentElements;
 
 	public DropHandlerImplementation(final AbstractOrderedLayout cols, final boolean vertical,
-			final List<T> currentElements) {
-		this.cols = cols;
+			final NotifyingList<T> currentElements) {
+		this.orderedLayout = cols;
 		this.vertical = vertical;
 		this.currentElements = currentElements;
-		currentElements.forEach(element -> updateUi(element, -1));
+		updateUIElementsFromList(currentElements);
+		currentElements.addChangeListener(this::updateUIElementsFromList);
+	}
+
+	protected void updateUIElementsFromList(final List<T> list) {
+		this.orderedLayout.removeAllComponents();
+		list.forEach(this::updateUi);
+		updateAllComponentIndices();
 	}
 
 	@Override
@@ -90,16 +98,12 @@ public abstract class DropHandlerImplementation<T> implements DropHandler {
 
 	protected static <T> void removeFromList(final Component sourceComponent, final T data2,
 			final DropHandlerImplementation<T> pivotCriteriaList) {
-		assert pivotCriteriaList.cols.getComponentIndex(sourceComponent) != -1;
-		pivotCriteriaList.cols.removeComponent(sourceComponent);
-		pivotCriteriaList.updateAllComponentIndices();
-
 		final boolean changed = pivotCriteriaList.currentElements.remove(data2);
 		assert changed;
 	}
 
 	private void updateAllComponentIndices() {
-		final HasComponents hc = cols;
+		final HasComponents hc = orderedLayout;
 		hc.forEach(new Consumer<Component>() {
 			int index = 1;
 
@@ -113,23 +117,18 @@ public abstract class DropHandlerImplementation<T> implements DropHandler {
 	protected abstract AbstractComponent createUIComponent(T createFilter);
 
 	private final void doWithFilteringComponent(final T createFilter, final int index) {
-		updateUi(createFilter, index);
+		// updateUi(createFilter, index);
 		if (index == -1)
 			currentElements.add(createFilter);
 		else
 			currentElements.add(index, createFilter);
 	}
 
-	private void updateUi(final T createFilter, final int index) {
+	private void updateUi(final T createFilter) {
 		final AbstractComponent uiComponent = createUIComponent(createFilter);
 
 		final DragAndDropWrapper moveWrapper = new DragAndDropWrapper(uiComponent);
-		if (index == -1)
-			cols.addComponent(moveWrapper);
-		else
-			cols.addComponent(moveWrapper, index);
-
-		updateAllComponentIndices();
+		orderedLayout.addComponent(moveWrapper);
 
 		moveWrapper.setDragStartMode(DragStartMode.COMPONENT);
 		uiComponent.setData(createFilter);

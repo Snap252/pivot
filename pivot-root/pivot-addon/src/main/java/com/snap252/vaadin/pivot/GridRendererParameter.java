@@ -58,6 +58,10 @@ public final class GridRendererParameter<INPUT_TYPE, VALUE_TYPE> {
 				.addChangeListener(_l -> fireEvent(GridRendererChangeParameterKind.AGGREGATOR));
 	}
 
+	public void setConfig() {
+
+	}
+
 	public Collection<? extends Property<INPUT_TYPE, ?>> getProperties() {
 		return provider.getProperties();
 	}

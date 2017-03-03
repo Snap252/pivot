@@ -10,6 +10,13 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -42,7 +49,20 @@ public class Config {
 	public String toXml() throws JAXBException {
 		final StringWriter sw = new StringWriter();
 		jaxbContext.createMarshaller().marshal(this, sw);
-		return sw.toString();
+
+		try {
+			final Transformer transformer = TransformerFactory.newInstance().newTransformer();
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+			// initialize StreamResult with File object to save to file
+			final StreamResult result = new StreamResult(new StringWriter());
+			final Source source = new StreamSource(new StringReader(sw.toString()));
+			transformer.transform(source, result);
+			return result.getWriter().toString();
+		} catch (final TransformerException e) {
+			System.err.println(sw.toString());
+			throw new AssertionError(e);
+		}
 	}
 
 	private static final JAXBContext jaxbContext;
@@ -59,7 +79,7 @@ public class Config {
 		try {
 			return (@NonNull Config) jaxbContext.createUnmarshaller().unmarshal(new StringReader(xml));
 		} catch (final JAXBException e) {
-			//FIXME:
+			// FIXME:
 			throw new AssertionError(e);
 		}
 	}

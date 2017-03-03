@@ -91,6 +91,20 @@ public class NotifyingList<T> extends AbstractListDecorator<T> implements Change
 		return oldValue;
 	}
 
+	public boolean setAll(final Collection<? extends T> coll) {
+		if (coll.equals(this))
+			return false;
+
+		final boolean hasElements = !isEmpty();
+		if (hasElements)
+			super.clear();
+
+		final boolean changed = super.addAll(coll) || hasElements;
+		if (changed)
+			fireChange();
+		return changed;
+	}
+
 	@Override
 	public void clear() {
 		if (isEmpty())

@@ -26,7 +26,7 @@ import com.vaadin.ui.TextField;
 
 public abstract class Attribute<@Nullable DATA_TYPE>
 		implements DataExtractor<DATA_TYPE>, ChangeNotifierSupplier<Attribute<?>> {
-	@XmlAttribute(name = "name", required = true)
+	@XmlAttribute(name = "property-name", required = true)
 	public String attributeName = "";
 
 	@XmlAttribute(name = "display-name")

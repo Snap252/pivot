@@ -1,6 +1,5 @@
 package com.snap252.vaadin.pivot;
 
-import java.util.List;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -8,6 +7,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.vaadin.hene.popupbutton.PopupButton;
 
 import com.snap252.vaadin.pivot.xml.bucketextractors.Attribute;
+import com.snap252.vaadin.pivot.xml.data.NotifyingList;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.Alignment;
@@ -22,7 +22,7 @@ public class PivotCriteriaFilteringDnDHandler extends DropHandlerImplementation<
 	private final AttributeFactory filterFactory = new AttributeFactory();
 
 	public PivotCriteriaFilteringDnDHandler(final AbstractOrderedLayout cols, final boolean vertical,
-			final List<Attribute<?>> currentElements) {
+			final NotifyingList<Attribute<?>> currentElements) {
 		super(cols, vertical, currentElements);
 	}
 

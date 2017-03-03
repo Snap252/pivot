@@ -75,7 +75,7 @@ public abstract class Bucket<V> implements Predicate<@NonNull V> {
 	protected Stream<@NonNull ? extends Bucket<V>> streamWithSubTotals(final ShowingSubtotal showSubtotal)
 			throws AssertionError {
 		final @Nullable List<? extends @NonNull Bucket<V>> children$ = getChildren();
-		if (children$ == null)
+		if (children$ == null || children$.isEmpty())
 			switch (showSubtotal) {
 			case DONT_SHOW:
 				return Stream.of();

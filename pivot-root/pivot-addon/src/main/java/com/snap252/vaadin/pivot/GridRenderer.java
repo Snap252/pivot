@@ -118,7 +118,7 @@ final class GridRenderer {
 		grid.setRowDescriptionGenerator(null);
 
 		doHeader(grid, colBucket, 0);
-		//TODO: better not to add it
+		// TODO: better not to add it
 		grid.removeHeaderRow(0);
 	}
 
@@ -155,10 +155,11 @@ final class GridRenderer {
 				final int childDepth = depth + 1;
 				children$.forEach(c -> doHeader(g, c, childDepth));
 				final HeaderRow childRow = g.getHeaderRow(childDepth);
-				// childRow.getCell(b).setText(SUM_TEXT);
-				final HeaderCell ownCellInChildRow = childRow.getCell(b);
-				if (ownCellInChildRow != null)
-					ownCellInChildRow.setComponent(
+
+				if (depth == 0)
+					childRow.getCell(b).setText(SUM_TEXT);
+				else
+					childRow.getCell(b).setComponent(
 							createChildCollapseButton(g, b.stream().filter(b0 -> b0 != b).collect(toList()), SUM_TEXT));
 			}
 		}

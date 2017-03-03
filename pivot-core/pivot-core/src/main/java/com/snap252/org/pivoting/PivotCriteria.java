@@ -21,7 +21,7 @@ public interface PivotCriteria<F, T> extends Function<@NonNull F, @Nullable T>, 
 		return 0;
 	}
 
-	default @Nullable ShowingSubtotal showSubtotal() {
+	default ShowingSubtotal showSubtotal() {
 		return ShowingSubtotal.AFTER;
 	}
 

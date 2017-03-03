@@ -3,6 +3,7 @@ package com.snap252.vaadin.pivot;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.toList;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -279,7 +280,14 @@ class BucketContainer<INPUT_TYPE>
 	@Override
 	public Collection<@NonNull Bucket<INPUT_TYPE>> rootItemIds() {
 		assert isRoot(rowBucket);
-		return Collections.singleton(rowBucket);
+		@Nullable
+		final List<@NonNull Bucket<INPUT_TYPE>> children = rowBucket.getChildren();
+		if (children == null)
+			return Collections.singleton(rowBucket);
+
+		final List<Bucket<INPUT_TYPE>> arrayList = new ArrayList<>(children);
+		arrayList.add(0, rowBucket);
+		return arrayList;
 	}
 
 	@Override
@@ -302,12 +310,12 @@ class BucketContainer<INPUT_TYPE>
 
 	@Override
 	public boolean isRoot(final Object itemId) {
-		return itemId == rowBucket;
+		return itemId == rowBucket || ((Bucket<?>)itemId).parent == rowBucket;
 	}
 
 	@Override
 	public boolean hasChildren(final Object itemId) {
-		return ((Bucket<?>) itemId).getChildren() != null;
+		return ((Bucket<?>) itemId).getChildren() != null && itemId != rowBucket;
 	}
 
 	private final Set<Container.ItemSetChangeListener> itemSetEventListeners = new LinkedHashSet<>();

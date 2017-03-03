@@ -32,9 +32,8 @@ public abstract class Attribute<@Nullable DATA_TYPE>
 	@Nullable
 	public String displayName;
 
-	@Nullable
 	@XmlAttribute(name = "subtotal")
-	public ShowingSubtotal subtotal = ShowingSubtotal.AFTER;
+	public ShowingSubtotal subtotal = ShowingSubtotal.INHERIT;
 
 	@Nullable
 	@XmlAttribute(name = "sort")
@@ -79,7 +78,7 @@ public abstract class Attribute<@Nullable DATA_TYPE>
 			}
 
 			@Override
-			public @Nullable ShowingSubtotal showSubtotal() {
+			public ShowingSubtotal showSubtotal() {
 				return subtotal;
 			}
 		};
@@ -114,17 +113,20 @@ public abstract class Attribute<@Nullable DATA_TYPE>
 		});
 
 		final ComboBox cb = new ComboBox("Zwischensumme", Arrays.asList(ShowingSubtotal.values()));
+		cb.setNullSelectionItemId(ShowingSubtotal.INHERIT);
+		cb.setNullSelectionAllowed(false);
 		cb.setValue(att.subtotal);
-		
+
 		cb.setNullSelectionAllowed(true);
-		cb.addValueChangeListener(vce -> {
-			final ShowingSubtotal sst = (ShowingSubtotal) vce.getProperty().getValue();
-			if (att.subtotal == sst)
+		cb.addValueChangeListener(valueChangeEvent -> {
+			final ShowingSubtotal showSubTotal = (ShowingSubtotal) valueChangeEvent.getProperty().getValue();
+			assert showSubTotal != null;
+			if (att.subtotal == showSubTotal)
 				return;
-			
-			att.subtotal = sst;
+
+			att.subtotal = showSubTotal;
 			att.fireChange();
-			
+
 		});
 		final FormLayout fl = new FormLayout(tf, cb);
 //		fl.setSizeUndefined();

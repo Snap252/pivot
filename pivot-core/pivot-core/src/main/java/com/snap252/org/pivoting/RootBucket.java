@@ -33,4 +33,9 @@ public class RootBucket<V> extends SubBucket<V> {
 	public Collection<V> filter(final Collection<V> l) {
 		return l;
 	}
+
+	@Override
+	protected @NonNull ShowingSubtotal getSubTotal() {
+		return ShowingSubtotal.AFTER;
+	}
 }

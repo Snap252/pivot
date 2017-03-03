@@ -72,11 +72,11 @@ public abstract class Bucket<V> implements Predicate<@NonNull V> {
 		final @Nullable List<? extends @NonNull Bucket<V>> children$ = getChildren();
 		if (children$ == null)
 			return Stream.of(this);
-		final ShowingSubtotal showSubtotal = extractor.showSubtotal();
-		if (showSubtotal == null)
-			return children$.stream().flatMap(Bucket::stream);
+		final ShowingSubtotal showSubtotal = getSubTotal();
 
 		switch (showSubtotal) {
+		case DONT_SHOW:
+			return children$.stream().flatMap(Bucket::stream);
 		case AFTER:
 			return Stream.concat(children$.stream().flatMap(Bucket::stream), Stream.of(this));
 		case BEFORE:
@@ -84,6 +84,15 @@ public abstract class Bucket<V> implements Predicate<@NonNull V> {
 		default:
 			throw new AssertionError(showSubtotal);
 		}
+	}
+
+	protected ShowingSubtotal getSubTotal() {
+		@Nullable
+		final ShowingSubtotal showSubtotal = extractor.showSubtotal();
+		if (showSubtotal != ShowingSubtotal.INHERIT) {
+			return showSubtotal;
+		}
+		return parent != null ? parent.getSubTotal() : ShowingSubtotal.AFTER;
 	}
 
 	@Override

@@ -1,5 +1,7 @@
 package com.snap252.vaadin.pivot.xml.renderers;
 
+import java.util.Objects;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 
@@ -43,12 +45,12 @@ public class DecimalValueField extends ValueField<Number> {
 		public DecimalConfigurable() {
 			final CountingAggregator.CountingAggConfig countingAggConfig = new CountingAggregator.CountingAggConfig();
 			countingAggConfig.addValueChangeListener(vce -> {
-				agg = (Aggregator<?, ?>) vce.getProperty().getValue();
+				agg = Objects.requireNonNull((CountingAggregator) vce.getProperty().getValue());
 				fireChange();
 			});
 			final NumberStatisticsConfig statisticsAggConfig = new NumberStatisticsConfig();
 			statisticsAggConfig.addValueChangeListener(vce -> {
-				agg = (Aggregator<?, ?>) vce.getProperty().getValue();
+				agg = Objects.requireNonNull((NumberStatisticsAggregator) vce.getProperty().getValue());
 				fireChange();
 			});
 

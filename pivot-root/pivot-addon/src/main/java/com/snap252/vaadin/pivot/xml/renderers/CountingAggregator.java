@@ -21,7 +21,7 @@ import com.vaadin.ui.VerticalLayout;
 public final class CountingAggregator extends Aggregator<ObjectStatistics, BigDecimal> {
 
 	@XmlAttribute(name = "mode")
-	public WhatOfObjectStatisticsToShow whatToRender = WhatOfObjectStatisticsToShow.cntNonNull;
+	public WhatOfObjectStatisticsToShow whatToRender = WhatOfObjectStatisticsToShow.COUNT;
 
 	@Override
 	public BigDecimalRenderer createRenderer() {

@@ -24,7 +24,7 @@ public class ObjectValueExtractor<INPUT_TYPE> implements FilteringRenderingCompo
 
 	private final ComboBox howToRenderComboBox = new ComboBox("Anzeige",
 			Arrays.asList(WhatOfObjectStatisticsToShow.values()));
-	private WhatOfObjectStatisticsToShow whatToRender = WhatOfObjectStatisticsToShow.cnt;
+	private WhatOfObjectStatisticsToShow whatToRender = WhatOfObjectStatisticsToShow.COUNT;
 
 	public ObjectValueExtractor(final Property<INPUT_TYPE, ?> nameType) {
 		this.property = nameType;
@@ -32,7 +32,7 @@ public class ObjectValueExtractor<INPUT_TYPE> implements FilteringRenderingCompo
 		final FormLayout formLayout = new FormLayout();
 
 		howToRenderComboBox.setNullSelectionAllowed(false);
-		howToRenderComboBox.setValue(WhatOfObjectStatisticsToShow.cnt);
+		howToRenderComboBox.setValue(WhatOfObjectStatisticsToShow.COUNT);
 
 		howToRenderComboBox.addValueChangeListener(value -> {
 			this.whatToRender = (WhatOfObjectStatisticsToShow) requireNonNull(value.getProperty().getValue());

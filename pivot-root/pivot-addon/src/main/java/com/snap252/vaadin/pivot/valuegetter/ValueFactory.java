@@ -8,6 +8,7 @@ import com.snap252.vaadin.pivot.Property;
 import com.snap252.vaadin.pivot.xml.renderers.DecimalValueField;
 import com.snap252.vaadin.pivot.xml.renderers.IntegerValueField;
 import com.snap252.vaadin.pivot.xml.renderers.ObjectValueField;
+import com.snap252.vaadin.pivot.xml.renderers.StringValueField;
 import com.snap252.vaadin.pivot.xml.renderers.ValueField;
 
 public class ValueFactory {
@@ -24,6 +25,8 @@ public class ValueFactory {
 
 		if (Integer.class.isAssignableFrom(n.getType()))
 			return new IntegerValueField();
+		if (String.class.isAssignableFrom(n.getType()))
+			return new StringValueField();
 
 		return new ObjectValueField();
 

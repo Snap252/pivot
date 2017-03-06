@@ -17,6 +17,11 @@ public class IntegerValueField extends ValueField<Integer> {
 	}
 
 	@Override
+	public Aggregator<?, ?> getAggregator() {
+		return super.getAggregator();
+	}
+
+	@Override
 	protected Integer roundImpl(final Integer input) {
 		return input;
 	}

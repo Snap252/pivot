@@ -7,6 +7,7 @@ import java.util.Objects;
 
 import org.apache.commons.collections4.list.AbstractListDecorator;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 public class NotifyingList<T> extends AbstractListDecorator<T> implements ChangeNotifierSupplier<@NonNull List<T>> {
 
@@ -39,7 +40,7 @@ public class NotifyingList<T> extends AbstractListDecorator<T> implements Change
 		changeNotifier.fireChange(this);
 	}
 
-	private void addListenerIfSupported(final T t) {
+	protected void addListenerIfSupported(final @Nullable T t) {
 		if (t instanceof ChangeNotifier) {
 			@SuppressWarnings({ "unchecked", "rawtypes" })
 			final ChangeNotifier<? super Object> changeNotifier = (ChangeNotifier) t;
@@ -47,7 +48,7 @@ public class NotifyingList<T> extends AbstractListDecorator<T> implements Change
 		}
 	}
 
-	private void removeListenerIfSupported(final Object t) {
+	protected void removeListenerIfSupported(final @Nullable Object t) {
 		if (t instanceof ChangeNotifier) {
 			@SuppressWarnings({ "unchecked", "rawtypes" })
 			final ChangeNotifier<? super Object> changeNotifier = (ChangeNotifier) t;

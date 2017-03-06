@@ -53,8 +53,9 @@ final class GridRenderer {
 			if (columnPropertyId != COLLAPSE_COL_PROPERTY_ID) {
 				final Bucket<?> colBucket = (Bucket<?>) columnPropertyId;
 				modelAggregator.updateRendererAndConverter(column, colBucket.getLevel());
-//				final RendererConverter<?, ?> rc = modelAggregator.createRendererConverter();
-//				rc.setToColumn(column, colBucket.getLevel());
+				// final RendererConverter<?, ?> rc =
+				// modelAggregator.createRendererConverter();
+				// rc.setToColumn(column, colBucket.getLevel());
 				column.setMinimumWidth(75);
 			} else
 				column.setMinimumWidth(170);
@@ -112,12 +113,14 @@ final class GridRenderer {
 			}
 		}
 
+
 		grid.setCellDescriptionGenerator(null);
 		grid.setRowDescriptionGenerator(null);
 
 		doHeader(grid, colBucket, 0);
 		// TODO: better not to add it
-		grid.removeHeaderRow(0);
+		if (depth != 0)
+			grid.removeHeaderRow(0);
 	}
 
 	private void cleanupGridHeader(final Grid grid) {

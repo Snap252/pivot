@@ -30,6 +30,7 @@ import com.snap252.vaadin.pivot.xml.renderers.DecimalValueField;
 import com.snap252.vaadin.pivot.xml.renderers.IntegerValueField;
 import com.snap252.vaadin.pivot.xml.renderers.ObjectValueField;
 import com.snap252.vaadin.pivot.xml.renderers.SimpleObjectValueField;
+import com.snap252.vaadin.pivot.xml.renderers.StringValueField;
 import com.snap252.vaadin.pivot.xml.renderers.ValueField;
 
 @XmlRootElement(name = "config")
@@ -41,6 +42,7 @@ public class Config {
 	@XmlElements({ @XmlElement(name = "object", type = ObjectValueField.class),
 			@XmlElement(name = "decimal", type = DecimalValueField.class),
 			@XmlElement(name = "integer", type = IntegerValueField.class),
+			@XmlElement(name = "string", type = StringValueField.class),
 
 	})
 	@Deprecated
@@ -73,19 +75,20 @@ public class Config {
 		}
 	}
 
-//	private static final JAXBContext JAXB_CONTEXT;
-//	static {
-//		try {
-//			JAXB_CONTEXT = JAXBContext.newInstance(Config.class);
-//		} catch (final JAXBException e) {
-//			throw new AssertionError(e);
-//		}
-//	}
+	// private static final JAXBContext JAXB_CONTEXT;
+	// static {
+	// try {
+	// JAXB_CONTEXT = JAXBContext.newInstance(Config.class);
+	// } catch (final JAXBException e) {
+	// throw new AssertionError(e);
+	// }
+	// }
 
 	@SuppressWarnings("null")
 	public static Config fromXml(final String xml) {
 		try {
-			return (@NonNull Config) JAXBContext.newInstance(Config.class).createUnmarshaller().unmarshal(new StringReader(xml));
+			return (@NonNull Config) JAXBContext.newInstance(Config.class).createUnmarshaller()
+					.unmarshal(new StringReader(xml));
 		} catch (final JAXBException e) {
 			// FIXME:
 			throw new AssertionError(e);
@@ -102,14 +105,23 @@ public class Config {
 	private final class SingleNotifyingList extends NotifyingList<ValueField<?>> {
 		@Override
 		public void add(final int index, @NonNull final ValueField<?> object) {
+			assert index == 0;
+			if (renderer == object)
+				return;
+
+			removeListenerIfSupported(renderer);
+			renderer = object;
+			addListenerIfSupported(object);
 			fireChange();
 		}
 
 		@Override
-		public boolean add(@Nullable final ValueField<?> object) {
+		public boolean add(final ValueField<?> object) {
 			if (renderer == object)
 				return false;
+			removeListenerIfSupported(renderer);
 			renderer = object;
+			addListenerIfSupported(object);
 			fireChange();
 			return true;
 		}
@@ -122,6 +134,7 @@ public class Config {
 
 		@Override
 		public void clear() {
+			removeListenerIfSupported(renderer);
 			renderer = new SimpleObjectValueField();
 			fireChange();
 		}
@@ -129,6 +142,7 @@ public class Config {
 		@Override
 		public @Nullable ValueField<?> remove(final int index) {
 			assert index == 0;
+			removeListenerIfSupported(renderer);
 			final ValueField<?> oldRenderer = renderer;
 			renderer = new SimpleObjectValueField();
 
@@ -139,6 +153,7 @@ public class Config {
 		@Override
 		public boolean remove(final @Nullable Object object) {
 			assert object == renderer;
+			removeListenerIfSupported(renderer);
 			renderer = null;
 			fireChange();
 			return true;
@@ -176,6 +191,8 @@ public class Config {
 		columns.attributes.setAll(newconfig.columns.attributes);
 		rows.attributes.setAll(newconfig.rows.attributes);
 		displayName = newconfig.displayName;
-		rendererList.add(newconfig.renderer);
+		final ValueField<?> renderer$ = newconfig.renderer;
+		if (renderer$ != null)
+			rendererList.add(renderer$);
 	}
 }

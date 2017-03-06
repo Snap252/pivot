@@ -17,9 +17,8 @@ public class DecimalValueField extends ValueField<BigDecimal> {
 
 	@XmlElements({ @XmlElement(name = "counting", type = CountingAggregator.class),
 			@XmlElement(name = "statistics", type = NumberStatisticsAggregator.class) })
-	@Override
-	public void setAggregator(@NonNull final Aggregator<?, ?> agg) {
-		super.setAggregator(agg);
+	public void setAggregator(final Aggregator<?, ?> agg) {
+		this.agg = agg;
 	}
 
 	@Override

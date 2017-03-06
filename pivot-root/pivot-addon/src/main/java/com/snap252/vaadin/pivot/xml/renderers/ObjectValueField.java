@@ -11,9 +11,8 @@ public final class ObjectValueField extends ValueField<Object> {
 	}
 
 	@XmlElements(@XmlElement(name = "counting", type = CountingAggregator.class))
-	@Override
 	public void setAggregator(final Aggregator<?, ?> agg) {
-		super.setAggregator(agg);
+		this.agg = agg;
 	}
 
 	@Override

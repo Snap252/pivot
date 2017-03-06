@@ -56,7 +56,7 @@ public class Config {
 	public String toXml() {
 		final StringWriter sw = new StringWriter();
 		try {
-			JAXB_CONTEXT.createMarshaller().marshal(this, sw);
+			JAXBContext.newInstance(Config.class).createMarshaller().marshal(this, sw);
 
 			final Transformer transformer = TransformerFactory.newInstance().newTransformer();
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -73,19 +73,19 @@ public class Config {
 		}
 	}
 
-	private static final JAXBContext JAXB_CONTEXT;
-	static {
-		try {
-			JAXB_CONTEXT = JAXBContext.newInstance(Config.class);
-		} catch (final JAXBException e) {
-			throw new AssertionError(e);
-		}
-	}
+//	private static final JAXBContext JAXB_CONTEXT;
+//	static {
+//		try {
+//			JAXB_CONTEXT = JAXBContext.newInstance(Config.class);
+//		} catch (final JAXBException e) {
+//			throw new AssertionError(e);
+//		}
+//	}
 
 	@SuppressWarnings("null")
 	public static Config fromXml(final String xml) {
 		try {
-			return (@NonNull Config) JAXB_CONTEXT.createUnmarshaller().unmarshal(new StringReader(xml));
+			return (@NonNull Config) JAXBContext.newInstance(Config.class).createUnmarshaller().unmarshal(new StringReader(xml));
 		} catch (final JAXBException e) {
 			// FIXME:
 			throw new AssertionError(e);
@@ -106,7 +106,7 @@ public class Config {
 		}
 
 		@Override
-		public boolean add(final ValueField<?> object) {
+		public boolean add(@Nullable final ValueField<?> object) {
 			if (renderer == object)
 				return false;
 			renderer = object;
@@ -175,5 +175,7 @@ public class Config {
 	public void setAll(final Config newconfig) {
 		columns.attributes.setAll(newconfig.columns.attributes);
 		rows.attributes.setAll(newconfig.rows.attributes);
+		displayName = newconfig.displayName;
+		rendererList.add(newconfig.renderer);
 	}
 }

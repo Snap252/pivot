@@ -33,6 +33,9 @@ public class NumberStatisticsAggregator
 		return whatToRender.getValue(value);
 	}
 
+	@XmlAttribute(name = "null-representation")
+	public String nullRepresentation = "-";
+
 	@Override
 	public @NonNull Renderer<@Nullable BigDecimal> createRenderer() {
 		return new BigDecimalRenderer(nullRepresentation);
@@ -41,6 +44,7 @@ public class NumberStatisticsAggregator
 	@Override
 	public <INPUT_TYPE> @NonNull Collector<INPUT_TYPE, ?, @Nullable NumberStatistics<@NonNull BigDecimal>> getCollector() {
 		final Arithmetics<BigDecimal> arithmetics = new NullableArithmeticsWrapper<>(new BigDecimalArithmetics());
-		return (@NonNull Collector<INPUT_TYPE, ?, @Nullable NumberStatistics<@NonNull BigDecimal>>) PivotCollectors.getNumberReducer(arithmetics);
+		return (@NonNull Collector<INPUT_TYPE, ?, @Nullable NumberStatistics<@NonNull BigDecimal>>) PivotCollectors
+				.getNumberReducer(arithmetics);
 	}
 }

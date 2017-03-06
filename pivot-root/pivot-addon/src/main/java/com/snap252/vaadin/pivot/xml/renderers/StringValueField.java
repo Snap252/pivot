@@ -3,8 +3,6 @@ package com.snap252.vaadin.pivot.xml.renderers;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 
-import org.eclipse.jdt.annotation.NonNull;
-
 import com.snap252.vaadin.pivot.UIConfigurable;
 
 public class StringValueField extends ValueField<String> {
@@ -14,9 +12,8 @@ public class StringValueField extends ValueField<String> {
 
 	@XmlElements({ @XmlElement(name = "counting", type = CountingAggregator.class),
 			@XmlElement(name = "concat", type = StringConcatAggregator.class) })
-	@Override
-	public void setAggregator(@NonNull final Aggregator<?, ?> agg) {
-		super.setAggregator(agg);
+	public void setAggregator(final Aggregator<?, ?> agg) {
+		this.agg = agg;
 	}
 
 	@Override
@@ -30,8 +27,7 @@ public class StringValueField extends ValueField<String> {
 	}
 
 	@Override
-	public @NonNull UIConfigurable createUIConfigurable() {
-		// TODO Auto-generated method stub
-		return null;
+	public UIConfigurable createUIConfigurable() {
+		return () -> null;
 	}
 }

@@ -12,9 +12,8 @@ public class IntegerValueField extends ValueField<Integer> {
 	}
 
 	@XmlElements(@XmlElement(name = "counting", type = CountingAggregator.class))
-	@Override
 	public void setAggregator(final Aggregator<?, ?> agg) {
-		super.setAggregator(agg);
+		this.agg = agg;
 	}
 
 	@Override

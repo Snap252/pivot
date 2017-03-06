@@ -1,7 +1,5 @@
 package com.snap252.vaadin.pivot.xml.renderers;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.eclipse.jdt.annotation.Nullable;
@@ -15,15 +13,7 @@ public abstract class ValueField<DATA_TYPE> extends Attribute<@Nullable DATA_TYP
 	}
 
 	@XmlTransient
-	private Aggregator<?, ?> agg;
-
-	@XmlAttribute(name = "attribute-name", required = true)
-	public String name = "";
-
-	@XmlElement
-	public void setAggregator(final Aggregator<?, ?> agg) {
-		this.agg = agg;
-	}
+	protected Aggregator<?, ?> agg;
 
 	public Aggregator<?, ?> getAggregator() {
 		return agg;

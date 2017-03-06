@@ -3,8 +3,6 @@ package com.snap252.vaadin.pivot.xml.renderers;
 import java.util.Locale;
 import java.util.stream.Collector;
 
-import javax.xml.bind.annotation.XmlAttribute;
-
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -24,9 +22,6 @@ public abstract class Aggregator<T, U> {
 	public abstract @NonNull Renderer<? super U> createRenderer();
 
 	public abstract @NonNull <INPUT_TYPE> Collector<INPUT_TYPE, ?, T> getCollector();
-
-	@XmlAttribute(name = "null-representation")
-	public @NonNull String nullRepresentation = "-";
 
 	@NonNullByDefault
 	private Converter<? extends U, PivotCellReference<T, ?>> createConverter(final Class<U> presentationType) {

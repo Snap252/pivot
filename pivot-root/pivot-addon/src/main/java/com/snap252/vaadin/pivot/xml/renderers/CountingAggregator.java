@@ -10,7 +10,7 @@ import com.snap252.vaadin.pivot.renderer.BigDecimalRenderer;
 import com.snap252.vaadin.pivot.valuegetter.ObjectStatistics;
 import com.snap252.vaadin.pivot.valuegetter.WhatOfObjectStatisticsToShow;
 
-public class CountingAggregator extends Aggregator<ObjectStatistics, BigDecimal> {
+public final class CountingAggregator extends Aggregator<ObjectStatistics, BigDecimal> {
 
 	@XmlAttribute(name = "mode")
 	public WhatOfObjectStatisticsToShow whatToRender = WhatOfObjectStatisticsToShow.cntNonNull;

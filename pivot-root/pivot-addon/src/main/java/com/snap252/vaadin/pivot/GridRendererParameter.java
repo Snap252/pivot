@@ -92,11 +92,11 @@ public final class GridRendererParameter<INPUT_TYPE, VALUE_TYPE> {
 	// }
 
 	public Aggregator<?, ?> getAggregator() {
-		return config.renderer.getAggregator();
+		return config.getRenderer().getAggregator();
 	}
 
 	public Collector<INPUT_TYPE, ?, ?> getCollector() {
-		final ValueField<?> renderer = config.renderer;
+		final ValueField<?> renderer = config.getRenderer();
 		final PivotCriteria<INPUT_TYPE, ?> s = renderer.createPivotCriteria(provider);
 		return Collectors.mapping(s, renderer.getAggregator().getCollector());
 	}

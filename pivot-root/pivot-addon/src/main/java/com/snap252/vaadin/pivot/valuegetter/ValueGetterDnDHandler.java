@@ -3,8 +3,6 @@ package com.snap252.vaadin.pivot.valuegetter;
 import java.util.Objects;
 
 import org.vaadin.hene.popupbutton.PopupButton;
-import org.vaadin.hene.popupbutton.PopupButton.PopupVisibilityEvent;
-import org.vaadin.hene.popupbutton.PopupButton.PopupVisibilityListener;
 
 import com.snap252.vaadin.pivot.DropHandlerImplementation;
 import com.snap252.vaadin.pivot.Property;
@@ -37,43 +35,26 @@ public class ValueGetterDnDHandler<INPUT_TYPE> extends DropHandlerImplementation
 	protected AbstractComponent createUIComponent(final ValueField<?> createFilter) {
 		final AbstractComponent component = createFilter.createUIConfigurable().getComponent();
 
-		final Button b;
-		if (component != null) {
-			final PopupButton popupButton = new PopupButton(createFilter.getDisplayName());
-			final Button deleteButton = new Button("Entfernen", evt -> {
-				removeFromList(Objects.requireNonNull(popupButton.getParent()), createFilter, this);
-				popupButton.setPopupVisible(false);
-			});
+		final PopupButton popupButton = new PopupButton(createFilter.getDisplayName());
+		final Button deleteButton = new Button("Entfernen", evt -> {
+			removeFromList(Objects.requireNonNull(popupButton.getParent()), createFilter, this);
+			popupButton.setPopupVisible(false);
+		});
 
-			final Button closeButton = new Button("Schließen", evt -> popupButton.setPopupVisible(false));
+		final Button closeButton = new Button("Schließen", evt -> popupButton.setPopupVisible(false));
 
-			final HorizontalLayout footer = new HorizontalLayout(deleteButton, closeButton);
-			footer.setSpacing(true);
-			footer.setWidth("100%");
-			footer.setComponentAlignment(deleteButton, Alignment.BOTTOM_LEFT);
-			footer.setComponentAlignment(closeButton, Alignment.BOTTOM_RIGHT);
+		final HorizontalLayout footer = new HorizontalLayout(deleteButton, closeButton);
+		footer.setSpacing(true);
+		footer.setWidth("100%");
+		footer.setComponentAlignment(deleteButton, Alignment.BOTTOM_LEFT);
+		footer.setComponentAlignment(closeButton, Alignment.BOTTOM_RIGHT);
 
-			final VerticalLayout verticalLayout = new VerticalLayout(component, footer);
-			popupButton.setContent(verticalLayout);
-			{
-				final PopupVisibilityListener listener = new PopupVisibilityListener() {
-					@Override
-					public void popupVisibilityChange(final PopupVisibilityEvent _ignore2) {
-						/* we need a this-context here */
-						popupButton.removePopupVisibilityListener(this);
-						popupButton.setCaption(createFilter.toString());
-						// popupButton.addStyleName(createFilter.getButtonStyles());
-					}
-				};
-			}
+		popupButton.setContent(component != null ? new VerticalLayout(component, footer) : footer);
 
-			b = popupButton;
-		} else
-			b = new Button(createFilter.getDisplayName());
-		//TODO: check self?
-		createFilter.addChangeListener((cl, self) -> b.setCaption(cl.getDisplayName()));
-		b.addStyleName(ValoTheme.BUTTON_SMALL);
-		return b;
+		// TODO: check self?
+		createFilter.addChangeListener((cl, self) -> popupButton.setCaption(cl.getDisplayName()));
+		popupButton.addStyleName(ValoTheme.BUTTON_SMALL);
+		return popupButton;
 	}
 
 }

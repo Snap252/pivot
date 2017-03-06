@@ -37,32 +37,25 @@ public class PivotCriteriaFilteringDnDHandler extends DropHandlerImplementation<
 		final UIConfigurable uiConfigurable = createFilter.createUIConfigurable();
 		final AbstractComponent component = uiConfigurable.getComponent();
 
-		final Button b;
-		if (component != null) {
-			final PopupButton popupButton = new PopupButton(createFilter.getDisplayName());
-			final Button deleteButton = new Button("Entfernen", evt -> {
-				removeFromList(Objects.requireNonNull(popupButton.getParent()), createFilter, this);
-				popupButton.setPopupVisible(false);
-			});
-			final Button closeButton = new Button("Schließen", evt -> popupButton.setPopupVisible(false));
+		final PopupButton popupButton = new PopupButton(createFilter.getDisplayName());
+		final Button deleteButton = new Button("Entfernen", evt -> {
+			removeFromList(Objects.requireNonNull(popupButton.getParent()), createFilter, this);
+			popupButton.setPopupVisible(false);
+		});
+		final Button closeButton = new Button("Schließen", evt -> popupButton.setPopupVisible(false));
 
-			final HorizontalLayout footer = new HorizontalLayout(deleteButton, closeButton);
-			footer.setSpacing(true);
-			footer.setWidth("100%");
-			footer.setComponentAlignment(deleteButton, Alignment.BOTTOM_LEFT);
-			footer.setComponentAlignment(closeButton, Alignment.BOTTOM_RIGHT);
+		final HorizontalLayout footer = new HorizontalLayout(deleteButton, closeButton);
+		footer.setSpacing(true);
+		footer.setWidth("100%");
+		footer.setComponentAlignment(deleteButton, Alignment.BOTTOM_LEFT);
+		footer.setComponentAlignment(closeButton, Alignment.BOTTOM_RIGHT);
 
-			final VerticalLayout verticalLayout = new VerticalLayout(component, footer);
-			popupButton.setContent(verticalLayout);
-
-			b = popupButton;
-		} else
-			b = new Button(createFilter.getDisplayName());
+		popupButton.setContent(component != null ? new VerticalLayout(component, footer) : footer);
 
 		// TODO: check self
-		createFilter.addChangeListener((cl, self) -> b.setCaption(cl.getDisplayName()));
-		b.addStyleName(ValoTheme.BUTTON_SMALL);
-		return b;
+		createFilter.addChangeListener((cl, self) -> popupButton.setCaption(cl.getDisplayName()));
+		popupButton.addStyleName(ValoTheme.BUTTON_SMALL);
+		return popupButton;
 	}
 
 	protected UIConfigurable createUIConfigurable(final FilteringComponent<?, ?> filteringComponent) {

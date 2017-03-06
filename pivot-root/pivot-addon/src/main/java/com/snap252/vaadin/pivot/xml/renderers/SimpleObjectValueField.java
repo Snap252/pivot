@@ -1,13 +1,11 @@
 package com.snap252.vaadin.pivot.xml.renderers;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.snap252.org.pivoting.PivotCriteria;
 import com.snap252.org.pivoting.ShowingSubtotal;
 import com.snap252.vaadin.pivot.PropertyProvider;
 import com.snap252.vaadin.pivot.UIConfigurable;
-import com.vaadin.ui.Label;
 
 public class SimpleObjectValueField extends ValueField<Object> {
 	public SimpleObjectValueField() {
@@ -15,13 +13,13 @@ public class SimpleObjectValueField extends ValueField<Object> {
 	}
 
 	@Override
-	protected @NonNull Object roundImpl(@NonNull final Object input) {
+	protected Object roundImpl(final Object input) {
 		return input;
 	}
 
 	@Override
-	public @NonNull UIConfigurable createUIConfigurable() {
-		return () -> new Label("test");
+	public UIConfigurable createUIConfigurable() {
+		return () -> null;
 	}
 
 	@Override
@@ -46,7 +44,8 @@ public class SimpleObjectValueField extends ValueField<Object> {
 
 			@Override
 			public ShowingSubtotal showSubtotal() {
-				return subtotal;
+				assert false;
+				return ShowingSubtotal.DONT_SHOW;
 			}
 		};
 	}

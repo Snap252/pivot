@@ -43,8 +43,9 @@ public class Config {
 			@XmlElement(name = "integer", type = IntegerValueField.class),
 
 	})
-
-	public ValueField<?> renderer = new SimpleObjectValueField();
+	@Deprecated
+	@Nullable
+	public ValueField<?> renderer;
 
 	@XmlElement(name = "columns")
 	public ValuesConfig columns = new ValuesConfig();
@@ -126,7 +127,7 @@ public class Config {
 		}
 
 		@Override
-		public ValueField<?> remove(final int index) {
+		public @Nullable ValueField<?> remove(final int index) {
 			assert index == 0;
 			final ValueField<?> oldRenderer = renderer;
 			renderer = new SimpleObjectValueField();
@@ -138,7 +139,7 @@ public class Config {
 		@Override
 		public boolean remove(final @Nullable Object object) {
 			assert object == renderer;
-			renderer = new SimpleObjectValueField();
+			renderer = null;
 			fireChange();
 			return true;
 		}
@@ -150,14 +151,24 @@ public class Config {
 
 		@Override
 		public ValueField<?> get(final int index) {
-			return renderer;
+			return renderer != null ? renderer : defaultRenderer;
 		}
 
 		@Override
 		public Iterator<ValueField<?>> iterator() {
-			final Set<ValueField<?>> singleton = Collections.singleton((ValueField<?>) renderer);
-			return singleton.iterator();
+			if (renderer != null) {
+				final Set<ValueField<?>> singleton = Collections.singleton((ValueField<?>) renderer);
+				return singleton.iterator();
+			} else {
+				return Collections.emptyIterator();
+			}
 		}
+	}
+
+	private final SimpleObjectValueField defaultRenderer = new SimpleObjectValueField();
+
+	public ValueField<?> getRenderer() {
+		return renderer != null ? renderer : defaultRenderer;
 	}
 
 	@XmlTransient

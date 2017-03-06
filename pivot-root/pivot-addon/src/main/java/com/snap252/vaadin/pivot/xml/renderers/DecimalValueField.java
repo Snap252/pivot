@@ -1,7 +1,5 @@
 package com.snap252.vaadin.pivot.xml.renderers;
 
-import java.math.BigDecimal;
-
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 
@@ -12,7 +10,7 @@ import com.snap252.vaadin.pivot.xml.renderers.NumberStatisticsAggregator.NumberS
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.TabSheet;
 
-public class DecimalValueField extends ValueField<BigDecimal> {
+public class DecimalValueField extends ValueField<Number> {
 	public DecimalValueField() {
 		super(new NumberStatisticsAggregator());
 	}
@@ -29,20 +27,20 @@ public class DecimalValueField extends ValueField<BigDecimal> {
 	}
 
 	@Override
-	protected BigDecimal roundImpl(final BigDecimal input) {
+	protected Number roundImpl(final Number input) {
 		return input;
 	}
 
 	@Override
 	public UIConfigurable createUIConfigurable() {
-		return new StringConfigurable();
+		return new DecimalConfigurable();
 	}
 
-	private class StringConfigurable implements UIConfigurable {
+	private class DecimalConfigurable implements UIConfigurable {
 
 		private final TabSheet comp;
 
-		public StringConfigurable() {
+		public DecimalConfigurable() {
 			final CountingAggregator.CountingAggConfig countingAggConfig = new CountingAggregator.CountingAggConfig();
 			countingAggConfig.addValueChangeListener(vce -> {
 				agg = (Aggregator<?, ?>) vce.getProperty().getValue();

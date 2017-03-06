@@ -1,20 +1,8 @@
 package com.snap252.vaadin.pivot.xml.renderers;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
+import java.math.BigDecimal;
 
-import com.snap252.vaadin.pivot.UIConfigurable;
-
-public class IntegerValueField extends ValueField<Integer> {
-
-	public IntegerValueField() {
-		super(new CountingAggregator());
-	}
-
-	@XmlElements(@XmlElement(name = "counting", type = CountingAggregator.class))
-	public void setAggregator(final Aggregator<?, ?> agg) {
-		this.agg = agg;
-	}
+public class IntegerValueField extends DecimalValueField {
 
 	@Override
 	public Aggregator<?, ?> getAggregator() {
@@ -22,13 +10,8 @@ public class IntegerValueField extends ValueField<Integer> {
 	}
 
 	@Override
-	protected Integer roundImpl(final Integer input) {
-		return input;
+	protected Number roundImpl(final Number input) {
+		assert input instanceof Integer;
+		return BigDecimal.valueOf(input.intValue());
 	}
-
-	@Override
-	public UIConfigurable createUIConfigurable() {
-		return () -> null;
-	}
-
 }

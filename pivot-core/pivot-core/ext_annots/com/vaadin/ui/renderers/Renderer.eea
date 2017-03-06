@@ -1,0 +1,4 @@
+class com/vaadin/ui/renderers/Renderer
+getPresentationType
+ ()Ljava/lang/Class<TT;>;
+ ()L1java/lang/Class<TT;>;

@@ -3,10 +3,7 @@ package com.snap252.vaadin.pivot.xml.renderers;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 
-import org.eclipse.jdt.annotation.NonNull;
-
 import com.snap252.vaadin.pivot.UIConfigurable;
-import com.vaadin.ui.Label;
 
 public final class ObjectValueField extends ValueField<Object> {
 	public ObjectValueField() {
@@ -15,7 +12,7 @@ public final class ObjectValueField extends ValueField<Object> {
 
 	@XmlElements(@XmlElement(name = "counting", type = CountingAggregator.class))
 	@Override
-	public void setAggregator(@NonNull final Aggregator<?, ?> agg) {
+	public void setAggregator(final Aggregator<?, ?> agg) {
 		super.setAggregator(agg);
 	}
 
@@ -25,12 +22,12 @@ public final class ObjectValueField extends ValueField<Object> {
 	}
 
 	@Override
-	protected @NonNull Object roundImpl(@NonNull final Object input) {
+	protected Object roundImpl(final Object input) {
 		return input;
 	}
 
 	@Override
-	public @NonNull UIConfigurable createUIConfigurable() {
-		return () -> new Label("test");
+	public UIConfigurable createUIConfigurable() {
+		return () -> null;
 	}
 }

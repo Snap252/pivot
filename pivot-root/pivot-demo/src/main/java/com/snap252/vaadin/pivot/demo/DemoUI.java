@@ -65,7 +65,7 @@ public class DemoUI extends UI {
 	}
 
 	private PropertyProvider<PropertyOnceItem, ?> xxx() {
-		List<Person> personen = RandomDataGenerator.createPersons(4000);
+		List<Person> personen = RandomDataGenerator.createPersons(10000);
 		BeanItemContainer<Person> container = new BeanItemContainer<>(Person.class);
 		container.addAll(personen);
 		return new ExtractOncePropertyProvider<>(new ContainerPropertyProvider(container));

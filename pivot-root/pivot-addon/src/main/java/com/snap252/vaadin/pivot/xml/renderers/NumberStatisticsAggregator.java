@@ -1,13 +1,18 @@
 package com.snap252.vaadin.pivot.xml.renderers;
 
 import java.math.BigDecimal;
+import java.util.stream.Collector;
 
 import javax.xml.bind.annotation.XmlAttribute;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
+import com.snap252.org.aggregators.Arithmetics;
+import com.snap252.org.aggregators.BigDecimalArithmetics;
+import com.snap252.org.aggregators.NullableArithmeticsWrapper;
 import com.snap252.org.aggregators.NumberStatistics;
+import com.snap252.org.aggregators.PivotCollectors;
 import com.snap252.vaadin.pivot.renderer.BigDecimalRenderer;
 import com.snap252.vaadin.pivot.valuegetter.WhatOfNumberStatisticsToRender;
 import com.vaadin.ui.renderers.Renderer;
@@ -24,12 +29,18 @@ public class NumberStatisticsAggregator
 	public WhatOfNumberStatisticsToRender whatToRender = WhatOfNumberStatisticsToRender.sum;
 
 	@Override
-	public @Nullable BigDecimal getConvertedValue(@Nullable final NumberStatistics<@NonNull BigDecimal> value) {
-		return value == null ? null : whatToRender.getValue(value);
+	public BigDecimal getConvertedValue(final NumberStatistics<BigDecimal> value) {
+		return whatToRender.getValue(value);
 	}
 
 	@Override
-	public @NonNull Renderer<? super @Nullable BigDecimal> createRenderer() {
+	public @NonNull Renderer<@Nullable BigDecimal> createRenderer() {
 		return new BigDecimalRenderer(nullRepresentation);
+	}
+
+	@Override
+	public <INPUT_TYPE> @NonNull Collector<INPUT_TYPE, ?, @Nullable NumberStatistics<@NonNull BigDecimal>> getCollector() {
+		final Arithmetics<BigDecimal> arithmetics = new NullableArithmeticsWrapper<>(new BigDecimalArithmetics());
+		return (@NonNull Collector<INPUT_TYPE, ?, @Nullable NumberStatistics<@NonNull BigDecimal>>) PivotCollectors.getNumberReducer(arithmetics);
 	}
 }

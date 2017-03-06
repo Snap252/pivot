@@ -2,6 +2,10 @@ package com.snap252.vaadin.pivot.xml;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -25,6 +29,7 @@ import com.snap252.vaadin.pivot.xml.data.NotifyingList;
 import com.snap252.vaadin.pivot.xml.renderers.DecimalValueField;
 import com.snap252.vaadin.pivot.xml.renderers.IntegerValueField;
 import com.snap252.vaadin.pivot.xml.renderers.ObjectValueField;
+import com.snap252.vaadin.pivot.xml.renderers.SimpleObjectValueField;
 import com.snap252.vaadin.pivot.xml.renderers.ValueField;
 
 @XmlRootElement(name = "config")
@@ -38,7 +43,8 @@ public class Config {
 			@XmlElement(name = "integer", type = IntegerValueField.class),
 
 	})
-	public ValueField<?> renderer = new ObjectValueField();
+
+	public ValueField<?> renderer = new SimpleObjectValueField();
 
 	@XmlElement(name = "columns")
 	public ValuesConfig columns = new ValuesConfig();
@@ -46,11 +52,11 @@ public class Config {
 	@XmlElement(name = "rows")
 	public ValuesConfig rows = new ValuesConfig();
 
-	public String toXml() throws JAXBException {
+	public String toXml() {
 		final StringWriter sw = new StringWriter();
-		jaxbContext.createMarshaller().marshal(this, sw);
-
 		try {
+			JAXB_CONTEXT.createMarshaller().marshal(this, sw);
+
 			final Transformer transformer = TransformerFactory.newInstance().newTransformer();
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
@@ -60,16 +66,16 @@ public class Config {
 			final Source source = new StreamSource(new StringReader(sw.toString()));
 			transformer.transform(source, result);
 			return result.getWriter().toString();
-		} catch (final TransformerException e) {
+		} catch (final TransformerException | JAXBException e) {
 			System.err.println(sw.toString());
 			throw new AssertionError(e);
 		}
 	}
 
-	private static final JAXBContext jaxbContext;
+	private static final JAXBContext JAXB_CONTEXT;
 	static {
 		try {
-			jaxbContext = JAXBContext.newInstance(Config.class);
+			JAXB_CONTEXT = JAXBContext.newInstance(Config.class);
 		} catch (final JAXBException e) {
 			throw new AssertionError(e);
 		}
@@ -78,7 +84,7 @@ public class Config {
 	@SuppressWarnings("null")
 	public static Config fromXml(final String xml) {
 		try {
-			return (@NonNull Config) jaxbContext.createUnmarshaller().unmarshal(new StringReader(xml));
+			return (@NonNull Config) JAXB_CONTEXT.createUnmarshaller().unmarshal(new StringReader(xml));
 		} catch (final JAXBException e) {
 			// FIXME:
 			throw new AssertionError(e);
@@ -99,8 +105,8 @@ public class Config {
 		}
 
 		@Override
-		public boolean add(@NonNull final ValueField<?> object) {
-			if (renderer != object)
+		public boolean add(final ValueField<?> object) {
+			if (renderer == object)
 				return false;
 			renderer = object;
 			fireChange();
@@ -108,16 +114,22 @@ public class Config {
 		}
 
 		@Override
+		public boolean addAll(@SuppressWarnings("null") final Collection<? extends @NonNull ValueField<?>> coll) {
+			assert false;
+			return super.addAll(coll);
+		}
+
+		@Override
 		public void clear() {
-			renderer = new ObjectValueField();
+			renderer = new SimpleObjectValueField();
 			fireChange();
 		}
 
 		@Override
-		public @NonNull ValueField<?> remove(final int index) {
+		public ValueField<?> remove(final int index) {
 			assert index == 0;
 			final ValueField<?> oldRenderer = renderer;
-			renderer = new ObjectValueField();
+			renderer = new SimpleObjectValueField();
 
 			fireChange();
 			return oldRenderer;
@@ -125,21 +137,26 @@ public class Config {
 
 		@Override
 		public boolean remove(final @Nullable Object object) {
-			renderer = new ObjectValueField();
+			assert object == renderer;
+			renderer = new SimpleObjectValueField();
 			fireChange();
 			return true;
 		}
 
 		@Override
 		public int size() {
-			assert renderer != null;
 			return 1;
 		}
 
 		@Override
-		public @NonNull ValueField<?> get(final int index) {
-			assert renderer != null;
+		public ValueField<?> get(final int index) {
 			return renderer;
+		}
+
+		@Override
+		public Iterator<ValueField<?>> iterator() {
+			final Set<ValueField<?>> singleton = Collections.singleton((ValueField<?>) renderer);
+			return singleton.iterator();
 		}
 	}
 

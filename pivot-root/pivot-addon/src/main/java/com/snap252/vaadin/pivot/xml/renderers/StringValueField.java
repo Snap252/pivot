@@ -16,7 +16,7 @@ public class StringValueField extends ValueField<String> {
 			@XmlElement(name = "concat", type = StringConcatAggregator.class) })
 	@Override
 	public void setAggregator(@NonNull final Aggregator<?, ?> agg) {
-		this.agg = agg;
+		super.setAggregator(agg);
 	}
 
 	@Override
@@ -25,9 +25,8 @@ public class StringValueField extends ValueField<String> {
 	}
 
 	@Override
-	protected @NonNull String roundImpl(@NonNull final String input) {
-		// TODO Auto-generated method stub
-		return null;
+	protected String roundImpl(final String input) {
+		return input;
 	}
 
 	@Override

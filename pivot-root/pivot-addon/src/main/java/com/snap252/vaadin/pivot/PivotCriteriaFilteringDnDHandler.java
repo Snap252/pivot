@@ -16,6 +16,7 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+//TODO: rename
 @NonNullByDefault
 public class PivotCriteriaFilteringDnDHandler extends DropHandlerImplementation<Attribute<?>> {
 

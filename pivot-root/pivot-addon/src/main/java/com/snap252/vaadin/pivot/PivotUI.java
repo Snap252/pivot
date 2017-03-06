@@ -6,8 +6,6 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import javax.xml.bind.JAXBException;
-
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -62,13 +60,7 @@ public class PivotUI extends GridLayout {
 				final TextArea textArea = new TextArea();
 				textArea.setRows(20);
 				textArea.setColumns(50);
-				renderer.addPopupVisibilityListener(_ignore -> {
-					try {
-						textArea.setValue(config.toXml());
-					} catch (final JAXBException e) {
-						e.printStackTrace();
-					}
-				});
+				renderer.addPopupVisibilityListener(_ignore -> textArea.setValue(config.toXml()));
 				final Component fromXmlButton = new Button("Aus Xml",
 						_ignore -> config.setAll(Config.fromXml(Objects.requireNonNull(textArea.getValue()))));
 

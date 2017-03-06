@@ -19,7 +19,7 @@ public class DecimalValueField extends ValueField<BigDecimal> {
 			@XmlElement(name = "statistics", type = NumberStatisticsAggregator.class) })
 	@Override
 	public void setAggregator(@NonNull final Aggregator<?, ?> agg) {
-		this.agg = agg;
+		super.setAggregator(agg);
 	}
 
 	@Override
@@ -29,6 +29,6 @@ public class DecimalValueField extends ValueField<BigDecimal> {
 
 	@Override
 	public UIConfigurable createUIConfigurable() {
-		return () -> new Label("xyz") ;
+		return () -> new Label("xyz");
 	}
 }

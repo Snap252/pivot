@@ -11,14 +11,13 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.jdt.annotation.Nullable;
 
 import com.snap252.org.pivoting.PivotCriteria;
 import com.snap252.org.pivoting.RootBucket;
 import com.snap252.vaadin.pivot.GridRendererParameter.ParameterChangeListener.ParametersChangedEventArgs;
-import com.snap252.vaadin.pivot.valuegetter.DummyAggregator;
-import com.snap252.vaadin.pivot.valuegetter.ModelAggregtor;
 import com.snap252.vaadin.pivot.xml.Config;
+import com.snap252.vaadin.pivot.xml.renderers.Aggregator;
+import com.snap252.vaadin.pivot.xml.renderers.ValueField;
 
 @NonNullByDefault
 public final class GridRendererParameter<INPUT_TYPE, VALUE_TYPE> {
@@ -85,14 +84,21 @@ public final class GridRendererParameter<INPUT_TYPE, VALUE_TYPE> {
 		return config.columns.attributes.size();
 	}
 
-	private ModelAggregtor<INPUT_TYPE, ?> modelAggregator = new DummyAggregator<INPUT_TYPE>();
+	// private final ModelAggregtor<INPUT_TYPE, ?> modelAggregator = new
+	// DummyAggregator<INPUT_TYPE>();
+	//
+	// public ModelAggregtor<?, ?> getModelAggregator() {
+	// return modelAggregator;
+	// }
 
-	public ModelAggregtor<?, ?> getModelAggregator() {
-		return modelAggregator;
+	public Aggregator<?, ?> getAggregator() {
+		return config.renderer.getAggregator();
 	}
 
 	public Collector<INPUT_TYPE, ?, ?> getCollector() {
-		return modelAggregator.getAggregator();
+		final ValueField<?> renderer = config.renderer;
+		final PivotCriteria<INPUT_TYPE, ?> s = renderer.createPivotCriteria(provider);
+		return Collectors.mapping(s, renderer.getAggregator().getCollector());
 	}
 
 	private final Map<GridRendererChangeParameterKind, Collection<ParameterChangeListener<INPUT_TYPE, VALUE_TYPE>>> listeners = new EnumMap<>(
@@ -166,9 +172,11 @@ public final class GridRendererParameter<INPUT_TYPE, VALUE_TYPE> {
 	// fireEvent(GridRendererChangeParameterKind.AGGREGATOR);
 	// }
 
-	public void setModelAggregator(@Nullable final ModelAggregtor<INPUT_TYPE, ?> aggregator) {
-		this.modelAggregator = aggregator != null ? aggregator : new DummyAggregator<INPUT_TYPE>();
-		fireEvent(GridRendererChangeParameterKind.AGGREGATOR);
-	}
+	// public void setModelAggregator(@Nullable final ModelAggregtor<INPUT_TYPE,
+	// ?> aggregator) {
+	// this.modelAggregator = aggregator != null ? aggregator : new
+	// DummyAggregator<INPUT_TYPE>();
+	// fireEvent(GridRendererChangeParameterKind.AGGREGATOR);
+	// }
 
 }

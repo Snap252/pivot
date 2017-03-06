@@ -4,14 +4,13 @@ import java.math.BigDecimal;
 
 import com.google.gwt.i18n.client.CurrencyList;
 import com.google.gwt.i18n.client.constants.NumberConstants;
-import com.snap252.org.aggregators.NumberStatistics;
 import com.vaadin.client.communication.StateChangeEvent;
 import com.vaadin.client.communication.StateChangeEvent.StateChangeHandler;
 import com.vaadin.client.connectors.AbstractRendererConnector;
 import com.vaadin.shared.ui.Connect;
 
 /**
- * A connector for {@link NumberStatistics} .
+ * A connector for {@link BigDecimal} .
  * <p>
  * The server-side Renderer operates on numbers, but the data is serialized as a
  * string, and displayed as-is on the client side. This is to be able to support

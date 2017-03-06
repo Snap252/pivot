@@ -11,19 +11,22 @@ import com.snap252.vaadin.pivot.xml.bucketextractors.Attribute;
 public abstract class ValueField<DATA_TYPE> extends Attribute<@Nullable DATA_TYPE> {
 
 	protected ValueField(final Aggregator<?, ?> defaultValue) {
-		agg = defaultValue;
+		this.agg = defaultValue;
 	}
 
 	@XmlTransient
-	protected Aggregator<?, ?> agg;
+	private Aggregator<?, ?> agg;
 
 	@XmlAttribute(name = "attribute-name", required = true)
 	public String name = "";
 
 	@XmlElement
-	public abstract void setAggregator(Aggregator<?, ?> agg);
+	public void setAggregator(final Aggregator<?, ?> agg) {
+		this.agg = agg;
+	}
 
 	public Aggregator<?, ?> getAggregator() {
 		return agg;
 	}
+
 }

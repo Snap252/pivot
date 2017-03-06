@@ -38,7 +38,7 @@ class BucketContainer<INPUT_TYPE>
 		implements Indexed, Hierarchical, ItemSetChangeNotifier, PropertySetChangeNotifier, Collapsible {
 	private RootBucket<INPUT_TYPE> rowBucket;
 	private RootBucket<INPUT_TYPE> colBucket;
-	Collector<INPUT_TYPE, ?, ?> aggregator;
+	Collector<INPUT_TYPE, ?, ?> collector;
 
 	public RootBucket<INPUT_TYPE> getColBucket() {
 		return colBucket;
@@ -71,7 +71,7 @@ class BucketContainer<INPUT_TYPE>
 		rowBucket = gp.creatRowBucket(GridRenderer.SUM_TEXT);
 		colBucket = gp.creatColBucket(GridRenderer.SUM_TEXT);
 
-		this.aggregator = gp.getCollector();
+		this.collector = gp.getCollector();
 
 		gp.addParameterChangeListener(GridRendererChangeParameterKind.ROW_FNKT, e -> {
 			rowBucket = e.gridParameter.creatRowBucket(GridRenderer.SUM_TEXT);
@@ -94,7 +94,7 @@ class BucketContainer<INPUT_TYPE>
 		});
 
 		gp.addParameterChangeListener(GridRendererChangeParameterKind.AGGREGATOR, _ignore -> {
-			this.aggregator = _ignore.gridParameter.getCollector();
+			this.collector = _ignore.gridParameter.getCollector();
 			resetPropertiesAndFireValueChange();
 		});
 

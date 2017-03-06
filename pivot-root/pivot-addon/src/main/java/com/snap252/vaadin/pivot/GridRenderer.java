@@ -11,8 +11,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import com.snap252.org.pivoting.Bucket;
 import com.snap252.vaadin.pivot.GridRendererParameter.GridRendererChangeParameterKind;
-import com.snap252.vaadin.pivot.valuegetter.ModelAggregtor;
-import com.snap252.vaadin.pivot.valuegetter.ModelAggregtor.RendererConverter;
+import com.snap252.vaadin.pivot.xml.renderers.Aggregator;
 import com.vaadin.data.Container.PropertySetChangeListener;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
@@ -33,30 +32,29 @@ final class GridRenderer {
 		final BucketContainer<X> bucketContainer = new BucketContainer<>(gridParameter);
 
 		gridParameter.addParameterChangeListener(GridRendererChangeParameterKind.AGGREGATOR,
-				_ignore -> updateGridColumns(grid, _ignore.gridParameter.getModelAggregator()));
+				_ignore -> updateGridColumns(grid, _ignore.gridParameter.getAggregator()));
 
 		// work around for : https://github.com/vaadin/framework/issues/8638
-		final PropertySetChangeListener columnsChanged0 = _ignore -> {
-			cleanupGridHeader(grid);
-		};
+		final PropertySetChangeListener columnsChanged0 = _ignore -> cleanupGridHeader(grid);
 		bucketContainer.addPropertySetChangeListener(columnsChanged0);
 		grid.setContainerDataSource(bucketContainer);
 
 		final PropertySetChangeListener columnsChanged = _ignore -> {
-			updateGridColumns(grid, gridParameter.getModelAggregator());
+			updateGridColumns(grid, gridParameter.getAggregator());
 			grid.setColumnOrder(grid.getContainerDataSource().getContainerPropertyIds().toArray());
 			updateGridHeader(grid, bucketContainer.getColBucket(), gridParameter.getColDepth());
 		};
 		bucketContainer.addPropertySetChangeListener(columnsChanged);
 	}
 
-	protected void updateGridColumns(final Grid grid, final ModelAggregtor<?, ?> modelAggregator) {
+	protected void updateGridColumns(final Grid grid, final Aggregator<?, ?> modelAggregator) {
 		grid.getColumns().forEach(column -> {
 			final Object columnPropertyId = column.getPropertyId();
 			if (columnPropertyId != COLLAPSE_COL_PROPERTY_ID) {
-				final RendererConverter<?, ?> rc = modelAggregator.createRendererConverter();
 				final Bucket<?> colBucket = (Bucket<?>) columnPropertyId;
-				rc.setToColumn(column, colBucket.getLevel());
+				modelAggregator.updateRendererAndConverter(column, colBucket.getLevel());
+//				final RendererConverter<?, ?> rc = modelAggregator.createRendererConverter();
+//				rc.setToColumn(column, colBucket.getLevel());
 				column.setMinimumWidth(75);
 			} else
 				column.setMinimumWidth(170);

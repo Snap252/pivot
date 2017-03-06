@@ -1,6 +1,7 @@
 package com.snap252.vaadin.pivot.xml.renderers;
 
 import java.math.BigDecimal;
+import java.util.stream.Collector;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -25,6 +26,12 @@ public class RelativeWrapperAggregator<X> extends Aggregator<@Nullable X, @Nulla
 	@Override
 	public @NonNull Renderer<? super @Nullable BigDecimal> createRenderer() {
 		return new BigDecimalRenderer(nullRepresentation);
+	}
+
+	@Override
+	public <INPUT_TYPE> @NonNull Collector<INPUT_TYPE, ?, @Nullable X> getCollector() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

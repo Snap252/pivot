@@ -16,14 +16,12 @@ public class IntegerValueField extends ValueField<Integer> {
 	@XmlElements(@XmlElement(name = "counting", type = CountingAggregator.class))
 	@Override
 	public void setAggregator(@NonNull final Aggregator<?, ?> agg) {
-		this.agg = agg;
-
+		super.setAggregator(agg);
 	}
 
 	@Override
 	protected @NonNull Integer roundImpl(@NonNull final Integer input) {
-		// TODO Auto-generated method stub
-		return null;
+		return input;
 	}
 
 	@Override

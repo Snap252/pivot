@@ -75,7 +75,7 @@ final class BucketItem<INPUT_TYPE> implements Item {
 			if (cachedPivotCellReference != null)
 				return cachedPivotCellReference;
 
-			final Object newValue0 = getOwnItems().stream().collect(bucketContainer.aggregator);
+			final Object newValue0 = getOwnItems().stream().collect(bucketContainer.collector);
 			final PivotCellReference<?, INPUT_TYPE> newValue = new PivotCellReference<@Nullable Object, INPUT_TYPE>(
 					newValue0, rowBucket, colBucket, bucketContainer);
 			cachedPivotCellReference = newValue;

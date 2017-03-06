@@ -1,0 +1,4 @@
+class org/apache/commons/collections4/list/AbstractListDecorator
+remove
+ (I)TE;
+ (I)T0E;

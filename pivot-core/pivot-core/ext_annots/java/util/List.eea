@@ -2,3 +2,6 @@ class java/util/List
 get
  (I)TE;
  (I)TE;
+remove
+ (I)TE;
+ (I)T0E;

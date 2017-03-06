@@ -1,26 +1,28 @@
 package com.snap252.vaadin.pivot.xml.renderers;
 
-import java.util.Locale;
+import java.math.BigDecimal;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-import com.vaadin.ui.renderers.NumberRenderer;
+import com.snap252.vaadin.pivot.renderer.BigDecimalRenderer;
 
-public class SimpleCountingAggregator extends Aggregator<Integer, Integer> {
+public class SimpleCountingAggregator extends Aggregator<BigDecimal, BigDecimal> {
 
 	@Override
-	public Integer getConvertedValue(final Integer value) {
+	public BigDecimal getConvertedValue(final BigDecimal value) {
 		return value;
 	}
 
 	@Override
-	public NumberRenderer createRenderer() {
-		return new NumberRenderer("%s", Locale.getDefault(), nullRepresentation);
+	public BigDecimalRenderer createRenderer() {
+		final BigDecimalRenderer bigDecimalRenderer = new BigDecimalRenderer("---");
+		bigDecimalRenderer.setFormat("0");
+		return bigDecimalRenderer;
 	}
 
 	@Override
-	public Collector<?, ?, Integer> getCollector() {
-		return Collectors.collectingAndThen(Collectors.counting(), Long::intValue);
+	public Collector<?, ?, BigDecimal> getCollector() {
+		return Collectors.collectingAndThen(Collectors.counting(), BigDecimal::valueOf);
 	}
 
 }

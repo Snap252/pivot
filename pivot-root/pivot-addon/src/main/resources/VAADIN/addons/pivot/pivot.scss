@@ -46,16 +46,16 @@ $tg-expander-width: 5px;
 
 	.#{$primary-stylename}-header .#{$primary-stylename}-cell, .#{$primary-stylename}-row > td {
 
-		&.depth-0 {
+		&.column-depth-0 {
 			@include valo-gradient($c1);
 		}
-		&.depth-1 {
+		&.column-depth-1 {
 			@include valo-gradient($c2);
 		}
-		&.depth-2 {
+		&.column-depth-2 {
 			@include valo-gradient($c3);
 		}
-		&.depth-3 {
+		&.column-depth-3 {
 			@include valo-gradient($c4);
 		}
 	}
@@ -114,5 +114,10 @@ $tg-expander-width: 5px;
 		.v-grid-tiny-cell {
 			height: 25px !important;
 		}
+
+		tr.row-depth-0 {
+			font-weight: bold;
+		}
+
 	}
 }

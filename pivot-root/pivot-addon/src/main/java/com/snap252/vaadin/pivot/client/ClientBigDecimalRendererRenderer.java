@@ -18,7 +18,7 @@ public class ClientBigDecimalRendererRenderer implements Renderer<BigDecimal> {
 		element.getStyle().setTextAlign(TextAlign.RIGHT);
 
 		element.setInnerText(getTextual(value));
-		element.addClassName("depth-" + depth);
+		element.addClassName("column-depth-" + depth);
 	}
 
 	private String getTextual(final BigDecimal value) {

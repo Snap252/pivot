@@ -113,9 +113,13 @@ final class GridRenderer {
 			}
 		}
 
-
 		grid.setCellDescriptionGenerator(null);
 		grid.setRowDescriptionGenerator(null);
+
+		grid.setRowStyleGenerator(rowref -> {
+			final Bucket<?> itemId = (Bucket<?>) rowref.getItemId();
+			return "row-depth-" + itemId.getLevel();
+		});
 
 		doHeader(grid, colBucket, 0);
 		// TODO: better not to add it

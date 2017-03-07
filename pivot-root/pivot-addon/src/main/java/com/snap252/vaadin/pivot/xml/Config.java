@@ -26,6 +26,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.snap252.vaadin.pivot.xml.data.NotifyingList;
+import com.snap252.vaadin.pivot.xml.renderers.ComparableValueField;
 import com.snap252.vaadin.pivot.xml.renderers.DecimalValueField;
 import com.snap252.vaadin.pivot.xml.renderers.IntegerValueField;
 import com.snap252.vaadin.pivot.xml.renderers.ObjectValueField;
@@ -43,6 +44,7 @@ public class Config {
 			@XmlElement(name = "decimal", type = DecimalValueField.class),
 			@XmlElement(name = "integer", type = IntegerValueField.class),
 			@XmlElement(name = "string", type = StringValueField.class),
+			@XmlElement(name = "comparable", type = ComparableValueField.class),
 
 	})
 	@Deprecated

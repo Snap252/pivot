@@ -27,10 +27,6 @@ public final class ObjectValueField extends ValueField<Object> {
 		return super.getAggregator();
 	}
 
-	@Override
-	protected Object roundImpl(final Object input) {
-		return input;
-	}
 
 	@Override
 	public UIConfigurable createUIConfigurable() {

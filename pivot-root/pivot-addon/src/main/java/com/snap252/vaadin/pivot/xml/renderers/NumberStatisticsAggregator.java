@@ -27,6 +27,7 @@ import com.vaadin.ui.renderers.Renderer;
 
 public class NumberStatisticsAggregator
 		extends Aggregator<@Nullable NumberStatistics<BigDecimal>, @Nullable BigDecimal> {
+
 	@XmlAttribute(name = "rounding")
 	public Integer preRounding = 0;
 

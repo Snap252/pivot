@@ -19,4 +19,9 @@ public abstract class ValueField<DATA_TYPE> extends Attribute<@Nullable DATA_TYP
 		return agg;
 	}
 
+	@Override
+	protected DATA_TYPE roundImpl(final DATA_TYPE input) {
+		return input;
+	}
+
 }

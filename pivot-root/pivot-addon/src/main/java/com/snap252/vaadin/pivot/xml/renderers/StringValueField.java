@@ -26,10 +26,6 @@ public class StringValueField extends ValueField<String> {
 		return super.getAggregator();
 	}
 
-	@Override
-	protected String roundImpl(final String input) {
-		return input;
-	}
 
 	@Override
 	public UIConfigurable createUIConfigurable() {

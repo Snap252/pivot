@@ -12,10 +12,6 @@ public class SimpleObjectValueField extends ValueField<Object> {
 		super(new SimpleCountingAggregator());
 	}
 
-	@Override
-	protected Object roundImpl(final Object input) {
-		return input;
-	}
 
 	@Override
 	public UIConfigurable createUIConfigurable() {

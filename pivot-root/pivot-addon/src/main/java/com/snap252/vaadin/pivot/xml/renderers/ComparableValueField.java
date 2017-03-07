@@ -1,6 +1,6 @@
 package com.snap252.vaadin.pivot.xml.renderers;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
@@ -8,17 +8,17 @@ import javax.xml.bind.annotation.XmlElements;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.snap252.vaadin.pivot.UIConfigurable;
-import com.snap252.vaadin.pivot.xml.renderers.NumberStatisticsAggregator.NumberStatisticsConfig;
+import com.snap252.vaadin.pivot.xml.renderers.ComparableAggregator.ComparableAggConfig;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.TabSheet;
 
-public class DecimalValueField extends ValueField<Number> {
-	public DecimalValueField() {
-		super(new NumberStatisticsAggregator());
+public class ComparableValueField extends ValueField<Comparable<?>> {
+	public ComparableValueField() {
+		super(new ComparableAggregator<>());
 	}
 
 	@XmlElements({ @XmlElement(name = "counting", type = CountingAggregator.class),
-			@XmlElement(name = "statistics", type = NumberStatisticsAggregator.class) })
+			@XmlElement(name = "comparable", type = ComparableAggregator.class) })
 	public void setAggregator(final Aggregator<?, ?> agg) {
 		this.agg = agg;
 	}
@@ -31,34 +31,35 @@ public class DecimalValueField extends ValueField<Number> {
 
 	@Override
 	public UIConfigurable createUIConfigurable() {
-		return new DecimalConfigurable();
+		return new ComparableConfigurable();
 	}
 
-	private class DecimalConfigurable implements UIConfigurable {
+	private class ComparableConfigurable implements UIConfigurable {
 
 		private final TabSheet comp;
 
-		public DecimalConfigurable() {
+		public ComparableConfigurable() {
 			final CountingAggregator.CountingAggConfig countingAggConfig = new CountingAggregator.CountingAggConfig();
 			countingAggConfig.addValueChangeListener(vce -> {
-				agg = Objects.requireNonNull((CountingAggregator) vce.getProperty().getValue());
+				agg = requireNonNull((Aggregator<?, ?>) vce.getProperty().getValue());
 				fireChange();
 			});
-			final NumberStatisticsConfig statisticsAggConfig = new NumberStatisticsConfig();
-			statisticsAggConfig.addValueChangeListener(vce -> {
-				agg = Objects.requireNonNull((NumberStatisticsAggregator) vce.getProperty().getValue());
+
+			final ComparableAggConfig comparableAggConfig = new ComparableAggConfig();
+			comparableAggConfig.addValueChangeListener(vce -> {
+				agg = requireNonNull((Aggregator<?, ?>) vce.getProperty().getValue());
 				fireChange();
 			});
 
 			final TabSheet allTabSheet = new TabSheet(
-					getWrapper("Allgemein", createForDisplayName(DecimalValueField.this)),
-					getWrapper("Statistiken", statisticsAggConfig), getWrapper("Zählung", countingAggConfig));
+					getWrapper("Allgemein", createForDisplayName(ComparableValueField.this)),
+					getWrapper("Zählung", countingAggConfig), getWrapper("Vergleich", comparableAggConfig));
 			if (agg instanceof CountingAggregator) {
 				countingAggConfig.setValue((CountingAggregator) agg);
-				allTabSheet.setSelectedTab(2);
-			} else if (agg instanceof NumberStatisticsAggregator) {
-				statisticsAggConfig.setValue((NumberStatisticsAggregator) agg);
 				allTabSheet.setSelectedTab(1);
+			} else if (agg instanceof ComparableAggregator) {
+				comparableAggConfig.setValue((ComparableAggregator<?>) agg);
+				allTabSheet.setSelectedTab(2);
 			}
 			allTabSheet.setWidth("500px");
 			this.comp = allTabSheet;

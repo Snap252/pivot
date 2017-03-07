@@ -8,17 +8,18 @@ import javax.xml.bind.annotation.XmlElements;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.snap252.vaadin.pivot.UIConfigurable;
-import com.snap252.vaadin.pivot.xml.renderers.NumberStatisticsAggregator.NumberStatisticsConfig;
+import com.snap252.vaadin.pivot.xml.renderers.RelativeStasticsAggregator.NumberStatisticsConfig;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.TabSheet;
 
 public class DecimalValueField extends ValueField<Number> {
 	public DecimalValueField() {
-		super(new NumberStatisticsAggregator());
+		super(new RelativeStasticsAggregator());
 	}
 
 	@XmlElements({ @XmlElement(name = "counting", type = CountingAggregator.class),
-			@XmlElement(name = "statistics", type = NumberStatisticsAggregator.class) })
+			@XmlElement(name = "statistics", type = RelativeStasticsAggregator.class),
+	})
 	public void setAggregator(final Aggregator<?, ?> agg) {
 		this.agg = agg;
 	}
@@ -46,7 +47,7 @@ public class DecimalValueField extends ValueField<Number> {
 			});
 			final NumberStatisticsConfig statisticsAggConfig = new NumberStatisticsConfig();
 			statisticsAggConfig.addValueChangeListener(vce -> {
-				agg = Objects.requireNonNull((NumberStatisticsAggregator) vce.getProperty().getValue());
+				agg = Objects.requireNonNull((RelativeStasticsAggregator) vce.getProperty().getValue());
 				fireChange();
 			});
 
@@ -56,8 +57,8 @@ public class DecimalValueField extends ValueField<Number> {
 			if (agg instanceof CountingAggregator) {
 				countingAggConfig.setValue((CountingAggregator) agg);
 				allTabSheet.setSelectedTab(2);
-			} else if (agg instanceof NumberStatisticsAggregator) {
-				statisticsAggConfig.setValue((NumberStatisticsAggregator) agg);
+			} else if (agg instanceof RelativeStasticsAggregator) {
+				statisticsAggConfig.setValue((RelativeStasticsAggregator) agg);
 				allTabSheet.setSelectedTab(1);
 			}
 			allTabSheet.setWidth("500px");

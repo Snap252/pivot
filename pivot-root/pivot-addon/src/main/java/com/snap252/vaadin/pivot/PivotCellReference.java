@@ -56,6 +56,10 @@ public class PivotCellReference<T, INPUT_TYPE> {
 		return getReference(rowBucket2, colBucket2.getParentOrSelf());
 	}
 
+	public PivotCellReference<T, INPUT_TYPE> ofTotal() {
+		return getReference(rowBucket2.getParentOrSelf(), colBucket2.getParentOrSelf());
+	}
+
 	public T getValue() {
 		return value;
 	}

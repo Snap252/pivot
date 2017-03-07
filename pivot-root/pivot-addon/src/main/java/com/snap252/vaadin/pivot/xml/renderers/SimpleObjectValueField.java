@@ -15,6 +15,7 @@ public class SimpleObjectValueField extends ValueField<Object> {
 
 	@Override
 	public UIConfigurable createUIConfigurable() {
+		assert false;
 		return () -> null;
 	}
 

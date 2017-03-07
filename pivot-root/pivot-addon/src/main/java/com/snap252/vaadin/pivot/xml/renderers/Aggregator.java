@@ -48,10 +48,16 @@ public abstract class Aggregator<T, U> {
 			@Override
 			public U convertToPresentation(final PivotCellReference<T, ?> value, final Class<? extends U> targetType,
 					final @Nullable Locale locale) throws ConversionException {
-				final T value2 = value.getValue();
-				return value2 != null ? getConvertedValue(value2) : null;
+				return getValueFromPivotCell(value);
 			}
+
 		};
+	}
+
+	@Nullable
+	protected U getValueFromPivotCell(@NonNull final PivotCellReference<T, ?> value) {
+		final T value2 = value.getValue();
+		return value2 != null ? getConvertedValue(value2) : null;
 	}
 
 	public final void updateRendererAndConverter(final Column column, final int depth) {

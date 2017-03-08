@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlAttribute;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.snap252.vaadin.pivot.utils.ClassUtils;
@@ -26,19 +25,23 @@ import com.vaadin.ui.renderers.TextRenderer;
 public class ComparableAggregator<X extends Comparable<X>> extends Aggregator<Optional<X>, @Nullable String> {
 
 	public enum Sorters {
-		MIN(Comparator.naturalOrder()), MAX(Comparator.naturalOrder().reversed())
+		MIN() {
+			@Override
+			public <X extends Comparable<X>> BinaryOperator<X> getComparator() {
+				return BinaryOperator.minBy(Comparator.naturalOrder());
+			}
+		},
+		MAX() {
+
+			@Override
+			public <X extends Comparable<X>> BinaryOperator<X> getComparator() {
+				return BinaryOperator.minBy(Comparator.reverseOrder());
+			}
+		}
 
 		;
 
-		private final BinaryOperator<?> c;
-
-		Sorters(final Comparator<?> x) {
-			this.c = BinaryOperator.minBy(x);
-		}
-		@SuppressWarnings("unchecked")
-		public <X extends Comparable<X>> BinaryOperator<X> casted(){
-			return  (@NonNull BinaryOperator<X>) c;
-		}
+		public abstract <X extends Comparable<X>> BinaryOperator<X> getComparator();
 	}
 
 	@XmlAttribute(name = "sorter")
@@ -56,7 +59,7 @@ public class ComparableAggregator<X extends Comparable<X>> extends Aggregator<Op
 
 	@Override
 	public <INPUT_TYPE> Collector<INPUT_TYPE, ?, Optional<X>> getCollector() {
-		return (Collector<INPUT_TYPE, ?, Optional<X>>) Collectors.reducing(sorter.<X>casted());
+		return (Collector<INPUT_TYPE, ?, Optional<X>>) Collectors.reducing(sorter.<X>getComparator());
 	}
 
 	static class ComparableAggConfig extends VerticalLayout implements DefaultField<ComparableAggregator<?>> {

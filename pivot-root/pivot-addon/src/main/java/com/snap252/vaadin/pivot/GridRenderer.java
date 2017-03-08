@@ -149,7 +149,7 @@ final class GridRenderer {
 
 			if (meAndMyChildren != null) {
 				meAndMyChildren.setText(b.getFormattedBucketValue());
-				meAndMyChildren.setStyleName("depth-" + depth);
+				meAndMyChildren.setStyleName("column-depth-" + depth);
 			}
 		}
 
@@ -177,7 +177,7 @@ final class GridRenderer {
 			if (cell == null) {
 				break;
 			}
-			cell.setStyleName("depth-" + depth);
+			cell.setStyleName("column-depth-" + depth);
 		}
 	}
 

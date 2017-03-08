@@ -39,6 +39,9 @@ scaleByPowerOfTen
  (I)Ljava/math/BigDecimal;
  (I)L1java/math/BigDecimal;
 setScale
+ (I)Ljava/math/BigDecimal;
+ (I)L1java/math/BigDecimal;
+setScale
  (ILjava/math/RoundingMode;)Ljava/math/BigDecimal;
  (ILjava/math/RoundingMode;)L1java/math/BigDecimal;
 subtract

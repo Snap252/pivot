@@ -79,6 +79,7 @@ public abstract class Bucket<V> implements Predicate<@NonNull V> {
 			switch (showSubtotal) {
 			case DONT_SHOW:
 			case AFTER:
+			case BOTH:
 			case BEFORE:
 				return Stream.of(this);
 			default:
@@ -92,9 +93,22 @@ public abstract class Bucket<V> implements Predicate<@NonNull V> {
 				return Stream.concat(children$.stream().flatMap(Bucket::stream), Stream.of(this));
 			case BEFORE:
 				return Stream.concat(Stream.of(this), children$.stream().flatMap(Bucket::stream));
+			case BOTH:
+				return Stream.concat(Stream.of(this),
+						Stream.concat(children$.stream().flatMap(Bucket::stream), Stream.of(getWrapped())));
 			default:
 				throw new AssertionError(showSubtotal);
 			}
+	}
+
+	@Nullable
+	private WrappedBucket<V> b;
+
+	private Bucket<V> getWrapped() {
+		if (b != null) {
+			return b;
+		}
+		return b = new WrappedBucket<>(this);
 	}
 
 	protected ShowingSubtotal getSubTotal() {
@@ -146,5 +160,30 @@ public abstract class Bucket<V> implements Predicate<@NonNull V> {
 		assert this.parent == null ? current == this : current != this;
 		assert current.parent == null;
 		return current;
+	}
+
+	private static class WrappedBucket<V> extends Bucket<V> {
+		private final Bucket<V> b;
+
+		WrappedBucket(final Bucket<V> b) {
+			super(b.bucketValue, b.parent, b.extractor, b.values, b.level);
+			this.b = b;
+		}
+
+		@Override
+		public int getSize(final int forSelf) {
+			return b.getSize(forSelf);
+		}
+
+		@Override
+		public @Nullable List<@NonNull ? extends @NonNull Bucket<V>> getChildren() {
+			return b.getChildren();
+		}
+
+		@Override
+		public int getDepth() {
+			return b.getDepth();
+		}
+
 	}
 }

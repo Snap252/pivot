@@ -9,6 +9,7 @@ import com.snap252.vaadin.pivot.UIConfigurable;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Slider;
+import com.vaadin.ui.TabSheet;
 
 public class StringAttribute extends Attribute<@Nullable String> {
 	@XmlAttribute(name = "substring")
@@ -28,25 +29,33 @@ public class StringAttribute extends Attribute<@Nullable String> {
 
 	private class StringUIConfigurable implements UIConfigurable {
 
-		private final FormLayout comp;
-		private final Slider slider;
+		private final AbstractComponent comp;
+		private final Slider slider = new Slider(0, 10);
 
 		public StringUIConfigurable() {
+			final TabSheet allTabSheet = new TabSheet(
+					getWrapper("Allgemein", false, createForDisplayName(StringAttribute.this)),
+					getWrapper("Format", false, getRounder()));
+			allTabSheet.setWidth("500px");
+			this.comp = allTabSheet;
+		}
+
+		protected FormLayout getRounder() {
 			final FormLayout formLayout = new FormLayout();
-			slider = new Slider(0, 10);
+
 			slider.setCaption("SubString");
 			formLayout.addComponent(slider);
 			formLayout.setWidth("200px");
 
 			slider.addValueChangeListener(vce -> {
-				final int i = ((Number)vce.getProperty().getValue()).intValue();
+				final int i = ((Number) vce.getProperty().getValue()).intValue();
 				if (i == subString)
 					return;
 				subString = i;
 				fireChange();
 			});
 			slider.setValue(subString.doubleValue());
-			this.comp = formLayout;
+			return formLayout;
 		}
 
 		@Override

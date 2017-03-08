@@ -52,8 +52,8 @@ public class ComparableValueField extends ValueField<Comparable<?>> {
 			});
 
 			final TabSheet allTabSheet = new TabSheet(
-					getWrapper("Allgemein", createForDisplayName(ComparableValueField.this)),
-					getWrapper("Zählung", countingAggConfig), getWrapper("Vergleich", comparableAggConfig));
+					getWrapper("Allgemein", false, createForDisplayName(ComparableValueField.this)),
+					getWrapper("Zählung", false, countingAggConfig), getWrapper("Vergleich", false, comparableAggConfig));
 			if (agg instanceof CountingAggregator) {
 				countingAggConfig.setValue((CountingAggregator) agg);
 				allTabSheet.setSelectedTab(1);

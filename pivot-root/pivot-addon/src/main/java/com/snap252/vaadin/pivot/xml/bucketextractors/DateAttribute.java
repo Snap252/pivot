@@ -56,8 +56,8 @@ public class DateAttribute extends Attribute<@Nullable Date> {
 		private final TabSheet comp;
 
 		public DateConfigurable() {
-			final TabSheet allTabSheet = new TabSheet(getWrapper("Allgemein", createForDisplayName(DateAttribute.this)),
-					getWrapper("Format", getDateFormatConfig()));
+			final TabSheet allTabSheet = new TabSheet(getWrapper("Allgemein", false, createForDisplayName(DateAttribute.this)),
+					getWrapper("Format", false, getDateFormatConfig()));
 			allTabSheet.setWidth("500px");
 			this.comp = allTabSheet;
 		}
@@ -67,9 +67,10 @@ public class DateAttribute extends Attribute<@Nullable Date> {
 			// TODO: "apply from rounding to custom" - button
 			final TextField textfield = new TextField("Eingabe");
 
-			final TabSheet ts = new TabSheet(getWrapper("Vorgegebenes Format", combobox),
-					getWrapper("Benutzerdefiniertes Format", textfield));
+			final TabSheet ts = new TabSheet(getWrapper("Vorgegebenes Format", true, combobox),
+					getWrapper("Benutzerdefiniertes Format", true, textfield));
 
+			ts.setSizeFull();
 			if (dateFormat instanceof CustomDateFormat) {
 				ts.setSelectedTab(1);
 

@@ -1,5 +1,8 @@
 package com.snap252.vaadin.pivot.xml.bucketextractors;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 import javax.xml.bind.annotation.XmlAttribute;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -11,14 +14,31 @@ import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Slider;
+import com.vaadin.ui.TabSheet;
 
 public class NumberAttribute extends Attribute<@Nullable Number> {
+
 	@XmlAttribute(name = "rounding")
-	public int rounding = 2;
+	public @Nullable Integer rounding;
 
 	@Override
 	protected Number roundImpl(final Number input) {
+		final Integer rounding$ = rounding;
+		if (rounding$ != null) {
+			assert input instanceof BigDecimal;
+			final BigDecimal bd = (BigDecimal) input;
+			return bd.setScale(rounding$, RoundingMode.HALF_UP);
+		}
 		return input;
+	}
+
+	@Override
+	protected String formatImpl(final Number input) {
+		if (input instanceof BigDecimal) {
+			final BigDecimal bigDecimal = (BigDecimal) input;
+			return bigDecimal.toPlainString();
+		}
+		return super.formatImpl(input);
 	}
 
 	@Override
@@ -28,39 +48,54 @@ public class NumberAttribute extends Attribute<@Nullable Number> {
 
 	private class NumberUIConfigurable implements UIConfigurable {
 
-		private final FormLayout comp;
-		private final Slider slider;
-		private final CheckBox roundingEnabledCheckBox;
+		private final AbstractComponent comp;
+		private final Slider slider = new Slider(-4, 4);
+		private final CheckBox roundingEnabledCheckBox = new CheckBox("Rundung", false);
 		private final Label sliderValueLabel = new Label("0");
 
-		private boolean roundingEnabled;
-		private int sliderValue;
-
 		public NumberUIConfigurable() {
-			roundingEnabledCheckBox = new CheckBox("Rundung", false);
+
+			final TabSheet allTabSheet = new TabSheet(
+					getWrapper("Allgemein", false, createForDisplayName(NumberAttribute.this)),
+					getWrapper("Format", false, getRounder()));
+			allTabSheet.setWidth("500px");
+			this.comp = allTabSheet;
+		}
+
+		protected FormLayout getRounder() {
+
 			final FormLayout formLayout = new FormLayout();
-			slider = new Slider(-4, 4);
-			slider.setVisible(false);
-			sliderValueLabel.setVisible(false);
+
+			slider.setVisible(rounding != null);
+			if (rounding != null)
+				slider.setValue(rounding.doubleValue());
+
+			sliderValueLabel.setVisible(rounding != null);
 
 			roundingEnabledCheckBox.addValueChangeListener(e -> {
 				final boolean roundingEnabled = (boolean) e.getProperty().getValue();
+				if (!roundingEnabled) {
+					rounding = null;
+				} else
+					rounding = slider.getValue().intValue();
+
 				slider.setVisible(roundingEnabled);
-				this.roundingEnabled = roundingEnabled;
 				sliderValueLabel.setVisible(roundingEnabled);
+				fireChange();
 			});
 			roundingEnabledCheckBox.setDescription("Hinweis:<br/>Die Rundung bezieht sich auf die Einzelwerte.");
 
 			slider.setCaption("auf Stellen");
 			formLayout.addComponents(roundingEnabledCheckBox, slider, sliderValueLabel);
 			formLayout.setWidth("400px");
-			this.comp = formLayout;
 
 			slider.addValueChangeListener(_ignore -> {
 				final int sliderValue = ((Number) _ignore.getProperty().getValue()).intValue();
-				this.sliderValue = sliderValue;
+				rounding = sliderValue;
 				this.sliderValueLabel.setValue(Integer.toString(sliderValue));
+				fireChange();
 			});
+			return formLayout;
 		}
 
 		@Override

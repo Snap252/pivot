@@ -188,7 +188,6 @@ public class RelativeStasticsAggregator
 
 			ofWhatParentCheckBox.addValueChangeListener(vce -> {
 				final OfWhatParent what = (OfWhatParent) vce.getProperty().getValue();
-				assert what != null;
 				if (what == agg.ofParent) {
 					return;
 				}

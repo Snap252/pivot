@@ -1,7 +1,5 @@
 package com.snap252.vaadin.pivot;
 
-import java.util.Objects;
-
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.vaadin.hene.popupbutton.PopupButton;
@@ -39,7 +37,7 @@ public class PivotCriteriaFilteringDnDHandler extends DropHandlerImplementation<
 
 		final PopupButton popupButton = new PopupButton(createFilter.getDisplayName());
 		final Button deleteButton = new Button("Entfernen", evt -> {
-			removeFromList(Objects.requireNonNull(popupButton.getParent()), createFilter, this);
+			removeFromList(createFilter, this);
 			popupButton.setPopupVisible(false);
 		});
 		final Button closeButton = new Button("Schließen", evt -> popupButton.setPopupVisible(false));

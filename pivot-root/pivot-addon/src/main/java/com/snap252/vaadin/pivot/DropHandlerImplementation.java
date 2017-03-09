@@ -95,12 +95,11 @@ public abstract class DropHandlerImplementation<T> implements DropHandler {
 		final DropHandlerImplementation<T> pivotCriteriaList2 = (DropHandlerImplementation<T>) sourceComponent
 				.getData();
 		assert pivotCriteriaList2 != null;
-		removeFromList(sourceComponent, data2, pivotCriteriaList2);
+		removeFromList(data2, pivotCriteriaList2);
 		return data2;
 	}
 
-	protected static <T> void removeFromList(final Component sourceComponent, final T data2,
-			final DropHandlerImplementation<T> pivotCriteriaList) {
+	protected static <T> void removeFromList(final T data2, final DropHandlerImplementation<T> pivotCriteriaList) {
 		final boolean changed = pivotCriteriaList.currentElements.remove(data2);
 		assert changed;
 	}

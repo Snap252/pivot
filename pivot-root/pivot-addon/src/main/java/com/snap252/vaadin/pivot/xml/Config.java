@@ -9,7 +9,6 @@ import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -36,9 +35,6 @@ import com.snap252.vaadin.pivot.xml.renderers.ValueField;
 
 @XmlRootElement(name = "config")
 public class Config {
-
-	@XmlAttribute(name = "display-name")
-	public String displayName = "New Config";
 
 	@XmlElements({ @XmlElement(name = "object", type = ObjectValueField.class),
 			@XmlElement(name = "decimal", type = DecimalValueField.class),
@@ -192,7 +188,6 @@ public class Config {
 	public void setAll(final Config newconfig) {
 		columns.attributes.setAll(newconfig.columns.attributes);
 		rows.attributes.setAll(newconfig.rows.attributes);
-		displayName = newconfig.displayName;
 		final ValueField<?> renderer$ = newconfig.renderer;
 		if (renderer$ != null)
 			rendererList.add(renderer$);

@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlTransient;
 
+import com.snap252.vaadin.pivot.Property;
 import com.snap252.vaadin.pivot.PropertyProvider;
 import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.ui.AbstractComponent;
@@ -37,8 +38,8 @@ public abstract class ValueField<DATA_TYPE> extends ForAttributeAndValueField<Va
 	public <INPUT_TYPE> Collector<INPUT_TYPE, ?, ?> createMappingFunctionCriteria(
 			final PropertyProvider<INPUT_TYPE, ?> pp) {
 		assert !attributeName.isEmpty();
-		return Collectors.mapping((Function<INPUT_TYPE, ?>) pp.getProperty(attributeName)::getValue,
-				agg.getCollector());
+		final Property<INPUT_TYPE, ?> property = pp.getProperty(attributeName);
+		return Collectors.mapping((Function<INPUT_TYPE, ?>) property::getValue, agg.getCollector());
 	}
 
 }

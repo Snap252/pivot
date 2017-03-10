@@ -96,9 +96,7 @@ public final class GridRendererParameter<INPUT_TYPE, VALUE_TYPE> {
 	}
 
 	public Collector<INPUT_TYPE, ?, ?> getCollector() {
-		final ValueField<?> renderer = config.getRenderer();
-		final PivotCriteria<INPUT_TYPE, ?> s = renderer.createPivotCriteria(provider);
-		return Collectors.mapping(s, renderer.getAggregator().getCollector());
+		return config.getRenderer().createMappingFunctionCriteria(provider);
 	}
 
 	private final Map<GridRendererChangeParameterKind, Collection<ParameterChangeListener<INPUT_TYPE, VALUE_TYPE>>> listeners = new EnumMap<>(

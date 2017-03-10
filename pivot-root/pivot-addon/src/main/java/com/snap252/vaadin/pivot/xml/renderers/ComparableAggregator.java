@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BinaryOperator;
@@ -62,12 +63,33 @@ public class ComparableAggregator<X extends Comparable<X>> extends Aggregator<Op
 		return messageFormat != null ? messageFormat.toPattern() : null;
 	}
 
+	private enum DEFAULT_FORMATS {
+		DATE(new MessageFormat("{0,date,medium}"));
+		private final MessageFormat mf;
+
+		DEFAULT_FORMATS(final MessageFormat mf) {
+			this.mf = mf;
+		}
+
+		public String format(final Object... o) {
+			return mf.format(o);
+		}
+	}
+
 	@Override
 	public String getConvertedValue(final Optional<X> value) {
 
-		return value.isPresent()
-				? (messageFormat != null ? messageFormat.format(new Object[] { value.get() }) : value.get().toString())
-				: "---";
+		if (!value.isPresent())
+			return "---";
+
+		final X v = value.get();
+		if (messageFormat != null)
+			return messageFormat.format(new Object[] { v });
+
+		if (v instanceof Date) {
+			return DEFAULT_FORMATS.DATE.format(v);
+		}
+		return v.toString();
 	}
 
 	@Override

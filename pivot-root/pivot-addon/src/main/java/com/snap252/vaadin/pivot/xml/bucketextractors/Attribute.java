@@ -1,10 +1,8 @@
 package com.snap252.vaadin.pivot.xml.bucketextractors;
 
 import java.util.Arrays;
-import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlTransient;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -13,25 +11,16 @@ import com.snap252.org.pivoting.PivotCriteria;
 import com.snap252.org.pivoting.ShowingSubtotal;
 import com.snap252.vaadin.pivot.Property;
 import com.snap252.vaadin.pivot.PropertyProvider;
-import com.snap252.vaadin.pivot.UIConfigurable;
-import com.snap252.vaadin.pivot.xml.data.ChangeNotifier;
-import com.snap252.vaadin.pivot.xml.data.ChangeNotifierImpl;
-import com.snap252.vaadin.pivot.xml.data.ChangeNotifierSupplier;
 import com.snap252.vaadin.pivot.xml.data.DataExtractor;
+import com.snap252.vaadin.pivot.xml.renderers.ForAttributeAndValueField;
 import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.TextField;
 
-public abstract class Attribute<@Nullable DATA_TYPE>
-		implements DataExtractor<DATA_TYPE>, ChangeNotifierSupplier<Attribute<?>> {
-	@XmlAttribute(name = "property-name", required = true)
-	public String attributeName = "";
-
-	@XmlAttribute(name = "display-name")
-	@Nullable
-	public String displayName;
+public abstract class Attribute<@Nullable DATA_TYPE> extends ForAttributeAndValueField<Attribute<?>>
+		implements DataExtractor<DATA_TYPE> {
 
 	@XmlAttribute(name = "subtotal")
 	public ShowingSubtotal subtotal = ShowingSubtotal.INHERIT;
@@ -85,36 +74,8 @@ public abstract class Attribute<@Nullable DATA_TYPE>
 		};
 	}
 
-	public abstract UIConfigurable createUIConfigurable();
-
-	@XmlTransient
-	public String getDisplayName() {
-		final String displayName$ = displayName;
-		return displayName$ != null && !displayName$.isEmpty() ? displayName$ : attributeName;
-	}
-
-	@XmlTransient
-	@Override
-	public ChangeNotifier<Attribute<?>> getChangeNotifierSupplier() {
-		return cn;
-	}
-
-	private final ChangeNotifierImpl<Attribute<?>> cn = new ChangeNotifierImpl<>();
-
-	protected final void fireChange() {
-		cn.fireChange(this);
-	}
-
 	protected static AbstractComponent createForDisplayName(final Attribute<?> att) {
-		final TextField tf = new TextField("Anzeige-Name", att.displayName);
-		tf.setValue(att.getDisplayName());
-		tf.addValueChangeListener(v -> {
-			final String name = (String) v.getProperty().getValue();
-			if (!Objects.equals(att.getDisplayName(), name)) {
-				att.displayName = name;
-				att.fireChange();
-			}
-		});
+		final TextField tf = createTextField(att);
 
 		final ComboBox cb = new ComboBox("Zwischensumme", Arrays.asList(ShowingSubtotal.values()));
 		cb.setValue(att.subtotal);
@@ -134,5 +95,4 @@ public abstract class Attribute<@Nullable DATA_TYPE>
 		fl.setWidth(500, Unit.PIXELS);
 		return fl;
 	}
-
 }

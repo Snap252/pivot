@@ -57,8 +57,10 @@ final class GridRenderer {
 				// modelAggregator.createRendererConverter();
 				// rc.setToColumn(column, colBucket.getLevel());
 				column.setMinimumWidth(75);
-			} else
+			} else {
+				column.setRenderer(new org.vaadin.treegrid.HierarchyRenderer( "-"));
 				column.setMinimumWidth(170);
+			}
 		});
 		// grid.setFrozenColumnCount(1);
 	}

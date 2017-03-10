@@ -17,5 +17,4 @@ public interface ChangeNotifierSupplier<T> extends ChangeNotifier<T> {
 	default void removeChangeListener(final ChangeListener<T> cl) {
 		getChangeNotifierSupplier().removeChangeListener(cl);
 	}
-
 }

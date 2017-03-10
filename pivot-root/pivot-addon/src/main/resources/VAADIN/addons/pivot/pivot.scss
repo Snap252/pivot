@@ -118,6 +118,8 @@ $tg-expander-width: 5px;
 		tr.row-depth-0, td.column-depth-0 {
 			font-weight: bold;
 		}
-
+		.v-tree-grid-node {
+			height: inherit;
+		}
 	}
 }

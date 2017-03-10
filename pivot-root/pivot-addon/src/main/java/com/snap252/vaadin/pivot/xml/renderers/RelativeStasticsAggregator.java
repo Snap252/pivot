@@ -76,6 +76,7 @@ public class RelativeStasticsAggregator
 	}
 
 	@XmlAttribute(name = "null-representation")
+	@Nullable
 	public String nullRepresentation = "-";
 
 	@XmlAttribute(name = "format")
@@ -84,7 +85,7 @@ public class RelativeStasticsAggregator
 
 	@Override
 	public BigDecimalRenderer createRenderer() {
-		final BigDecimalRenderer ret = new BigDecimalRenderer(nullRepresentation);
+		final BigDecimalRenderer ret = new BigDecimalRenderer("");
 		if (format != null)
 			ret.setFormat(format);
 		else if (ofParent != null)
@@ -198,12 +199,16 @@ public class RelativeStasticsAggregator
 			ofWhatParentCheckBox.setNullSelectionAllowed(true);
 
 			nullFormatTextField.addValueChangeListener(vce -> {
-				final String nullRepresentation = (String) vce.getProperty().getValue();
+				String nullRepresentation = (String) vce.getProperty().getValue();
 				assert nullRepresentation != null;
+				if (nullRepresentation.isEmpty()) {
+					nullRepresentation = null;
+				}
+
 				if (Objects.equals(nullRepresentation, agg.nullRepresentation)) {
 					return;
 				}
-				assert nullRepresentation == null || !nullRepresentation.isEmpty();
+
 				agg.nullRepresentation = nullRepresentation;
 				if (fireEvents)
 					fireValueChange();

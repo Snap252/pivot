@@ -117,8 +117,6 @@ public abstract class Attribute<@Nullable DATA_TYPE>
 		});
 
 		final ComboBox cb = new ComboBox("Zwischensumme", Arrays.asList(ShowingSubtotal.values()));
-		cb.setNullSelectionItemId(ShowingSubtotal.INHERIT);
-		cb.setNullSelectionAllowed(false);
 		cb.setValue(att.subtotal);
 
 		cb.addValueChangeListener(valueChangeEvent -> {

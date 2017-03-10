@@ -1,4 +1,10 @@
 class java/text/MessageFormat
+MessageFormat
+ (Ljava/lang/String;)V
+ (L1java/lang/String;)V
 format
  (Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;
  (Ljava/lang/String;[Ljava/lang/Object;)L1java/lang/String;
+toPattern
+ ()Ljava/lang/String;
+ ()L1java/lang/String;

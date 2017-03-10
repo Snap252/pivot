@@ -3,14 +3,17 @@ package com.snap252.vaadin.pivot.xml.renderers;
 import static java.util.Objects.requireNonNull;
 
 import java.lang.reflect.Method;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -18,7 +21,8 @@ import com.snap252.vaadin.pivot.utils.ClassUtils;
 import com.vaadin.data.Property;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.renderers.Renderer;
 import com.vaadin.ui.renderers.TextRenderer;
 
@@ -27,29 +31,43 @@ public class ComparableAggregator<X extends Comparable<X>> extends Aggregator<Op
 	public enum Sorters {
 		MIN() {
 			@Override
-			public <X extends Comparable<X>> BinaryOperator<X> getComparator() {
+			protected <X extends Comparable<X>> BinaryOperator<X> getComparator() {
 				return BinaryOperator.minBy(Comparator.naturalOrder());
 			}
 		},
 		MAX() {
 
 			@Override
-			public <X extends Comparable<X>> BinaryOperator<X> getComparator() {
+			protected <X extends Comparable<X>> BinaryOperator<X> getComparator() {
 				return BinaryOperator.minBy(Comparator.reverseOrder());
 			}
-		}
+		};
 
-		;
-
-		public abstract <X extends Comparable<X>> BinaryOperator<X> getComparator();
+		protected abstract <X extends Comparable<X>> BinaryOperator<X> getComparator();
 	}
 
 	@XmlAttribute(name = "sorter")
 	public Sorters sorter = Sorters.MAX;
 
+	@XmlTransient
+	@Nullable
+	private MessageFormat messageFormat;
+
+	@XmlAttribute(name = "format")
+	public void setFormat(final @Nullable String pattern) {
+		messageFormat = pattern != null ? new MessageFormat(pattern) : null;
+	}
+
+	public @Nullable String getFormat() {
+		return messageFormat != null ? messageFormat.toPattern() : null;
+	}
+
 	@Override
 	public String getConvertedValue(final Optional<X> value) {
-		return value.isPresent() ? value.get().toString() : "---";
+
+		return value.isPresent()
+				? (messageFormat != null ? messageFormat.format(new Object[] { value.get() }) : value.get().toString())
+				: "---";
 	}
 
 	@Override
@@ -62,7 +80,7 @@ public class ComparableAggregator<X extends Comparable<X>> extends Aggregator<Op
 		return (Collector<INPUT_TYPE, ?, Optional<X>>) Collectors.reducing(sorter.<X>getComparator());
 	}
 
-	static class ComparableAggConfig extends VerticalLayout implements DefaultField<ComparableAggregator<?>> {
+	static class ComparableAggConfig extends FormLayout implements DefaultField<ComparableAggregator<?>> {
 		private ComparableAggregator<?> agg = new ComparableAggregator<>();
 
 		@Override
@@ -96,11 +114,25 @@ public class ComparableAggregator<X extends Comparable<X>> extends Aggregator<Op
 		private boolean fireEvents = true;
 
 		private final ComboBox cb = new ComboBox("Darstellung", Arrays.asList(Sorters.values()));
+		private final TextField tf = new TextField("Formatierung");
 
 		ComparableAggConfig() {
 			cb.setNullSelectionAllowed(false);
+			tf.setNullRepresentation("");
+			tf.addValueChangeListener(vce -> {
+				String newPattern = (String) vce.getProperty().getValue();
+				if (newPattern != null && newPattern.isEmpty()) {
+					newPattern = null;
+				}
+				if (Objects.equals(agg.getFormat(), newPattern))
+					return;
 
-			addComponents(cb);
+				agg.setFormat(newPattern);
+				if (fireEvents)
+					fireValueChange();
+			});
+
+			addComponents(cb, tf);
 			cb.addValueChangeListener(vce -> {
 				final Sorters sorter = requireNonNull((Sorters) vce.getProperty().getValue());
 				if (agg.sorter == sorter) {

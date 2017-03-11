@@ -31,7 +31,7 @@ public final class CountingAggregator extends Aggregator<ObjectStatistics, BigDe
 	}
 
 	@Override
-	public Collector<?, ?, ObjectStatistics> getCollector() {
+	public <INPUT_TYPE> Collector<INPUT_TYPE, ?, ObjectStatistics> getCollector() {
 		return Collector.of(() -> new ObjectStatistics(), ObjectStatistics::add, ObjectStatistics::mergeTo,
 				Function.identity());
 	}

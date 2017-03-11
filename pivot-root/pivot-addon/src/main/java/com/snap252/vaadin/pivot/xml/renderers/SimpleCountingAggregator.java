@@ -21,7 +21,7 @@ public class SimpleCountingAggregator extends Aggregator<BigDecimal, BigDecimal>
 	}
 
 	@Override
-	public Collector<?, ?, BigDecimal> getCollector() {
+	public <INPUT_TYPE> Collector<INPUT_TYPE, ?, BigDecimal> getCollector() {
 		return Collectors.collectingAndThen(Collectors.counting(), BigDecimal::valueOf);
 	}
 

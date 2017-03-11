@@ -98,7 +98,7 @@ public class RelativeStasticsAggregator
 
 	@Override
 	public <INPUT_TYPE> Collector<INPUT_TYPE, ?, @Nullable NumberStatistics<BigDecimal>> getCollector() {
-		final Arithmetics<BigDecimal> arithmetics = new NullableArithmeticsWrapper<>(new BigDecimalArithmetics());
+		final Arithmetics<@Nullable BigDecimal> arithmetics = new NullableArithmeticsWrapper<>(new BigDecimalArithmetics());
 		return (Collector<INPUT_TYPE, ?, @Nullable NumberStatistics<BigDecimal>>) PivotCollectors
 				.getNumberReducer(arithmetics);
 	}

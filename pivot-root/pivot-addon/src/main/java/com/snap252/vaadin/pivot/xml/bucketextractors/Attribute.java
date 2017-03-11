@@ -37,7 +37,9 @@ public abstract class Attribute<@Nullable DATA_TYPE> extends ForAttributeAndValu
 		return input != null ? formatImpl(input) : "";
 	}
 
-	protected abstract @NonNull DATA_TYPE roundImpl(@NonNull DATA_TYPE input);
+	protected @NonNull DATA_TYPE roundImpl(@NonNull final DATA_TYPE input) {
+		return input;
+	}
 
 	protected String formatImpl(@NonNull final DATA_TYPE input) {
 		return input.toString();

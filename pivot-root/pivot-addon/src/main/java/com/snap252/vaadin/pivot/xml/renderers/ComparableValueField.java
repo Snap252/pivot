@@ -5,7 +5,7 @@ import static java.util.Objects.requireNonNull;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 
-import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jdt.annotation.NonNull;
 
 import com.snap252.vaadin.pivot.UIConfigurable;
 import com.snap252.vaadin.pivot.xml.renderers.ComparableAggregator.ComparableAggConfig;
@@ -66,7 +66,7 @@ public class ComparableValueField extends ValueField<Comparable<?>> {
 		}
 
 		@Override
-		public @Nullable AbstractComponent getComponent() {
+		public @NonNull AbstractComponent getComponent() {
 			return comp;
 		}
 	}

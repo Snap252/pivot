@@ -2,7 +2,6 @@ package com.snap252.vaadin.pivot.xml.renderers;
 
 import static java.util.Objects.requireNonNull;
 
-import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -18,11 +17,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import org.eclipse.jdt.annotation.Nullable;
 
-import com.snap252.vaadin.pivot.utils.ClassUtils;
-import com.vaadin.data.Property;
-import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.renderers.Renderer;
 import com.vaadin.ui.renderers.TextRenderer;
@@ -102,90 +97,45 @@ public class ComparableAggregator<X extends Comparable<X>> extends Aggregator<Op
 		return Collectors.reducing(sorter.<X>getComparator());
 	}
 
-	static class ComparableAggConfig extends FormLayout implements DefaultField<ComparableAggregator<?>> {
-		private ComparableAggregator<?> agg = new ComparableAggregator<>();
+	static class ComparableAggConfig extends FormLayoutField<ComparableAggregator<?>> {
 
-		@Override
-		public void focus() {
-			super.focus();
-		}
-
-		private static final Method VALUE_CHANGE_METHOD;
-
-		static {
-			try {
-				VALUE_CHANGE_METHOD = Property.ValueChangeListener.class.getDeclaredMethod("valueChange",
-						new Class[] { Property.ValueChangeEvent.class });
-			} catch (final java.lang.NoSuchMethodException e) {
-				// This should never happen
-				throw new java.lang.RuntimeException("Internal error finding methods in AbstractField");
-			}
-		}
-
-		protected void fireValueChange() {
-			fireEvent(new AbstractField.ValueChangeEvent(this));
-		}
-
-		@Override
-		public void addValueChangeListener(final Property.ValueChangeListener listener) {
-			addListener(AbstractField.ValueChangeEvent.class, listener, VALUE_CHANGE_METHOD);
-			// ensure "automatic immediate handling" works
-			markAsDirty();
-		}
-
-		private boolean fireEvents = true;
-
-		private final ComboBox cb = new ComboBox("Darstellung", Arrays.asList(Sorters.values()));
-		private final TextField tf = new TextField("Formatierung");
+		private final ComboBox displayCheckbox = new ComboBox("Darstellung", Arrays.asList(Sorters.values()));
+		private final TextField formatTextfield = new TextField("Formatierung");
 
 		ComparableAggConfig() {
-			cb.setNullSelectionAllowed(false);
-			tf.setNullRepresentation("");
-			tf.addValueChangeListener(vce -> {
+			super(new ComparableAggregator<>());
+			displayCheckbox.setNullSelectionAllowed(false);
+			formatTextfield.setNullRepresentation("");
+			formatTextfield.addValueChangeListener(vce -> {
 				String newPattern = (String) vce.getProperty().getValue();
 				if (newPattern != null && newPattern.isEmpty()) {
 					newPattern = null;
 				}
-				if (Objects.equals(agg.getFormat(), newPattern))
+				final ComparableAggregator<?> value$ = value;
+				assert value$ != null;
+				if (Objects.equals(value$.getFormat(), newPattern))
 					return;
 
-				agg.setFormat(newPattern);
-				if (fireEvents)
-					fireValueChange();
+				value$.setFormat(newPattern);
+				fireValueChange();
 			});
 
-			addComponents(cb, tf);
-			cb.addValueChangeListener(vce -> {
+			addComponents(displayCheckbox, formatTextfield);
+			displayCheckbox.addValueChangeListener(vce -> {
 				final Sorters sorter = requireNonNull((Sorters) vce.getProperty().getValue());
-				if (agg.sorter == sorter) {
+				final ComparableAggregator<?> value$ = value;
+				assert value$ != null;
+				if (value$.sorter == sorter) {
 					return;
 				}
-				agg.sorter = sorter;
-				if (fireEvents)
-					fireValueChange();
+				value$.sorter = sorter;
+				fireValueChange();
 			});
 		}
 
 		@Override
-		public ComparableAggregator<?> getValue() {
-			return agg;
-		}
-
-		@Override
-		public void setValue(final ComparableAggregator<?> newValue) throws com.vaadin.data.Property.ReadOnlyException {
-			fireEvents = false;
-			try {
-				agg = newValue;
-				cb.setValue(agg.sorter);
-			} finally {
-				fireEvents = true;
-			}
-
-		}
-
-		@Override
-		public Class<ComparableAggregator<?>> getType() {
-			return ClassUtils.cast(ComparableAggregator.class);
+		protected void doAfterValueSetWithoutEvents(final ComparableAggregator<?> value) {
+			displayCheckbox.setValue(value.sorter);
 		}
 	}
 }

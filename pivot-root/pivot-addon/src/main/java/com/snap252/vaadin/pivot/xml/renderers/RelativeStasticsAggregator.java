@@ -1,6 +1,5 @@
 package com.snap252.vaadin.pivot.xml.renderers;
 
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.Arrays;
@@ -20,10 +19,7 @@ import com.snap252.org.aggregators.PivotCollectors;
 import com.snap252.vaadin.pivot.PivotCellReference;
 import com.snap252.vaadin.pivot.renderer.BigDecimalRenderer;
 import com.snap252.vaadin.pivot.valuegetter.WhatOfNumberStatisticsToRender;
-import com.vaadin.data.Property;
-import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.TextField;
 
 public class RelativeStasticsAggregator
@@ -125,39 +121,7 @@ public class RelativeStasticsAggregator
 		return getConvertedOwnValue.divide(getConvertedValue(parent), mathContextForDividing);
 	}
 
-	static class NumberStatisticsConfig extends FormLayout implements DefaultField<RelativeStasticsAggregator> {
-		private RelativeStasticsAggregator agg = new RelativeStasticsAggregator();
-
-		@Override
-		public void focus() {
-			super.focus();
-		}
-
-		private static final Method VALUE_CHANGE_METHOD;
-
-		static {
-			try {
-				VALUE_CHANGE_METHOD = Property.ValueChangeListener.class.getDeclaredMethod("valueChange",
-						new Class[] { Property.ValueChangeEvent.class });
-			} catch (final java.lang.NoSuchMethodException e) {
-				// This should never happen
-				throw new java.lang.RuntimeException("Internal error finding methods in AbstractField");
-			}
-		}
-
-		protected void fireValueChange() {
-			fireEvent(new AbstractField.ValueChangeEvent(this));
-		}
-
-		@Override
-		public void addValueChangeListener(final Property.ValueChangeListener listener) {
-			addListener(AbstractField.ValueChangeEvent.class, listener, VALUE_CHANGE_METHOD);
-			// ensure "automatic immediate handling" works
-			markAsDirty();
-		}
-
-		private boolean fireEvents = true;
-
+	static class NumberStatisticsConfig extends FormLayoutField<RelativeStasticsAggregator> {
 		private final ComboBox whatOfNumberStatisticsToRenderCheckBox = new ComboBox("Typ",
 				Arrays.asList(WhatOfNumberStatisticsToRender.values()));
 		private final ComboBox ofWhatParentCheckBox = new ComboBox("Relativ zu", Arrays.asList(OfWhatParent.values()));
@@ -165,36 +129,35 @@ public class RelativeStasticsAggregator
 		private final TextField nullFormatTextField = new TextField("Leere Werte");
 
 		NumberStatisticsConfig() {
+			super(new RelativeStasticsAggregator());
 			nullFormatTextField.setInputPrompt("-");
 			nullFormatTextField.setNullRepresentation("");
 
 			formatTextField.setNullRepresentation("");
 			formatTextField.setInputPrompt("0.00");
 
-			whatOfNumberStatisticsToRenderCheckBox.setValue(agg.whatToRender);
-			ofWhatParentCheckBox.setValue(agg.ofParent);
+			whatOfNumberStatisticsToRenderCheckBox.setValue(value.whatToRender);
+			ofWhatParentCheckBox.setValue(value.ofParent);
 
 			whatOfNumberStatisticsToRenderCheckBox.addValueChangeListener(vce -> {
 				final WhatOfNumberStatisticsToRender what = (WhatOfNumberStatisticsToRender) vce.getProperty()
 						.getValue();
 				assert what != null;
-				if (what == agg.whatToRender) {
+				if (value.whatToRender == what) {
 					return;
 				}
-				agg.whatToRender = what;
-				if (fireEvents)
-					fireValueChange();
+				value.whatToRender = what;
+				fireValueChange();
 			});
 			whatOfNumberStatisticsToRenderCheckBox.setNullSelectionAllowed(false);
 
 			ofWhatParentCheckBox.addValueChangeListener(vce -> {
 				final OfWhatParent what = (OfWhatParent) vce.getProperty().getValue();
-				if (what == agg.ofParent) {
+				if (value.ofParent == what) {
 					return;
 				}
-				agg.ofParent = what;
-				if (fireEvents)
-					fireValueChange();
+				value.ofParent = what;
+				fireValueChange();
 			});
 			ofWhatParentCheckBox.setNullSelectionAllowed(true);
 
@@ -205,52 +168,33 @@ public class RelativeStasticsAggregator
 					nullRepresentation = null;
 				}
 
-				if (Objects.equals(nullRepresentation, agg.nullRepresentation)) {
+				if (Objects.equals(nullRepresentation, value.nullRepresentation)) {
 					return;
 				}
 
-				agg.nullRepresentation = nullRepresentation;
-				if (fireEvents)
-					fireValueChange();
+				value.nullRepresentation = nullRepresentation;
+				fireValueChange();
 			});
 
 			formatTextField.addValueChangeListener(vce -> {
 				final String formatString = (String) vce.getProperty().getValue();
-				if (Objects.equals(formatString, agg.format)) {
+				if (Objects.equals(formatString, value.format)) {
 					return;
 				}
-				agg.format = formatString;
-				if (fireEvents)
-					fireValueChange();
+				value.format = formatString;
+				fireValueChange();
 			});
 			addComponents(whatOfNumberStatisticsToRenderCheckBox, ofWhatParentCheckBox, formatTextField,
 					nullFormatTextField);
 		}
 
 		@Override
-		public RelativeStasticsAggregator getValue() {
-			return agg;
+		protected void doAfterValueSetWithoutEvents(final RelativeStasticsAggregator value) {
+			whatOfNumberStatisticsToRenderCheckBox.setValue(value.whatToRender);
+			ofWhatParentCheckBox.setValue(value.ofParent);
+			formatTextField.setValue(value.format);
+			nullFormatTextField.setValue(value.nullRepresentation);
 		}
 
-		@Override
-		public void setValue(final RelativeStasticsAggregator newValue)
-				throws com.vaadin.data.Property.ReadOnlyException {
-			fireEvents = false;
-			try {
-				agg = newValue;
-				whatOfNumberStatisticsToRenderCheckBox.setValue(agg.whatToRender);
-				ofWhatParentCheckBox.setValue(agg.ofParent);
-				formatTextField.setValue(agg.format);
-				nullFormatTextField.setValue(agg.nullRepresentation);
-			} finally {
-				fireEvents = true;
-			}
-
-		}
-
-		@Override
-		public Class<RelativeStasticsAggregator> getType() {
-			return RelativeStasticsAggregator.class;
-		}
 	}
 }

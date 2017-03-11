@@ -56,7 +56,7 @@ public class PivotUI extends GridLayout {
 			{
 				renderer.setClosePopupOnOutsideClick(true);
 
-				final VerticalLayout l = new VerticalLayout();
+				final VerticalLayout exportWindowContent = new VerticalLayout();
 				final TextArea textArea = new TextArea();
 				textArea.setRows(20);
 				textArea.setColumns(50);
@@ -67,8 +67,8 @@ public class PivotUI extends GridLayout {
 				final HorizontalLayout horizontalLayout = new HorizontalLayout(fromXmlButton);
 				horizontalLayout.setComponentAlignment(fromXmlButton, Alignment.BOTTOM_RIGHT);
 				horizontalLayout.setSizeFull();
-				l.addComponents(textArea, horizontalLayout);
-				renderer.setContent(l);
+				exportWindowContent.addComponents(textArea, horizontalLayout);
+				renderer.setContent(exportWindowContent);
 			}
 
 			renderer.setSizeFull();

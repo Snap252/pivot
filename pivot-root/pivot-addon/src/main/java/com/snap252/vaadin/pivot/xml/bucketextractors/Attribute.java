@@ -5,13 +5,13 @@ import java.util.Arrays;
 import javax.xml.bind.annotation.XmlAttribute;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.snap252.org.pivoting.PivotCriteria;
 import com.snap252.org.pivoting.ShowingSubtotal;
 import com.snap252.vaadin.pivot.Property;
 import com.snap252.vaadin.pivot.PropertyProvider;
-import com.snap252.vaadin.pivot.xml.data.DataExtractor;
 import com.snap252.vaadin.pivot.xml.renderers.ForAttributeAndValueField;
 import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.ui.AbstractComponent;
@@ -19,12 +19,14 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.TextField;
 
-public abstract class Attribute<@Nullable DATA_TYPE> extends ForAttributeAndValueField<Attribute<?>>
-		implements DataExtractor<DATA_TYPE> {
+@NonNullByDefault({})
+public abstract class Attribute<@Nullable DATA_TYPE> extends ForAttributeAndValueField<Attribute<?>> {
 
 	@XmlAttribute(name = "subtotal")
-	public ShowingSubtotal subtotal = ShowingSubtotal.INHERIT;
+	@Nullable
+	public ShowingSubtotal subtotal;
 
+	// TODO: not used yet
 	@Nullable
 	@XmlAttribute(name = "sort")
 	public Boolean sort;
@@ -33,7 +35,7 @@ public abstract class Attribute<@Nullable DATA_TYPE> extends ForAttributeAndValu
 		return input != null ? roundImpl(input) : null;
 	}
 
-	protected final String format(final DATA_TYPE input) {
+	protected final @NonNull String format(final DATA_TYPE input) {
 		return input != null ? formatImpl(input) : "";
 	}
 
@@ -41,21 +43,19 @@ public abstract class Attribute<@Nullable DATA_TYPE> extends ForAttributeAndValu
 		return input;
 	}
 
-	protected String formatImpl(@NonNull final DATA_TYPE input) {
+	protected @NonNull String formatImpl(@NonNull final DATA_TYPE input) {
 		return input.toString();
 	}
 
-	@Override
-	public <INPUT_TYPE> PivotCriteria<INPUT_TYPE, DATA_TYPE> createPivotCriteria(
-			final PropertyProvider<INPUT_TYPE, ?> pp) {
+	public <INPUT_TYPE> PivotCriteria<INPUT_TYPE, ?> createPivotCriteria(final PropertyProvider<INPUT_TYPE, ?> pp) {
 		assert !attributeName.isEmpty();
 		@SuppressWarnings("unchecked")
-		final Property<INPUT_TYPE, DATA_TYPE> property = (Property<INPUT_TYPE, @Nullable DATA_TYPE>) pp
+		final Property<INPUT_TYPE, @Nullable DATA_TYPE> property = (Property<INPUT_TYPE, @Nullable DATA_TYPE>) pp
 				.getProperty(attributeName);
 
 		return new PivotCriteria<INPUT_TYPE, DATA_TYPE>() {
 			@Override
-			public @Nullable DATA_TYPE apply(final INPUT_TYPE t) {
+			public DATA_TYPE apply(final INPUT_TYPE t) {
 				return round(property.getValue(t));
 			}
 
@@ -70,21 +70,24 @@ public abstract class Attribute<@Nullable DATA_TYPE> extends ForAttributeAndValu
 			}
 
 			@Override
-			public ShowingSubtotal showSubtotal() {
-				return subtotal;
+			public @NonNull ShowingSubtotal showSubtotal() {
+				return subtotal != null ? subtotal : ShowingSubtotal.INHERIT;
 			}
 		};
 	}
 
+	@NonNullByDefault
 	protected static AbstractComponent createForDisplayName(final Attribute<?> att) {
-		final TextField tf = createTextField(att);
+		final TextField namingTextField = createNamingTextField(att);
 
-		final ComboBox cb = new ComboBox("Zwischensumme", Arrays.asList(ShowingSubtotal.values()));
-		cb.setValue(att.subtotal);
+		final ComboBox subtotalCombobox = new ComboBox("Zwischensumme", Arrays.asList(ShowingSubtotal.values()));
 
-		cb.addValueChangeListener(valueChangeEvent -> {
+		subtotalCombobox.setNullSelectionItemId(ShowingSubtotal.INHERIT);
+		subtotalCombobox.setNullSelectionAllowed(true);
+		subtotalCombobox.setValue(att.subtotal);
+
+		subtotalCombobox.addValueChangeListener(valueChangeEvent -> {
 			final ShowingSubtotal showSubTotal = (ShowingSubtotal) valueChangeEvent.getProperty().getValue();
-			assert showSubTotal != null;
 			if (att.subtotal == showSubTotal)
 				return;
 
@@ -92,9 +95,10 @@ public abstract class Attribute<@Nullable DATA_TYPE> extends ForAttributeAndValu
 			att.fireChange();
 
 		});
-		final FormLayout fl = new FormLayout(tf, cb);
+
+		final FormLayout formLayout = new FormLayout(namingTextField, subtotalCombobox);
 		// fl.setSizeUndefined();
-		fl.setWidth(500, Unit.PIXELS);
-		return fl;
+		formLayout.setWidth(500, Unit.PIXELS);
+		return formLayout;
 	}
 }

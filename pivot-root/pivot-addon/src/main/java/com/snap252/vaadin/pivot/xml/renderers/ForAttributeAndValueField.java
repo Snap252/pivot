@@ -41,7 +41,7 @@ public abstract class ForAttributeAndValueField<T> implements ChangeNotifierSupp
 		return displayName$ != null && !displayName$.isEmpty() ? displayName$ : attributeName;
 	}
 
-	protected static TextField createTextField(final ForAttributeAndValueField<?> att) {
+	protected static TextField createNamingTextField(final ForAttributeAndValueField<?> att) {
 		final TextField tf = new TextField("Anzeige-Name", att.displayName);
 		tf.setValue(att.getDisplayName());
 		tf.addValueChangeListener(v -> {

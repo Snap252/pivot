@@ -27,7 +27,7 @@ public abstract class ValueField<DATA_TYPE> extends ForAttributeAndValueField<Va
 	}
 
 	protected static AbstractComponent createForDisplayName(final ValueField<?> att) {
-		final TextField tf = createTextField(att);
+		final TextField tf = createNamingTextField(att);
 
 		final FormLayout fl = new FormLayout(tf);
 		// fl.setSizeUndefined();

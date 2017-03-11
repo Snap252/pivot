@@ -1,5 +1,7 @@
 package com.snap252.vaadin.pivot.xml.renderers;
 
+import static java.util.Objects.requireNonNull;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 
@@ -26,7 +28,6 @@ public class StringValueField extends ValueField<String> {
 		return super.getAggregator();
 	}
 
-
 	@Override
 	public UIConfigurable createUIConfigurable() {
 		return new StringConfigurable();
@@ -39,13 +40,13 @@ public class StringValueField extends ValueField<String> {
 		public StringConfigurable() {
 			final CountingAggregator.CountingAggConfig countingAggConfig = new CountingAggregator.CountingAggConfig();
 			countingAggConfig.addValueChangeListener(vce -> {
-				agg = (Aggregator<?, ?>) vce.getProperty().getValue();
+				agg = (Aggregator<?, ?>) requireNonNull(vce.getProperty().getValue());
 				fireChange();
 			});
 
 			final ConcatAggConfig concatAggConfig = new ConcatAggConfig();
 			concatAggConfig.addValueChangeListener(vce -> {
-				agg = (Aggregator<?, ?>) vce.getProperty().getValue();
+				agg = (Aggregator<?, ?>) requireNonNull(vce.getProperty().getValue());
 				fireChange();
 			});
 

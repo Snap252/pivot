@@ -98,8 +98,8 @@ public class ComparableAggregator<X extends Comparable<X>> extends Aggregator<Op
 	}
 
 	@Override
-	public <INPUT_TYPE> Collector<INPUT_TYPE, ?, Optional<X>> getCollector() {
-		return (Collector<INPUT_TYPE, ?, Optional<X>>) Collectors.reducing(sorter.<X>getComparator());
+	public Collector<?, ?, Optional<X>> getCollector() {
+		return Collectors.reducing(sorter.<X>getComparator());
 	}
 
 	static class ComparableAggConfig extends FormLayout implements DefaultField<ComparableAggregator<?>> {

@@ -64,7 +64,7 @@ public class DemoUI extends UI {
 		gridRendererParameter.setValues(xxx().getItems().collect(Collectors.toList()));
 	}
 
-	private PropertyProvider<PropertyOnceItem, ?> xxx() {
+	private static PropertyProvider<PropertyOnceItem, ?> xxx() {
 		List<Person> personen = RandomDataGenerator.createPersons(100);
 		BeanItemContainer<Person> container = new BeanItemContainer<>(Person.class);
 		container.addAll(personen);

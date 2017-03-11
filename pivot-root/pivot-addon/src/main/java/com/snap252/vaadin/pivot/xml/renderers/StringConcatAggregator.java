@@ -33,8 +33,8 @@ public class StringConcatAggregator extends Aggregator<@Nullable String, String>
 	public String separator = ", ";
 
 	@Override
-	public <INPUT_TYPE> Collector<INPUT_TYPE, ?, String> getCollector() {
-		return (Collector<INPUT_TYPE, ?, String>) Collectors.collectingAndThen(Collectors.joining(separator),
+	public  Collector<?, ?, String> getCollector() {
+		return Collectors.collectingAndThen(Collectors.joining(separator),
 				s -> s.length() < 100 ? s : s.substring(0, 100));
 	}
 

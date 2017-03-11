@@ -97,10 +97,10 @@ public class RelativeStasticsAggregator
 	}
 
 	@Override
-	public <INPUT_TYPE> Collector<INPUT_TYPE, ?, @Nullable NumberStatistics<BigDecimal>> getCollector() {
-		final Arithmetics<@Nullable BigDecimal> arithmetics = new NullableArithmeticsWrapper<>(new BigDecimalArithmetics());
-		return (Collector<INPUT_TYPE, ?, @Nullable NumberStatistics<BigDecimal>>) PivotCollectors
-				.getNumberReducer(arithmetics);
+	public Collector<?, ?, @Nullable NumberStatistics<@Nullable BigDecimal>> getCollector() {
+		final Arithmetics<@Nullable BigDecimal> arithmetics = new NullableArithmeticsWrapper<>(
+				new BigDecimalArithmetics());
+		return PivotCollectors.getNumberReducer(arithmetics);
 	}
 
 	private final MathContext mathContextForDividing = new MathContext(20);

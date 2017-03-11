@@ -6,8 +6,8 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.snap252.vaadin.pivot.xml.bucketextractors.Attribute;
 import com.snap252.vaadin.pivot.xml.bucketextractors.DateAttribute;
-import com.snap252.vaadin.pivot.xml.bucketextractors.EnumAttribute;
 import com.snap252.vaadin.pivot.xml.bucketextractors.NumberAttribute;
+import com.snap252.vaadin.pivot.xml.bucketextractors.ObjectAttribute;
 import com.snap252.vaadin.pivot.xml.bucketextractors.StringAttribute;
 
 @NonNullByDefault
@@ -27,7 +27,7 @@ public class AttributeFactory {
 		if (Number.class.isAssignableFrom(n.getType()))
 			return new NumberAttribute();
 		if (n.getType().isEnum())
-			return new EnumAttribute();
+			return new ObjectAttribute();
 
 		throw new AssertionError(n.getType());
 

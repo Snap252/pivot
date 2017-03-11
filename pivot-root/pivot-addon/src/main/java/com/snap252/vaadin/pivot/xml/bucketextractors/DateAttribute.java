@@ -13,7 +13,6 @@ import javax.xml.bind.annotation.XmlElements;
 
 import org.eclipse.jdt.annotation.Nullable;
 
-import com.snap252.vaadin.pivot.DateRounding;
 import com.snap252.vaadin.pivot.UIConfigurable;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.ui.AbstractComponent;

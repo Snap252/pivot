@@ -12,7 +12,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.vaadin.hene.popupbutton.PopupButton;
 import org.vaadin.miki.mapcontainer.MapContainer;
 
-import com.snap252.vaadin.pivot.valuegetter.ValueGetterDnDHandler;
+import com.snap252.vaadin.pivot.valuegetter.ValueFieldDnDHandler;
 import com.snap252.vaadin.pivot.xml.Config;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
@@ -99,7 +99,7 @@ public class PivotUI extends GridLayout {
 			final DDVerticalLayout aggregator = new DDVerticalLayout();
 			aggregator.setSpacing(true);
 			final DragAndDropWrapper aggregatorDragAndDropWrapper = new DragAndDropWrapper(aggregator);
-			final DropHandler aggDopHandler = new ValueGetterDnDHandler<INPUT_TYPE>(aggregator, true,
+			final DropHandler aggDopHandler = new ValueFieldDnDHandler(aggregator, true,
 					config.getRendererAsNotifyingList());
 
 			aggregator.setDropHandler(aggDopHandler);
@@ -107,8 +107,7 @@ public class PivotUI extends GridLayout {
 
 			final DDHorizontalLayout cols = new DDHorizontalLayout();
 			cols.addStyleName("pivot-ui-cols");
-			final DropHandler dropHandler = new PivotCriteriaFilteringDnDHandler(cols, false,
-					config.columns.attributes);
+			final DropHandler dropHandler = new AttributeDnDHandler(cols, false, config.columns.attributes);
 			cols.setDropHandler(dropHandler);
 			cols.setSpacing(true);
 
@@ -121,7 +120,7 @@ public class PivotUI extends GridLayout {
 			final DDVerticalLayout rows = new DDVerticalLayout();
 			rows.addStyleName("pivot-ui-rows");
 
-			final DropHandler dropHandler = new PivotCriteriaFilteringDnDHandler(rows, true, config.rows.attributes);
+			final DropHandler dropHandler = new AttributeDnDHandler(rows, true, config.rows.attributes);
 
 			rows.setDropHandler(dropHandler);
 			rows.setSpacing(true);

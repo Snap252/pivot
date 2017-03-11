@@ -1,4 +1,4 @@
-package com.snap252.vaadin.pivot;
+package com.snap252.vaadin.pivot.xml.bucketextractors;
 
 import java.text.SimpleDateFormat;
 

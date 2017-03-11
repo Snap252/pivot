@@ -17,7 +17,6 @@ import com.snap252.org.pivoting.RootBucket;
 import com.snap252.vaadin.pivot.GridRendererParameter.ParameterChangeListener.ParametersChangedEventArgs;
 import com.snap252.vaadin.pivot.xml.Config;
 import com.snap252.vaadin.pivot.xml.renderers.Aggregator;
-import com.snap252.vaadin.pivot.xml.renderers.ValueField;
 
 @NonNullByDefault
 public final class GridRendererParameter<INPUT_TYPE, VALUE_TYPE> {

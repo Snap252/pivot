@@ -14,11 +14,11 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-public class ValueGetterDnDHandler<INPUT_TYPE> extends DropHandlerImplementation<ValueField<?>> {
+public class ValueFieldDnDHandler extends DropHandlerImplementation<ValueField<?>> {
 
 	private final ValueFactory valueFactory = new ValueFactory();
 
-	public ValueGetterDnDHandler(final AbstractOrderedLayout cols, final boolean vertical,
+	public ValueFieldDnDHandler(final AbstractOrderedLayout cols, final boolean vertical,
 			final NotifyingList<ValueField<?>> refresher) {
 		super(cols, vertical, refresher);
 	}

@@ -14,13 +14,12 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-//TODO: rename
 @NonNullByDefault
-public class PivotCriteriaFilteringDnDHandler extends DropHandlerImplementation<Attribute<?>> {
+public class AttributeDnDHandler extends DropHandlerImplementation<Attribute<?>> {
 
 	private final AttributeFactory filterFactory = new AttributeFactory();
 
-	public PivotCriteriaFilteringDnDHandler(final AbstractOrderedLayout cols, final boolean vertical,
+	public AttributeDnDHandler(final AbstractOrderedLayout cols, final boolean vertical,
 			final NotifyingList<Attribute<?>> currentElements) {
 		super(cols, vertical, currentElements);
 	}

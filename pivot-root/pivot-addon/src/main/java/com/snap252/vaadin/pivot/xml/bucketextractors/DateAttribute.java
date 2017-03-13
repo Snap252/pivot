@@ -19,6 +19,7 @@ import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.themes.ValoTheme;
 
 public class DateAttribute extends Attribute<@Nullable Date> {
 	@XmlElements({ @XmlElement(name = "predefind", type = PredefinedDateFormat.class),
@@ -58,6 +59,7 @@ public class DateAttribute extends Attribute<@Nullable Date> {
 			final TabSheet allTabSheet = new TabSheet(getWrapper("Allgemein", false, createForDisplayName(DateAttribute.this)),
 					getWrapper("Format", false, getDateFormatConfig()));
 			allTabSheet.setWidth("500px");
+			allTabSheet.addStyleName(ValoTheme.TABSHEET_COMPACT_TABBAR);
 			this.comp = allTabSheet;
 		}
 
@@ -68,7 +70,7 @@ public class DateAttribute extends Attribute<@Nullable Date> {
 
 			final TabSheet ts = new TabSheet(getWrapper("Vorgegebenes Format", true, combobox),
 					getWrapper("Benutzerdefiniertes Format", true, textfield));
-
+			ts.addStyleName(ValoTheme.TABSHEET_COMPACT_TABBAR);
 			ts.setSizeFull();
 			if (dateFormat instanceof CustomDateFormat) {
 				ts.setSelectedTab(1);

@@ -10,6 +10,7 @@ import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Slider;
 import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.themes.ValoTheme;
 
 public class StringAttribute extends Attribute<@Nullable String> {
 	@XmlAttribute(name = "substring")
@@ -37,6 +38,7 @@ public class StringAttribute extends Attribute<@Nullable String> {
 					getWrapper("Allgemein", false, createForDisplayName(StringAttribute.this)),
 					getWrapper("Format", false, getRounder()));
 			allTabSheet.setWidth("500px");
+			allTabSheet.addStyleName(ValoTheme.TABSHEET_COMPACT_TABBAR);
 			this.comp = allTabSheet;
 		}
 

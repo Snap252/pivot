@@ -38,8 +38,10 @@ public class ValueFieldDnDHandler extends DropHandlerImplementation<ValueField<?
 			removeFromList(createFilter, this);
 			popupButton.setPopupVisible(false);
 		});
+		deleteButton.addStyleName(ValoTheme.BUTTON_SMALL);
 
 		final Button closeButton = new Button("Schließen", evt -> popupButton.setPopupVisible(false));
+		closeButton.addStyleName(ValoTheme.BUTTON_SMALL);
 
 		final HorizontalLayout footer = new HorizontalLayout(deleteButton, closeButton);
 		footer.setSpacing(true);

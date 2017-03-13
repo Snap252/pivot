@@ -11,6 +11,7 @@ import com.snap252.vaadin.pivot.UIConfigurable;
 import com.snap252.vaadin.pivot.xml.renderers.RelativeStasticsAggregator.NumberStatisticsConfig;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.themes.ValoTheme;
 
 public class DecimalValueField extends ValueField<Number> {
 	public DecimalValueField() {
@@ -62,6 +63,7 @@ public class DecimalValueField extends ValueField<Number> {
 				allTabSheet.setSelectedTab(1);
 			}
 			allTabSheet.setWidth("500px");
+			allTabSheet.addStyleName(ValoTheme.TABSHEET_COMPACT_TABBAR);
 			this.comp = allTabSheet;
 		}
 

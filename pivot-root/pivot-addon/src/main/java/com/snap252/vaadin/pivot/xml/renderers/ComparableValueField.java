@@ -11,6 +11,7 @@ import com.snap252.vaadin.pivot.UIConfigurable;
 import com.snap252.vaadin.pivot.xml.renderers.ComparableAggregator.ComparableAggConfig;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.themes.ValoTheme;
 
 public class ComparableValueField extends ValueField<Comparable<?>> {
 	public ComparableValueField() {
@@ -62,6 +63,7 @@ public class ComparableValueField extends ValueField<Comparable<?>> {
 				allTabSheet.setSelectedTab(2);
 			}
 			allTabSheet.setWidth("500px");
+			allTabSheet.addStyleName(ValoTheme.TABSHEET_COMPACT_TABBAR);
 			this.comp = allTabSheet;
 		}
 

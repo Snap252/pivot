@@ -5,12 +5,13 @@ import java.util.Objects;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 
-import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jdt.annotation.NonNull;
 
 import com.snap252.vaadin.pivot.UIConfigurable;
 import com.snap252.vaadin.pivot.xml.renderers.CountingAggregator.CountingAggConfig;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.themes.ValoTheme;
 
 public final class ObjectValueField extends ValueField<Object> {
 	public ObjectValueField() {
@@ -52,11 +53,12 @@ public final class ObjectValueField extends ValueField<Object> {
 				allTabSheet.setSelectedTab(1);
 			}
 			allTabSheet.setWidth("500px");
+			allTabSheet.addStyleName(ValoTheme.TABSHEET_COMPACT_TABBAR);
 			this.comp = allTabSheet;
 		}
 
 		@Override
-		public @Nullable AbstractComponent getComponent() {
+		public @NonNull AbstractComponent getComponent() {
 			return comp;
 		}
 	}

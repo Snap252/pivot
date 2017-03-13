@@ -159,12 +159,19 @@ class BucketContainer<INPUT_TYPE>
 		return rowCache.computeIfAbsent((Bucket<INPUT_TYPE>) itemId, x -> new BucketItem<INPUT_TYPE>(this, x));
 	}
 
+	@Nullable
+	private Collection<Object> containerPropertiesCached = null;
+
 	@Override
 	public Collection<@NonNull ?> getContainerPropertyIds() {
-		final List<Object> collect = colBucket.stream().collect(toList());
-		collect.add(0, GridRenderer.COLLAPSE_COL_PROPERTY_ID);
-		return collect;
+		if (containerPropertiesCached != null)
+			return containerPropertiesCached;
+
+		final List<Object> containerProperties = colBucket.stream().collect(toList());
+		containerProperties.add(0, GridRenderer.COLLAPSE_COL_PROPERTY_ID);
+		return this.containerPropertiesCached = Collections.unmodifiableCollection(containerProperties);
 	}
+
 
 	@Override
 	public List<@NonNull Bucket<INPUT_TYPE>> getItemIds() {
@@ -355,7 +362,8 @@ class BucketContainer<INPUT_TYPE>
 	}
 
 	private void firePropertySetSetChanged() {
-		rowCache.clear();
+//		rowCache.clear();
+		containerPropertiesCached = null;
 		propertyResetter.clear();
 		final PropertySetChangeEvent event = new PropertySetChangeEvent() {
 			@Override

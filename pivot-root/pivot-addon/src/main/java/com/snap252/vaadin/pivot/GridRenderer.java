@@ -53,48 +53,14 @@ final class GridRenderer {
 			if (columnPropertyId != COLLAPSE_COL_PROPERTY_ID) {
 				final Bucket<?> colBucket = (Bucket<?>) columnPropertyId;
 				modelAggregator.updateRendererAndConverter(column, colBucket.getLevel());
-				// final RendererConverter<?, ?> rc =
-				// modelAggregator.createRendererConverter();
-				// rc.setToColumn(column, colBucket.getLevel());
 				column.setMinimumWidth(75);
 			} else {
-//				column.setRenderer(new org.vaadin.treegrid.HierarchyRenderer( "-"));
+				column.setRenderer(new org.vaadin.treegrid.HierarchyRenderer( "-"));
 				column.setMinimumWidth(170);
 			}
 		});
-		// grid.setFrozenColumnCount(1);
 	}
 
-	// private final ModelAggregtorDelegate aggregatorDelegator = new
-	// ModelAggregtorDelegate();
-	//
-	// private void setModelAggregator(final ModelAggregtor<?> modelAggregator)
-	// {
-	// this.aggregatorDelegator.setDelegate(modelAggregator);
-	// fireValueChange();
-	// }
-	//
-	// private ModelAggregtor<?> getModelAggregator() {
-	// return this.aggregatorDelegator.getDelegate();
-	// }
-	//
-	// public void updateRenderer(final Grid g) {
-	//
-	// g.getColumns().forEach(col -> {
-	// col.setResizable(false);
-	// col.setSortable(false);
-	// if (col.getPropertyId() != colProp) {
-	// aggregatorDelegator.createRendererConverter().setToColumn(col);
-	// col.setMinimumWidth(50);
-	// } else
-	// col.setMinimumWidth(170);
-	//
-	// });
-	// /*
-	// * hack for https://vaadin.com/forum#!/thread/9319379
-	// */
-	// // g.setCellStyleGenerator(g.getCellStyleGenerator());
-	// }
 
 	static final Object COLLAPSE_COL_PROPERTY_ID = new Object() {
 		@Override

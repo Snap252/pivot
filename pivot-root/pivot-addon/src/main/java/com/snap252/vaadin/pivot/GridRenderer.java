@@ -13,7 +13,10 @@ import com.snap252.org.pivoting.Bucket;
 import com.snap252.vaadin.pivot.GridRendererParameter.GridRendererChangeParameterKind;
 import com.snap252.vaadin.pivot.xml.renderers.Aggregator;
 import com.vaadin.data.Container.PropertySetChangeListener;
+import com.vaadin.server.AbstractErrorMessage.ContentMode;
+import com.vaadin.server.ErrorMessage.ErrorLevel;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.server.UserError;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -37,6 +40,16 @@ final class GridRenderer {
 		// work around for : https://github.com/vaadin/framework/issues/8638
 		final PropertySetChangeListener columnsChanged0 = _ignore -> cleanupGridHeader(grid);
 		bucketContainer.addPropertySetChangeListener(columnsChanged0);
+		bucketContainer.addPropertySetChangeListener(pcl -> {
+			try {
+				pcl.getContainer().getContainerPropertyIds();
+				grid.setEnabled(true);
+				grid.setComponentError(null);
+			} catch (final IllegalArgumentException e) {
+				grid.setEnabled(false);
+				grid.setComponentError(new UserError(e.getMessage(), ContentMode.TEXT, ErrorLevel.INFORMATION));
+			}
+		});
 		grid.setContainerDataSource(bucketContainer);
 
 		final PropertySetChangeListener columnsChanged = _ignore -> {
@@ -55,12 +68,11 @@ final class GridRenderer {
 				modelAggregator.updateRendererAndConverter(column, colBucket.getLevel());
 				column.setMinimumWidth(75);
 			} else {
-				column.setRenderer(new org.vaadin.treegrid.HierarchyRenderer( "-"));
+				column.setRenderer(new org.vaadin.treegrid.HierarchyRenderer("-"));
 				column.setMinimumWidth(170);
 			}
 		});
 	}
-
 
 	static final Object COLLAPSE_COL_PROPERTY_ID = new Object() {
 		@Override

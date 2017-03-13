@@ -27,7 +27,10 @@ public class ChangeNotifierImpl<T> implements ChangeNotifier<T> {
 
 	public void fireChange(final T t, final boolean self) {
 		for (final ChangeListener<T> listChangeListener : new LinkedList<>(listChangeListeners)) {
-			listChangeListener.changed(t, self);
+			try {
+				listChangeListener.changed(t, self);
+			} catch (final Throwable e) {
+			}
 		}
 	}
 }

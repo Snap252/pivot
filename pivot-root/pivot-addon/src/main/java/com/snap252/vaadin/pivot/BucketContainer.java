@@ -168,10 +168,12 @@ class BucketContainer<INPUT_TYPE>
 			return containerPropertiesCached;
 
 		final List<Object> containerProperties = colBucket.stream().collect(toList());
+		if (containerProperties.size() > 100) {
+			throw new IllegalArgumentException("Zu viele Spalten (" + containerProperties.size() + ")!");
+		}
 		containerProperties.add(0, GridRenderer.COLLAPSE_COL_PROPERTY_ID);
 		return this.containerPropertiesCached = Collections.unmodifiableCollection(containerProperties);
 	}
-
 
 	@Override
 	public List<@NonNull Bucket<INPUT_TYPE>> getItemIds() {
@@ -315,7 +317,7 @@ class BucketContainer<INPUT_TYPE>
 
 	@Override
 	public boolean isRoot(final Object itemId) {
-		return itemId == rowBucket || ((Bucket<?>)itemId).parent == rowBucket;
+		return itemId == rowBucket || ((Bucket<?>) itemId).parent == rowBucket;
 	}
 
 	@Override
@@ -362,7 +364,7 @@ class BucketContainer<INPUT_TYPE>
 	}
 
 	private void firePropertySetSetChanged() {
-//		rowCache.clear();
+		rowCache.clear();
 		containerPropertiesCached = null;
 		propertyResetter.clear();
 		final PropertySetChangeEvent event = new PropertySetChangeEvent() {

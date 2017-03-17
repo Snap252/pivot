@@ -1,0 +1,7 @@
+class java/util/Locale
+ROOT
+ Ljava/util/Locale;
+ L1java/util/Locale;
+getDefault
+ ()Ljava/util/Locale;
+ ()L1java/util/Locale;

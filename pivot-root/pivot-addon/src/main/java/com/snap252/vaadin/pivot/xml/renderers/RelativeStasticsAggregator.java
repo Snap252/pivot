@@ -2,7 +2,6 @@ package com.snap252.vaadin.pivot.xml.renderers;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collector;
@@ -17,9 +16,10 @@ import com.snap252.org.aggregators.NullableArithmeticsWrapper;
 import com.snap252.org.aggregators.NumberStatistics;
 import com.snap252.org.aggregators.PivotCollectors;
 import com.snap252.vaadin.pivot.PivotCellReference;
+import com.snap252.vaadin.pivot.i18n.LookupComboBox;
 import com.snap252.vaadin.pivot.renderer.BigDecimalRenderer;
 import com.snap252.vaadin.pivot.valuegetter.WhatOfNumberStatisticsToRender;
-import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.TextField;
 
 public class RelativeStasticsAggregator
@@ -64,7 +64,7 @@ public class RelativeStasticsAggregator
 	public Boolean ignoreNull = false;
 
 	@XmlAttribute(name = "mode")
-	public WhatOfNumberStatisticsToRender whatToRender = WhatOfNumberStatisticsToRender.sum;
+	public WhatOfNumberStatisticsToRender whatToRender = WhatOfNumberStatisticsToRender.SUM;
 
 	@Override
 	public BigDecimal getConvertedValue(final NumberStatistics<BigDecimal> value) {
@@ -122,9 +122,9 @@ public class RelativeStasticsAggregator
 	}
 
 	static class NumberStatisticsConfig extends FormLayoutField<RelativeStasticsAggregator> {
-		private final ComboBox whatOfNumberStatisticsToRenderCheckBox = new ComboBox("Typ",
-				Arrays.asList(WhatOfNumberStatisticsToRender.values()));
-		private final ComboBox ofWhatParentCheckBox = new ComboBox("Relativ zu", Arrays.asList(OfWhatParent.values()));
+		private final AbstractSelect whatOfNumberStatisticsToRenderCheckBox = new LookupComboBox("Typ",
+				WhatOfNumberStatisticsToRender.values());
+		private final AbstractSelect ofWhatParentCheckBox = new LookupComboBox("Relativ zu", OfWhatParent.values());
 		private final TextField formatTextField = new TextField("Formatierung");
 		private final TextField nullFormatTextField = new TextField("Leere Werte");
 

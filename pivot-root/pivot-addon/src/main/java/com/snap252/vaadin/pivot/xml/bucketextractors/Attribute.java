@@ -1,7 +1,5 @@
 package com.snap252.vaadin.pivot.xml.bucketextractors;
 
-import java.util.Arrays;
-
 import javax.xml.bind.annotation.XmlAttribute;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -12,10 +10,11 @@ import com.snap252.org.pivoting.PivotCriteria;
 import com.snap252.org.pivoting.ShowingSubtotal;
 import com.snap252.vaadin.pivot.Property;
 import com.snap252.vaadin.pivot.PropertyProvider;
+import com.snap252.vaadin.pivot.i18n.LookupComboBox;
 import com.snap252.vaadin.pivot.xml.renderers.ForAttributeAndValueField;
 import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.ui.AbstractComponent;
-import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.TextField;
 
@@ -80,7 +79,7 @@ public abstract class Attribute<@Nullable DATA_TYPE> extends ForAttributeAndValu
 	protected static AbstractComponent createForDisplayName(final Attribute<?> att) {
 		final TextField namingTextField = createNamingTextField(att);
 
-		final ComboBox subtotalCombobox = new ComboBox("Zwischensumme", Arrays.asList(ShowingSubtotal.values()));
+		final AbstractSelect subtotalCombobox = new LookupComboBox("Zwischensumme", ShowingSubtotal.values());
 
 		subtotalCombobox.setNullSelectionItemId(ShowingSubtotal.INHERIT);
 		subtotalCombobox.setNullSelectionAllowed(true);

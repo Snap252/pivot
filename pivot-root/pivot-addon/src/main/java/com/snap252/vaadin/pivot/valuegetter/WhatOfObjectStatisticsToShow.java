@@ -3,35 +3,25 @@ package com.snap252.vaadin.pivot.valuegetter;
 import java.math.BigDecimal;
 
 public enum WhatOfObjectStatisticsToShow {
-	COUNT("Anzahl Datensätze") {
+	COUNT() {
 		@Override
 		public int getValue(final ObjectStatistics n) {
 			return n.numberOfValues;
 		}
 	},
-	COUNT_NON_NULL("Anzahl Werte") {
+	COUNT_NON_NULL() {
 		@Override
 		public int getValue(final ObjectStatistics n) {
 			return n.numberOfNonNullValues;
 		}
 	},
-	COUNT_DISTINCT("Anzahl unterschiedlicher Werte") {
+	COUNT_DISTINCT() {
 		@Override
 		public int getValue(final ObjectStatistics n) {
 			return n.getDistinct();
 		}
 	};
 
-	private final String s;
-
-	private WhatOfObjectStatisticsToShow(final String s) {
-		this.s = s;
-	}
-
-	@Override
-	public String toString() {
-		return s;
-	}
 
 	public abstract int getValue(ObjectStatistics n);
 

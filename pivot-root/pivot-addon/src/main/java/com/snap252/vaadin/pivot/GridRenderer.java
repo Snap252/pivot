@@ -148,6 +148,10 @@ final class GridRenderer {
 					} else
 						cell.setComponent(createChildCollapseButton(g,
 								b.stream().filter(b0 -> b0 != b).collect(toList()), SUM_TEXT));
+
+					final HeaderCell cell0 = childRow.getCell(b.getWrappedIfThere());
+					if (cell0 != null)
+						cell0.setText(SUM_TEXT);
 				}
 			}
 		}
@@ -158,6 +162,10 @@ final class GridRenderer {
 				break;
 			}
 			cell.setStyleName("column-depth-" + depth);
+
+			final HeaderCell cell0 = g.getHeaderRow(i).getCell(b.getWrappedIfThere());
+			if (cell0 != null)
+				cell0.setStyleName("column-depth-" + depth);
 		}
 	}
 

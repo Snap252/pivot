@@ -81,11 +81,11 @@ public class RelativeStasticsAggregator
 
 	@Override
 	public BigDecimalRenderer createRenderer() {
-		final BigDecimalRenderer ret = new BigDecimalRenderer("");
+		final BigDecimalRenderer ret = new BigDecimalRenderer(nullRepresentation != null ? nullRepresentation : "");
 		if (format != null)
 			ret.setFormat(format);
 		else if (ofParent != null)
-			ret.setFormat("0.00%");
+			ret.setFormat("0.0%");
 		else
 			ret.setFormat("0.00");
 

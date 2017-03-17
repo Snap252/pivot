@@ -19,7 +19,7 @@ public final class CountingAggregator extends Aggregator<ObjectStatistics, BigDe
 
 	@Override
 	public BigDecimalRenderer createRenderer() {
-		final BigDecimalRenderer bigDecimalRenderer = new BigDecimalRenderer("---");
+		final BigDecimalRenderer bigDecimalRenderer = new BigDecimalRenderer("-");
 		bigDecimalRenderer.setFormat("0");
 		return bigDecimalRenderer;
 	}

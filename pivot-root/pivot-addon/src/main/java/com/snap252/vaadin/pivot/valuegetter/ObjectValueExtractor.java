@@ -57,7 +57,7 @@ public class ObjectValueExtractor<INPUT_TYPE> implements FilteringRenderingCompo
 	@SuppressWarnings("null")
 	@Override
 	public RendererConverter<?, ? extends @NonNull ObjectStatistics> createRendererConverter() {
-		final BigDecimalRenderer renderer = new BigDecimalRenderer("---");
+		final BigDecimalRenderer renderer = new BigDecimalRenderer("-");
 		renderer.setFormat("0");
 		final Function<@Nullable ObjectStatistics, BigDecimal> singleExtractor = t -> t == null ? null
 				: whatToRender.getValueAsBigDecimal(t);

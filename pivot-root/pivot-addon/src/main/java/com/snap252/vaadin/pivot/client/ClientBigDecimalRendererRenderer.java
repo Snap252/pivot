@@ -23,20 +23,16 @@ public class ClientBigDecimalRendererRenderer implements Renderer<BigDecimal> {
 		element.addClassName("column-depth-" + depth);
 
 		if (gradient != null && value != null) {
-			try {
-				final Color color = gradient.interpolate(value.floatValue());
-				elementStyle.setBackgroundImage(
-						"linear-gradient(to bottom, " + (color.toRGBACssString(100) + " 0%, ")
-								+ (color.toRGBACssString(120) + " 25%,")
-								+ (color.toRGBACssString(180) + " 95%,")
-								+ (color.toRGBACssString(100) + " 100%") + ")");
-			} catch (final Exception e) {
-				System.err.println(e);
-			}
+			final Color color = gradient.interpolate(value.floatValue());
+			elementStyle.setBackgroundImage("linear-gradient(to bottom, " + (color.toRGBACssString(100) + " 0%, ")
+					+ (color.toRGBACssString(120) + " 25%,") + (color.toRGBACssString(200) + " 50%,")
+					+ (color.toRGBACssString(180) + " 95%,") + (color.toRGBACssString(100) + " 100%") + ")");
+			elementStyle.setBorderColor(color.toRGBACssString(255));
 		} else {
-			elementStyle.setBackgroundColor(null);
+			elementStyle.setBorderColor(null);
 			elementStyle.setBackgroundImage(null);
 		}
+		elementStyle.setColor("black");
 		element.setInnerText(getTextual(value));
 	}
 

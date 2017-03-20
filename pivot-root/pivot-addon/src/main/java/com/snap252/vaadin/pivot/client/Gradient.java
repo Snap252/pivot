@@ -40,10 +40,8 @@ public class Gradient implements Serializable {
 		final float factor = 1 - (value - fractions[index - 1]) / (fractions[index] - fractions[index - 1]);
 
 		final float factor1 = 1 - factor;
-		return new Color((int) (c0.getRed() * factor + c1.getRed() * factor1),
-				(int) (c0.getGreen() * factor + c1.getGreen() * factor1),
-				(int) (c0.getBlue() * factor + c1.getBlue() * factor1),
-				(int) (c0.getAlpha() * factor + c1.getAlpha() * factor1));
+		return new Color((int) (c0.red * factor + c1.red * factor1), (int) (c0.green * factor + c1.green * factor1),
+				(int) (c0.blue * factor + c1.blue * factor1), (int) (c0.alpha * factor + c1.alpha * factor1));
 	}
 
 	@Override

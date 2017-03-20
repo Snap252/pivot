@@ -30,6 +30,7 @@ public class ChangeNotifierImpl<T> implements ChangeNotifier<T> {
 			try {
 				listChangeListener.changed(t, self);
 			} catch (final Throwable e) {
+				e.printStackTrace();
 			}
 		}
 	}

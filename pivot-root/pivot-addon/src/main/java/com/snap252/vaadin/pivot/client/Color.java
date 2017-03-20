@@ -52,7 +52,8 @@ public class Color implements Serializable {
 	}
 
 	public String toRGBACssString(final int alpha) {
-		return "rgba(" + getRed() + ", " + getGreen() + ", " + getBlue() + ", " + (getAlpha() * alpha / (255.f * 255f)) + ")";
+		return "rgba(" + getRed() + ", " + getGreen() + ", " + getBlue() + ", " + (getAlpha() * alpha / (255.f * 255f))
+				+ ")";
 	}
 
 	@Override
@@ -149,6 +150,11 @@ public class Color implements Serializable {
 
 		return new Color(Math.min((int) (r / FACTOR), 255), Math.min((int) (g / FACTOR), 255),
 				Math.min((int) (b / FACTOR), 255), alpha);
+	}
+
+	@Override
+	public String toString() {
+		return "Color [red=" + red + ", green=" + green + ", blue=" + blue + ", alpha=" + alpha + "]";
 	}
 
 }

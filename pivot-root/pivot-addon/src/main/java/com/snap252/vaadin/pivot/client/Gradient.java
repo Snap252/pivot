@@ -4,18 +4,17 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 public class Gradient implements Serializable {
-	public float[] fractions;
+	public double[] fractions;
 	public Color[] colors;
 
+	@Deprecated
 	public Gradient() {
-
 	}
 
-	public Gradient(final float[] fractions, final Color[] colors) {
+	public Gradient(final double[] fractions, final Color[] colors) {
 		assert fractions.length == colors.length;
 		this.fractions = fractions;
 		this.colors = colors;
-
 	}
 
 	public Color interpolate(final float value) {
@@ -37,9 +36,9 @@ public class Gradient implements Serializable {
 
 		final Color c0 = colors[index - 1];
 		final Color c1 = colors[index];
-		final float factor = 1 - (value - fractions[index - 1]) / (fractions[index] - fractions[index - 1]);
+		final double factor = 1 - (value - fractions[index - 1]) / (fractions[index] - fractions[index - 1]);
 
-		final float factor1 = 1 - factor;
+		final double factor1 = 1 - factor;
 		return new Color((int) (c0.red * factor + c1.red * factor1), (int) (c0.green * factor + c1.green * factor1),
 				(int) (c0.blue * factor + c1.blue * factor1), (int) (c0.alpha * factor + c1.alpha * factor1));
 	}

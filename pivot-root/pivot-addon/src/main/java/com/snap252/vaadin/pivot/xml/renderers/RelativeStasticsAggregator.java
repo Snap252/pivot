@@ -7,6 +7,8 @@ import java.util.function.Function;
 import java.util.stream.Collector;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -16,7 +18,6 @@ import com.snap252.org.aggregators.NullableArithmeticsWrapper;
 import com.snap252.org.aggregators.NumberStatistics;
 import com.snap252.org.aggregators.PivotCollectors;
 import com.snap252.vaadin.pivot.PivotCellReference;
-import com.snap252.vaadin.pivot.client.Color;
 import com.snap252.vaadin.pivot.client.Gradient;
 import com.snap252.vaadin.pivot.i18n.LookupComboBox;
 import com.snap252.vaadin.pivot.renderer.BigDecimalRenderer;
@@ -56,9 +57,6 @@ public class RelativeStasticsAggregator
 	@Nullable
 	public OfWhatParent ofParent;
 
-	public RelativeStasticsAggregator() {
-	}
-
 	@XmlAttribute(name = "rounding")
 	public Integer preRounding = 0;
 
@@ -91,10 +89,22 @@ public class RelativeStasticsAggregator
 		else
 			ret.setFormat("0.00");
 
-		ret.setGradient(new Gradient(new float[] { 0 / 10f, 3 / 10f, 6 / 10f, 10 / 10f }, new Color[] {
-				new Color(0, 255, 0), new Color(255, 255, 0), new Color(255, 200, 0), new Color(255, 0, 0), }));
+		ret.setGradient(gradient);
 
 		return ret;
+	}
+
+	@Nullable
+	private Gradient gradient;
+
+	@XmlJavaTypeAdapter(GradientAdapter.class)
+	@XmlElement
+	public @Nullable Gradient getGradient() {
+		return gradient;
+	}
+
+	public void setGradient(@Nullable final Gradient gradient) {
+		this.gradient = gradient;
 	}
 
 	@Override

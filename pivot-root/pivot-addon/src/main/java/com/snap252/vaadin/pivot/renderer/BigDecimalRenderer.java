@@ -48,7 +48,7 @@ public class BigDecimalRenderer extends AbstractRenderer<@Nullable BigDecimal>
 		return this;
 	}
 
-	public BigDecimalRenderer setGradient(final Gradient gradient) {
+	public BigDecimalRenderer setGradient(@Nullable final Gradient gradient) {
 		final ClientRendererSharedState state = getState(false);
 		if (Objects.equals(state.gradient, gradient))
 			return this;

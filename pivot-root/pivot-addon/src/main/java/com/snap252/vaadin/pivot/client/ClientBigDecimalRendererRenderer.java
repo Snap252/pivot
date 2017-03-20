@@ -22,8 +22,8 @@ public class ClientBigDecimalRendererRenderer implements Renderer<BigDecimal> {
 		elementStyle.setTextAlign(TextAlign.RIGHT);
 		element.addClassName("column-depth-" + depth);
 
-		if (gradient != null && value != null) {
-			final Color color = gradient.interpolate(value.floatValue());
+		if (gradient != null) {
+			final Color color = gradient.interpolate(value != null ? value.floatValue() : 0f);
 			elementStyle.setBackgroundImage("linear-gradient(to bottom, " + (color.toRGBACssString(100) + " 0%, ")
 					+ (color.toRGBACssString(120) + " 25%,") + (color.toRGBACssString(200) + " 50%,")
 					+ (color.toRGBACssString(180) + " 95%,") + (color.toRGBACssString(100) + " 100%") + ")");
@@ -32,6 +32,7 @@ public class ClientBigDecimalRendererRenderer implements Renderer<BigDecimal> {
 			elementStyle.setBorderColor(null);
 			elementStyle.setBackgroundImage(null);
 		}
+
 		elementStyle.setColor("black");
 		element.setInnerText(getTextual(value));
 	}

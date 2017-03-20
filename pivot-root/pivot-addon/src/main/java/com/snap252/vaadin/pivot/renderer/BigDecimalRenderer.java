@@ -7,6 +7,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.snap252.vaadin.pivot.client.ClientRendererSharedState;
+import com.snap252.vaadin.pivot.client.Gradient;
 import com.vaadin.ui.Grid.AbstractRenderer;
 
 import elemental.json.JsonValue;
@@ -43,6 +44,15 @@ public class BigDecimalRenderer extends AbstractRenderer<@Nullable BigDecimal>
 		if (Objects.equals(state.nullRepresentation, nullRepresentation))
 			return this;
 		state.nullRepresentation = nullRepresentation;
+		markAsDirty();
+		return this;
+	}
+
+	public BigDecimalRenderer setGradient(final Gradient gradient) {
+		final ClientRendererSharedState state = getState(false);
+		if (Objects.equals(state.gradient, gradient))
+			return this;
+		state.gradient = gradient;
 		markAsDirty();
 		return this;
 	}

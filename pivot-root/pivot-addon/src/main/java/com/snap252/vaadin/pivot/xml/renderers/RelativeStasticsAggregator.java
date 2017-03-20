@@ -16,6 +16,8 @@ import com.snap252.org.aggregators.NullableArithmeticsWrapper;
 import com.snap252.org.aggregators.NumberStatistics;
 import com.snap252.org.aggregators.PivotCollectors;
 import com.snap252.vaadin.pivot.PivotCellReference;
+import com.snap252.vaadin.pivot.client.Color;
+import com.snap252.vaadin.pivot.client.Gradient;
 import com.snap252.vaadin.pivot.i18n.LookupComboBox;
 import com.snap252.vaadin.pivot.renderer.BigDecimalRenderer;
 import com.snap252.vaadin.pivot.valuegetter.WhatOfNumberStatisticsToRender;
@@ -88,6 +90,9 @@ public class RelativeStasticsAggregator
 			ret.setFormat("0.0%");
 		else
 			ret.setFormat("0.00");
+
+		ret.setGradient(new Gradient(new float[] { 0 / 10f, 3 / 10f, 6 / 10f, 10 / 10f }, new Color[] {
+				new Color(0, 255, 0), new Color(255, 255, 0), new Color(255, 200, 0), new Color(255, 0, 0), }));
 
 		return ret;
 	}

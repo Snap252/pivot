@@ -17,7 +17,7 @@ import com.vaadin.ui.renderers.Renderer;
 @NonNullByDefault({})
 public abstract class Aggregator<T, U> {
 
-	public abstract @NonNull U getConvertedValue(@NonNull T value);
+	protected abstract @NonNull U getConvertedValue(@NonNull T value);
 
 	public abstract @NonNull Renderer<? super U> createRenderer();
 

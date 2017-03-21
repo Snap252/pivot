@@ -10,6 +10,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.snap252.org.aggregators.Arithmetics;
@@ -18,12 +19,25 @@ import com.snap252.org.aggregators.NullableArithmeticsWrapper;
 import com.snap252.org.aggregators.NumberStatistics;
 import com.snap252.org.aggregators.PivotCollectors;
 import com.snap252.vaadin.pivot.PivotCellReference;
+import com.snap252.vaadin.pivot.client.Color;
 import com.snap252.vaadin.pivot.client.Gradient;
 import com.snap252.vaadin.pivot.i18n.LookupComboBox;
 import com.snap252.vaadin.pivot.renderer.BigDecimalRenderer;
 import com.snap252.vaadin.pivot.valuegetter.WhatOfNumberStatisticsToRender;
+import com.vaadin.data.Property;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.ui.AbstractColorPicker;
 import com.vaadin.ui.AbstractSelect;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.ColorPicker;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
+import com.vaadin.ui.components.colorpicker.ColorChangeEvent;
+import com.vaadin.ui.components.colorpicker.ColorPickerPopup;
+import com.vaadin.ui.components.colorpicker.ColorSelector;
 
 public class RelativeStasticsAggregator
 		extends Aggregator<@Nullable NumberStatistics<BigDecimal>, @Nullable BigDecimal> {
@@ -143,6 +157,95 @@ public class RelativeStasticsAggregator
 		private final TextField formatTextField = new TextField("Formatierung");
 		private final TextField nullFormatTextField = new TextField("Leere Werte");
 
+		static class ColorPickerField extends ColorPicker implements DefaultField<@Nullable Color> {
+			private final ColorSelector cs;
+
+			ColorPickerField(final ColorSelector cs) {
+				this.cs = cs;
+				cs.setColor(super.getColor());
+				cs.addColorChangeListener(this::colorChanged);
+			}
+
+			@Override
+			public void setColor(final com.vaadin.shared.ui.colorpicker.Color color) {
+				if (cs != null)
+					cs.setColor(color);
+				super.setColor(color);
+			}
+
+			@Override
+			protected void showPopup(final boolean open) {
+				// super.showPopup(open);
+				if (open)
+					try {
+						final java.lang.reflect.Field declaredField = AbstractColorPicker.class
+								.getDeclaredField("window");
+						declaredField.setAccessible(true);
+						final ColorPickerPopup window = (ColorPickerPopup) declaredField.get(this);
+						if (window != null)
+							window.addStyleName("window-in-popup");
+					} catch (ReflectiveOperationException | SecurityException | IllegalArgumentException e) {
+						assert false;
+					}
+			}
+
+			@Override
+			protected void colorChanged(final ColorChangeEvent event) {
+				super.colorChanged(event);
+				final int newRGB = event.getColor().getRGB();
+
+				if (newDataSource != null)
+					newDataSource.setValue(new Color(newRGB));
+			}
+
+			private @Nullable Color newValue;
+			private @Nullable Property<Color> newDataSource;
+
+			@Override
+			public void focus() {
+				super.focus();
+			}
+
+			@Override
+			public @Nullable Color getValue() {
+				return newValue;
+			}
+
+			@Override
+			public void setValue(@Nullable final Color newValue) throws ReadOnlyException {
+				this.newValue = newValue;
+
+			}
+
+			@Override
+			public Class<Color> getType() {
+				return Color.class;
+			}
+
+			@Override
+			public void addValueChangeListener(@NonNull final ValueChangeListener listener) {
+				assert false;
+			}
+
+			@Override
+			public @Nullable Property<?> getPropertyDataSource() {
+				return newDataSource;
+			}
+
+			@SuppressWarnings({ "null", "unchecked" })
+			@Override
+			public void setPropertyDataSource(@SuppressWarnings("rawtypes") @Nullable final Property newDataSource) {
+				this.newDataSource = newDataSource;
+				if (this.newDataSource != null) {
+					final Color color = this.newDataSource.getValue();
+					assert color != null;
+					setColor(new com.vaadin.shared.ui.colorpicker.Color(color.toRGBA()));
+				}
+			}
+		}
+
+		private final HeatMapInput hmi = new HeatMapInput();
+
 		NumberStatisticsConfig() {
 			super(new RelativeStasticsAggregator());
 			nullFormatTextField.setInputPrompt("-");
@@ -199,8 +302,30 @@ public class RelativeStasticsAggregator
 				value.format = formatString;
 				fireValueChange();
 			});
+			final Button b = new Button("Configure Heat-Map");
+
+			b.addClickListener(evt -> {
+				final Window window = new Window(" Heat-Map");
+				window.setIcon(FontAwesome.PENCIL);
+				window.setResizable(false);
+				window.addStyleName("window-in-popup");
+				final VerticalLayout vl = new VerticalLayout(hmi);
+				vl.addComponent(new HorizontalLayout(new Button("Close", btnEvt -> window.close())));
+
+				window.setContent(vl);
+				vl.setMargin(true);
+				window.addCloseListener(closeEvent -> {
+					final Gradient newGradient = hmi.getGradient();
+					if (Objects.equals(value.gradient, newGradient))
+						return;
+					value.gradient = newGradient;
+					fireValueChange();
+				});
+				UI.getCurrent().addWindow(window);
+			});
+
 			addComponents(whatOfNumberStatisticsToRenderCheckBox, ofWhatParentCheckBox, formatTextField,
-					nullFormatTextField);
+					nullFormatTextField, b);
 		}
 
 		@Override
@@ -209,6 +334,7 @@ public class RelativeStasticsAggregator
 			ofWhatParentCheckBox.setValue(value.ofParent);
 			formatTextField.setValue(value.format);
 			nullFormatTextField.setValue(value.nullRepresentation);
+			hmi.setValue(value.gradient);
 		}
 
 	}

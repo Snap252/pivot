@@ -34,6 +34,8 @@ public class ValueFieldDnDHandler extends DropHandlerImplementation<ValueField<?
 		final AbstractComponent component = createFilter.createUIConfigurable().getComponent();
 
 		final PopupButton popupButton = new PopupButton(createFilter.getDisplayName());
+		popupButton.setClosePopupOnOutsideClick(false);
+
 		final Button deleteButton = new Button("Entfernen", evt -> {
 			removeFromList(createFilter, this);
 			popupButton.setPopupVisible(false);

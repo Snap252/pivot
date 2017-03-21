@@ -8,10 +8,10 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import com.vaadin.ui.Component;
 
-public class Messages {
+public class Enums {
 	private static final String BUNDLE_NAME = "com.snap252.org.pivoting.enums"; //$NON-NLS-1$
 
-	private Messages() {
+	private Enums() {
 	}
 
 	public static String getString(final Enum<?> key, final Locale l) {

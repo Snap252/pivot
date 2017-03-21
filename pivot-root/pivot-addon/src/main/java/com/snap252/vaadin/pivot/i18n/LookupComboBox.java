@@ -16,6 +16,6 @@ public class LookupComboBox extends ComboBox {
 
 	@Override
 	public @Nullable String getItemCaption(final Object itemId) {
-		return Messages.getString((Enum<?>) itemId, this);
+		return Enums.getString((Enum<?>) itemId, this);
 	}
 }

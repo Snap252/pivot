@@ -208,14 +208,16 @@ public class HeatMapInput extends HorizontalLayout {
 		final double[] fractions = new double[itemIds.size()];
 		itemIds.stream().map(indexed::getItem)
 				.sorted(Comparator.comparing(
-						item -> (Double) Objects.requireNonNull(item.getItemProperty(VALUE_PROPERTY)).getValue()))
+						item -> ((Number) Objects.requireNonNull(item.getItemProperty(VALUE_PROPERTY)).getValue())
+								.doubleValue()))
 				.forEach(new Consumer<Item>() {
 					int i = 0;
 
 					@Override
 					public void accept(final Item item) {
 						colors[i] = (Color) Objects.requireNonNull(item.getItemProperty(COLOR_PROPERTY)).getValue();
-						fractions[i] = (Double) Objects.requireNonNull(item.getItemProperty(VALUE_PROPERTY)).getValue();
+						fractions[i] = ((Number) Objects.requireNonNull(item.getItemProperty(VALUE_PROPERTY))
+								.getValue()).doubleValue();
 						i++;
 
 					}

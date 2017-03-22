@@ -292,7 +292,7 @@ public class RelativeStasticsAggregator
 
 			b.addClickListener(evt -> {
 				final Window window = new Window(" Heat-Map");
-				window.setIcon(FontAwesome.PENCIL);
+				window.setIcon(FontAwesome.CROSSHAIRS);
 				window.setResizable(false);
 				window.addStyleName("window-in-popup");
 				final VerticalLayout vl = new VerticalLayout(hmi);

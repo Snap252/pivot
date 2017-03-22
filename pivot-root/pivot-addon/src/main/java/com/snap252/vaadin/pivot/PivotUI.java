@@ -1,21 +1,13 @@
 package com.snap252.vaadin.pivot;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.jdt.annotation.Nullable;
 import org.vaadin.hene.popupbutton.PopupButton;
-import org.vaadin.miki.mapcontainer.MapContainer;
 
 import com.snap252.vaadin.pivot.valuegetter.ValueFieldDnDHandler;
 import com.snap252.vaadin.pivot.xml.Config;
-import com.vaadin.data.Container;
-import com.vaadin.data.Item;
 import com.vaadin.event.dd.DropHandler;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -138,36 +130,4 @@ public class PivotUI extends GridLayout {
 		setRowExpandRatio(2, 1);
 		setColumnExpandRatio(1, 1);
 	}
-
-	public static Container cloneContainer(final Container origContainer) {
-		return cloneContainer(origContainer, f -> f);
-	}
-
-	@SuppressWarnings("null")
-	public static Container cloneContainer(final Container origContainer,
-			final Function<@NonNull Object, @Nullable Object> f) {
-		final Map<Object, Class<?>> m0 = origContainer.getContainerPropertyIds().stream()
-				.filter(propertyId -> f.apply(Objects.requireNonNull(propertyId)) != null)
-				.collect(Collectors.toMap(f, origContainer::getType, (u, v) -> {
-					throw new IllegalStateException(String.format("Duplicate key %s", u));
-				}, LinkedHashMap::new));
-
-		final Map<Object, Map<Object, @Nullable Object>> m1 = origContainer.getItemIds().stream()
-				.collect(Collectors.toMap(Function.identity(), itemId -> {
-					final Item item = origContainer.getItem(itemId);
-					final LinkedHashMap<Object, @Nullable Object> v = new LinkedHashMap<>();
-					item.getItemPropertyIds().forEach(propertyId -> {
-
-						assert propertyId != null;
-						final Object newPropertyId = f.apply(propertyId);
-						if (newPropertyId != null)
-							v.put(newPropertyId, Objects.requireNonNull(item.getItemProperty(propertyId)).getValue());
-					});
-					return v;
-				}, (u, v) -> {
-					throw new IllegalStateException(String.format("Duplicate key %s", u));
-				}, LinkedHashMap::new));
-		return new MapContainer(m0, m1);
-	}
-
 }

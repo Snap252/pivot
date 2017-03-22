@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.snap252.org.pivoting.PivotCriteria;
@@ -40,7 +41,7 @@ public final class GridRendererParameter<INPUT_TYPE, VALUE_TYPE> {
 				.addChangeListener((_l, self) -> fireEvent(GridRendererChangeParameterKind.AGGREGATOR));
 	}
 
-	public Collection<? extends Property<INPUT_TYPE, ?>> getProperties() {
+	public Collection<? extends Property<INPUT_TYPE, @NonNull ?>> getProperties() {
 		return provider.getProperties();
 	}
 

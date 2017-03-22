@@ -29,6 +29,10 @@ public class AttributeDnDHandler extends DropHandlerImplementation<Attribute<?>>
 		return filterFactory.createAttribute((Property<?, @Nullable ?>) data);
 	}
 
+	public void appendProprammatically(final Property<?, ?> data) {
+		doWithFilteringComponent(createNew(data), -1);
+	}
+
 	@Override
 	protected AbstractComponent createUIComponent(final Attribute<?> createFilter) {
 		final UIConfigurable uiConfigurable = createFilter.createUIConfigurable();

@@ -118,7 +118,7 @@ public abstract class DropHandlerImplementation<T> implements DropHandler {
 
 	protected abstract AbstractComponent createUIComponent(T createFilter);
 
-	private final void doWithFilteringComponent(final T createFilter, final int index) {
+	protected final void doWithFilteringComponent(final T createFilter, final int index) {
 		// updateUi(createFilter, index);
 		if (index == -1)
 			currentElements.add(createFilter);

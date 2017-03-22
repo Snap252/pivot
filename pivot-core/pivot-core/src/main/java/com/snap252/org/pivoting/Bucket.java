@@ -104,6 +104,10 @@ public abstract class Bucket<V> implements Predicate<@NonNull V> {
 	@Nullable
 	private WrappedBucket<V> b;
 
+	public @Nullable Object getWrappedIfThere() {
+		return b;
+	}
+
 	private Bucket<V> getWrapped() {
 		if (b != null) {
 			return b;

@@ -11,6 +11,7 @@ import com.snap252.vaadin.pivot.UIConfigurable;
 import com.snap252.vaadin.pivot.xml.renderers.StringConcatAggregator.ConcatAggConfig;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.themes.ValoTheme;
 
 public class StringValueField extends ValueField<String> {
 	public StringValueField() {
@@ -51,8 +52,8 @@ public class StringValueField extends ValueField<String> {
 			});
 
 			final TabSheet allTabSheet = new TabSheet(
-					getWrapper("Allgemein", false, createForDisplayName(StringValueField.this)),
-					getWrapper("Zählung", false, countingAggConfig), getWrapper("Verketten", false, concatAggConfig));
+					getWrapperForTab("common", false, createForDisplayName(StringValueField.this)),
+					getWrapperForTab("counting", false, countingAggConfig), getWrapperForTab("concatenating", false, concatAggConfig));
 			if (agg instanceof CountingAggregator) {
 				countingAggConfig.setValue((CountingAggregator) agg);
 				allTabSheet.setSelectedTab(1);
@@ -61,6 +62,7 @@ public class StringValueField extends ValueField<String> {
 				allTabSheet.setSelectedTab(2);
 			}
 			allTabSheet.setWidth("500px");
+			allTabSheet.addStyleName(ValoTheme.TABSHEET_COMPACT_TABBAR);
 			this.comp = allTabSheet;
 		}
 

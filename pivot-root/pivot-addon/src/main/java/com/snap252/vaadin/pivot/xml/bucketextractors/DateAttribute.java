@@ -3,7 +3,6 @@ package com.snap252.vaadin.pivot.xml.bucketextractors;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Objects;
 import java.util.Optional;
@@ -14,11 +13,14 @@ import javax.xml.bind.annotation.XmlElements;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.snap252.vaadin.pivot.UIConfigurable;
+import com.snap252.vaadin.pivot.i18n.LookupComboBox;
+import com.snap252.vaadin.pivot.i18n.LookupTextField;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.ui.AbstractComponent;
-import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.themes.ValoTheme;
 
 public class DateAttribute extends Attribute<@Nullable Date> {
 	@XmlElements({ @XmlElement(name = "predefind", type = PredefinedDateFormat.class),
@@ -55,20 +57,22 @@ public class DateAttribute extends Attribute<@Nullable Date> {
 		private final TabSheet comp;
 
 		public DateConfigurable() {
-			final TabSheet allTabSheet = new TabSheet(getWrapper("Allgemein", false, createForDisplayName(DateAttribute.this)),
-					getWrapper("Format", false, getDateFormatConfig()));
+			final TabSheet allTabSheet = new TabSheet(
+					getWrapperForTab("common", false, createForDisplayName(DateAttribute.this)),
+					getWrapperForTab("format", false, getDateFormatConfig()));
 			allTabSheet.setWidth("500px");
+			allTabSheet.addStyleName(ValoTheme.TABSHEET_COMPACT_TABBAR);
 			this.comp = allTabSheet;
 		}
 
 		private TabSheet getDateFormatConfig() {
-			final ComboBox combobox = new ComboBox("Auswahl", Arrays.asList(DateRounding.values()));
+			final AbstractSelect combobox = new LookupComboBox("selection", DateRounding.values());
 			// TODO: "apply from rounding to custom" - button
-			final TextField textfield = new TextField("Eingabe");
+			final TextField textfield = new LookupTextField("input");
 
-			final TabSheet ts = new TabSheet(getWrapper("Vorgegebenes Format", true, combobox),
-					getWrapper("Benutzerdefiniertes Format", true, textfield));
-
+			final TabSheet ts = new TabSheet(getWrapperForTab("predefined_format", true, combobox),
+					getWrapperForTab("userdefined_format", true, textfield));
+			ts.addStyleName(ValoTheme.TABSHEET_COMPACT_TABBAR);
 			ts.setSizeFull();
 			if (dateFormat instanceof CustomDateFormat) {
 				ts.setSelectedTab(1);

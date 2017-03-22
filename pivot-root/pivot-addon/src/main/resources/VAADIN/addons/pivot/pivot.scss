@@ -122,4 +122,8 @@ $tg-expander-width: 5px;
 			height: inherit;
 		}
 	}
+
+	.window-in-popup {
+		z-index: 22000 !important;
+	}
 }

@@ -2,13 +2,15 @@ package com.snap252.vaadin.pivot.xml.renderers;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collector;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.snap252.org.aggregators.Arithmetics;
@@ -17,10 +19,26 @@ import com.snap252.org.aggregators.NullableArithmeticsWrapper;
 import com.snap252.org.aggregators.NumberStatistics;
 import com.snap252.org.aggregators.PivotCollectors;
 import com.snap252.vaadin.pivot.PivotCellReference;
+import com.snap252.vaadin.pivot.client.Color;
+import com.snap252.vaadin.pivot.client.Gradient;
+import com.snap252.vaadin.pivot.i18n.Labels;
+import com.snap252.vaadin.pivot.i18n.LookupComboBox;
+import com.snap252.vaadin.pivot.i18n.LookupTextField;
+import com.snap252.vaadin.pivot.i18n.MessageButton;
 import com.snap252.vaadin.pivot.renderer.BigDecimalRenderer;
 import com.snap252.vaadin.pivot.valuegetter.WhatOfNumberStatisticsToRender;
-import com.vaadin.ui.ComboBox;
+import com.vaadin.data.Property;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.ui.AbstractSelect;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.ColorPicker;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
+import com.vaadin.ui.components.colorpicker.ColorChangeEvent;
+import com.vaadin.ui.components.colorpicker.ColorSelector;
 
 public class RelativeStasticsAggregator
 		extends Aggregator<@Nullable NumberStatistics<BigDecimal>, @Nullable BigDecimal> {
@@ -54,9 +72,6 @@ public class RelativeStasticsAggregator
 	@Nullable
 	public OfWhatParent ofParent;
 
-	public RelativeStasticsAggregator() {
-	}
-
 	@XmlAttribute(name = "rounding")
 	public Integer preRounding = 0;
 
@@ -64,7 +79,7 @@ public class RelativeStasticsAggregator
 	public Boolean ignoreNull = false;
 
 	@XmlAttribute(name = "mode")
-	public WhatOfNumberStatisticsToRender whatToRender = WhatOfNumberStatisticsToRender.sum;
+	public WhatOfNumberStatisticsToRender whatToRender = WhatOfNumberStatisticsToRender.SUM;
 
 	@Override
 	public BigDecimal getConvertedValue(final NumberStatistics<BigDecimal> value) {
@@ -81,15 +96,30 @@ public class RelativeStasticsAggregator
 
 	@Override
 	public BigDecimalRenderer createRenderer() {
-		final BigDecimalRenderer ret = new BigDecimalRenderer("");
+		final BigDecimalRenderer ret = new BigDecimalRenderer(nullRepresentation != null ? nullRepresentation : "");
 		if (format != null)
 			ret.setFormat(format);
 		else if (ofParent != null)
-			ret.setFormat("0.00%");
+			ret.setFormat("0.0%");
 		else
 			ret.setFormat("0.00");
 
+		ret.setGradient(gradient);
+
 		return ret;
+	}
+
+	@Nullable
+	private Gradient gradient;
+
+	@XmlJavaTypeAdapter(GradientAdapter.class)
+	@XmlElement
+	public @Nullable Gradient getGradient() {
+		return gradient;
+	}
+
+	public void setGradient(@Nullable final Gradient gradient) {
+		this.gradient = gradient;
 	}
 
 	@Override
@@ -122,11 +152,88 @@ public class RelativeStasticsAggregator
 	}
 
 	static class NumberStatisticsConfig extends FormLayoutField<RelativeStasticsAggregator> {
-		private final ComboBox whatOfNumberStatisticsToRenderCheckBox = new ComboBox("Typ",
-				Arrays.asList(WhatOfNumberStatisticsToRender.values()));
-		private final ComboBox ofWhatParentCheckBox = new ComboBox("Relativ zu", Arrays.asList(OfWhatParent.values()));
-		private final TextField formatTextField = new TextField("Formatierung");
-		private final TextField nullFormatTextField = new TextField("Leere Werte");
+		private final AbstractSelect whatOfNumberStatisticsToRenderCheckBox = new LookupComboBox("type",
+				WhatOfNumberStatisticsToRender.values());
+		private final AbstractSelect ofWhatParentCheckBox = new LookupComboBox("relative_to", OfWhatParent.values());
+		private final TextField formatTextField = new LookupTextField("format");
+		private final TextField nullFormatTextField = new LookupTextField("display_empty_values");
+
+		static class ColorPickerField extends ColorPicker implements DefaultField<@Nullable Color> {
+			private final ColorSelector cs;
+
+			ColorPickerField(final ColorSelector cs) {
+				this.cs = cs;
+				cs.setColor(super.getColor());
+				cs.addColorChangeListener(this::colorChanged);
+			}
+
+			@Override
+			public void setColor(final com.vaadin.shared.ui.colorpicker.Color color) {
+				if (cs != null)
+					cs.setColor(color);
+				super.setColor(color);
+			}
+
+			@Override
+			protected void showPopup(final boolean open) {
+			}
+
+			@Override
+			protected void colorChanged(final ColorChangeEvent event) {
+				super.colorChanged(event);
+				final int newRGB = event.getColor().getRGB();
+
+				if (newDataSource != null)
+					newDataSource.setValue(new Color(newRGB));
+			}
+
+			private @Nullable Color newValue;
+			private @Nullable Property<Color> newDataSource;
+
+			@Override
+			public void focus() {
+				super.focus();
+			}
+
+			@Override
+			public @Nullable Color getValue() {
+				return newValue;
+			}
+
+			@Override
+			public void setValue(@Nullable final Color newValue) throws ReadOnlyException {
+				this.newValue = newValue;
+
+			}
+
+			@Override
+			public Class<Color> getType() {
+				return Color.class;
+			}
+
+			@Override
+			public void addValueChangeListener(@NonNull final ValueChangeListener listener) {
+				assert false;
+			}
+
+			@Override
+			public @Nullable Property<?> getPropertyDataSource() {
+				return newDataSource;
+			}
+
+			@SuppressWarnings({ "null", "unchecked" })
+			@Override
+			public void setPropertyDataSource(@SuppressWarnings("rawtypes") @Nullable final Property newDataSource) {
+				this.newDataSource = newDataSource;
+				if (this.newDataSource != null) {
+					final Color color = this.newDataSource.getValue();
+					assert color != null;
+					setColor(new com.vaadin.shared.ui.colorpicker.Color(color.toRGBA()));
+				}
+			}
+		}
+
+		private final HeatMapInput hmi = new HeatMapInput();
 
 		NumberStatisticsConfig() {
 			super(new RelativeStasticsAggregator());
@@ -184,8 +291,36 @@ public class RelativeStasticsAggregator
 				value.format = formatString;
 				fireValueChange();
 			});
+			final Button b = new MessageButton("configure_heat_map");
+
+			b.addClickListener(evt -> {
+				final Window window = new Window(" "){
+					@Override
+					public void attach() {
+						super.attach();
+						setCaption(Labels.getString("heat_map", this));
+					}
+				};
+				window.setIcon(FontAwesome.CROSSHAIRS);
+				window.setResizable(false);
+				window.addStyleName("window-in-popup");
+				final VerticalLayout vl = new VerticalLayout(hmi);
+				vl.addComponent(new HorizontalLayout(new MessageButton("close", btnEvt -> window.close())));
+
+				window.setContent(vl);
+				vl.setMargin(true);
+				window.addCloseListener(closeEvent -> {
+					final Gradient newGradient = hmi.getGradient();
+					if (Objects.equals(value.gradient, newGradient))
+						return;
+					value.gradient = newGradient;
+					fireValueChange();
+				});
+				UI.getCurrent().addWindow(window);
+			});
+
 			addComponents(whatOfNumberStatisticsToRenderCheckBox, ofWhatParentCheckBox, formatTextField,
-					nullFormatTextField);
+					nullFormatTextField, b);
 		}
 
 		@Override
@@ -194,6 +329,7 @@ public class RelativeStasticsAggregator
 			ofWhatParentCheckBox.setValue(value.ofParent);
 			formatTextField.setValue(value.format);
 			nullFormatTextField.setValue(value.nullRepresentation);
+			hmi.setValue(value.gradient);
 		}
 
 	}

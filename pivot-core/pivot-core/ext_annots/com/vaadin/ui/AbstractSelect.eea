@@ -1,0 +1,4 @@
+class com/vaadin/ui/AbstractSelect
+getItemCaption
+ (Ljava/lang/Object;)Ljava/lang/String;
+ (L1java/lang/Object;)Ljava/lang/String;

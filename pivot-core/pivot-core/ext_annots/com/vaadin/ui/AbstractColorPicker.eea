@@ -1,0 +1,7 @@
+class com/vaadin/ui/AbstractColorPicker
+colorChanged
+ (Lcom/vaadin/ui/components/colorpicker/ColorChangeEvent;)V
+ (L1com/vaadin/ui/components/colorpicker/ColorChangeEvent;)V
+setColor
+ (Lcom/vaadin/shared/ui/colorpicker/Color;)V
+ (L1com/vaadin/shared/ui/colorpicker/Color;)V

@@ -1,16 +1,16 @@
 package com.snap252.vaadin.pivot.xml.renderers;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.function.Function;
 import java.util.stream.Collector;
 
 import javax.xml.bind.annotation.XmlAttribute;
 
+import com.snap252.vaadin.pivot.i18n.LookupComboBox;
 import com.snap252.vaadin.pivot.renderer.BigDecimalRenderer;
 import com.snap252.vaadin.pivot.valuegetter.ObjectStatistics;
 import com.snap252.vaadin.pivot.valuegetter.WhatOfObjectStatisticsToShow;
-import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.AbstractSelect;
 
 public final class CountingAggregator extends Aggregator<ObjectStatistics, BigDecimal> {
 
@@ -19,7 +19,7 @@ public final class CountingAggregator extends Aggregator<ObjectStatistics, BigDe
 
 	@Override
 	public BigDecimalRenderer createRenderer() {
-		final BigDecimalRenderer bigDecimalRenderer = new BigDecimalRenderer("---");
+		final BigDecimalRenderer bigDecimalRenderer = new BigDecimalRenderer("-");
 		bigDecimalRenderer.setFormat("0");
 		return bigDecimalRenderer;
 	}
@@ -36,8 +36,8 @@ public final class CountingAggregator extends Aggregator<ObjectStatistics, BigDe
 	}
 
 	static class CountingAggConfig extends FormLayoutField<CountingAggregator> {
-		private final ComboBox displayCheckbox = new ComboBox("Darstellung",
-				Arrays.asList(WhatOfObjectStatisticsToShow.values()));
+		private final AbstractSelect displayCheckbox = new LookupComboBox("display",
+				WhatOfObjectStatisticsToShow.values());
 
 		CountingAggConfig() {
 			super(new CountingAggregator());

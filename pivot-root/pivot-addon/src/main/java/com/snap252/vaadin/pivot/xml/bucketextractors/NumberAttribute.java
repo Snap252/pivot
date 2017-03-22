@@ -15,6 +15,7 @@ import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Slider;
 import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.themes.ValoTheme;
 
 public class NumberAttribute extends Attribute<@Nullable Number> {
 
@@ -56,9 +57,10 @@ public class NumberAttribute extends Attribute<@Nullable Number> {
 		public NumberUIConfigurable() {
 
 			final TabSheet allTabSheet = new TabSheet(
-					getWrapper("Allgemein", false, createForDisplayName(NumberAttribute.this)),
-					getWrapper("Format", false, getRounder()));
+					getWrapperForTab("common", false, createForDisplayName(NumberAttribute.this)),
+					getWrapperForTab("format", false, getRounder()));
 			allTabSheet.setWidth("500px");
+			allTabSheet.addStyleName(ValoTheme.TABSHEET_COMPACT_TABBAR);
 			this.comp = allTabSheet;
 		}
 

@@ -3,7 +3,6 @@ package com.snap252.vaadin.pivot.valuegetter;
 import static java.util.Objects.requireNonNull;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.function.Function;
 import java.util.stream.Collector;
 
@@ -11,10 +10,11 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.snap252.vaadin.pivot.Property;
+import com.snap252.vaadin.pivot.i18n.LookupComboBox;
 import com.snap252.vaadin.pivot.renderer.BigDecimalRenderer;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.AbstractComponent;
-import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.FormLayout;
 
 public class ObjectValueExtractor<INPUT_TYPE> implements FilteringRenderingComponent<INPUT_TYPE, @Nullable Object> {
@@ -22,8 +22,8 @@ public class ObjectValueExtractor<INPUT_TYPE> implements FilteringRenderingCompo
 	// protected final Object propertyId;
 	private final AbstractComponent comp;
 
-	private final ComboBox howToRenderComboBox = new ComboBox("Anzeige",
-			Arrays.asList(WhatOfObjectStatisticsToShow.values()));
+	private final AbstractSelect howToRenderComboBox = new LookupComboBox("display",
+			WhatOfObjectStatisticsToShow.values());
 	private WhatOfObjectStatisticsToShow whatToRender = WhatOfObjectStatisticsToShow.COUNT;
 
 	public ObjectValueExtractor(final Property<INPUT_TYPE, ?> nameType) {
@@ -57,7 +57,7 @@ public class ObjectValueExtractor<INPUT_TYPE> implements FilteringRenderingCompo
 	@SuppressWarnings("null")
 	@Override
 	public RendererConverter<?, ? extends @NonNull ObjectStatistics> createRendererConverter() {
-		final BigDecimalRenderer renderer = new BigDecimalRenderer("---");
+		final BigDecimalRenderer renderer = new BigDecimalRenderer("-");
 		renderer.setFormat("0");
 		final Function<@Nullable ObjectStatistics, BigDecimal> singleExtractor = t -> t == null ? null
 				: whatToRender.getValueAsBigDecimal(t);

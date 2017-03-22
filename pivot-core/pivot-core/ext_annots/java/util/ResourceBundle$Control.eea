@@ -1,0 +1,10 @@
+class java/util/ResourceBundle$Control
+getCandidateLocales
+ (Ljava/lang/String;Ljava/util/Locale;)Ljava/util/List<Ljava/util/Locale;>;
+ (L1java/lang/String;L1java/util/Locale;)L1java/util/List<L1java/util/Locale;>;
+getFallbackLocale
+ (Ljava/lang/String;Ljava/util/Locale;)Ljava/util/Locale;
+ (L1java/lang/String;L1java/util/Locale;)L0java/util/Locale;
+getTimeToLive
+ (Ljava/lang/String;Ljava/util/Locale;)J
+ (L1java/lang/String;L1java/util/Locale;)J

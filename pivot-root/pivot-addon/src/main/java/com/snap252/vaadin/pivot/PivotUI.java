@@ -16,6 +16,7 @@ import com.vaadin.ui.DragAndDropWrapper;
 import com.vaadin.ui.DragAndDropWrapper.DragStartMode;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
@@ -43,6 +44,12 @@ public class PivotUI extends GridLayout {
 
 		setSpacing(true);
 
+		final DDHorizontalLayout cols = new DDHorizontalLayout();
+		final AttributeDnDHandler colDropHandler = new AttributeDnDHandler(cols, false, config.columns.attributes);
+
+		final DDVerticalLayout rows = new DDVerticalLayout();
+		final AttributeDnDHandler rowDropHandler = new AttributeDnDHandler(rows, true, config.rows.attributes);
+
 		{
 			final PopupButton renderer = new PopupButton("Export/Import");
 			{
@@ -67,16 +74,17 @@ public class PivotUI extends GridLayout {
 			properties = new HorizontalLayout();
 			properties.setDescription("properties");
 			properties.setCaption("properties");
-			properties.setSpacing(true);
 			final DragAndDropWrapper rowDndWrapper = new DragAndDropWrapper(properties);
-			addComponents(renderer, rowDndWrapper);
+//			addComponents(renderer, rowDndWrapper);
+			addComponents(new Label(), rowDndWrapper);
 
 			{
 				final Component[] labels = gridRendererParameterx.getProperties().stream().map(propertyId -> {
 					assert propertyId != null;
-					final Component button = new Button(propertyId.toString());
+					final Component button = new Button(propertyId.toString(), btnEvt -> rowDropHandler.appendProprammatically(propertyId));
+					button.addStyleName(ValoTheme.BUTTON_QUIET);
 					button.addStyleName(ValoTheme.BUTTON_SMALL);
-					button.setEnabled(false);
+					// button.setEnabled(false);
 					final DragAndDropWrapper wrapper = new DragAndDropWrapper(button);
 					wrapper.setDragStartMode(DragStartMode.COMPONENT);
 					wrapper.setData(propertyId);
@@ -98,28 +106,26 @@ public class PivotUI extends GridLayout {
 			aggregator.setDropHandler(aggDopHandler);
 			aggregatorDragAndDropWrapper.setDropHandler(aggDopHandler);
 
-			final DDHorizontalLayout cols = new DDHorizontalLayout();
+
 			cols.addStyleName("pivot-ui-cols");
-			final DropHandler dropHandler = new AttributeDnDHandler(cols, false, config.columns.attributes);
-			cols.setDropHandler(dropHandler);
+
+			cols.setDropHandler(colDropHandler);
 			cols.setSpacing(true);
 
 			final DragAndDropWrapper colDnDWrapper = new DragAndDropWrapper(cols);
-			colDnDWrapper.setDropHandler(dropHandler);
+			colDnDWrapper.setDropHandler(colDropHandler);
 			addComponents(aggregatorDragAndDropWrapper, colDnDWrapper);
 		}
 
 		{
-			final DDVerticalLayout rows = new DDVerticalLayout();
 			rows.addStyleName("pivot-ui-rows");
 
-			final DropHandler dropHandler = new AttributeDnDHandler(rows, true, config.rows.attributes);
 
-			rows.setDropHandler(dropHandler);
+			rows.setDropHandler(rowDropHandler);
 			rows.setSpacing(true);
 
 			final DragAndDropWrapper rowDnDWrapper = new DragAndDropWrapper(rows);
-			rowDnDWrapper.setDropHandler(dropHandler);
+			rowDnDWrapper.setDropHandler(rowDropHandler);
 			rowDnDWrapper.setWidth(150, Unit.PIXELS);
 			rowDnDWrapper.setHeight("100%");
 

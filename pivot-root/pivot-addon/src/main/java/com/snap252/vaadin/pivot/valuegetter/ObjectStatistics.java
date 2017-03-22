@@ -8,16 +8,16 @@ import org.eclipse.jdt.annotation.Nullable;
 public class ObjectStatistics {
 	public int numberOfValues;
 	public int numberOfNonNullValues;
-	private final Set<@Nullable Object> distinctValues = new HashSet<>();
+	private final Set<Object> distinctValues = new HashSet<>();
 
 	public void add(@Nullable final Object o) {
 		numberOfValues++;
-		distinctValues.add(o);
 		if (o != null) {
+			distinctValues.add(o);
 			numberOfNonNullValues++;
 		}
 	}
-	
+
 	public int getDistinct(){
 		return distinctValues.size();
 	}

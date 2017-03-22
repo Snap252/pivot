@@ -13,7 +13,10 @@ import com.snap252.org.pivoting.Bucket;
 import com.snap252.vaadin.pivot.GridRendererParameter.GridRendererChangeParameterKind;
 import com.snap252.vaadin.pivot.xml.renderers.Aggregator;
 import com.vaadin.data.Container.PropertySetChangeListener;
+import com.vaadin.server.AbstractErrorMessage.ContentMode;
+import com.vaadin.server.ErrorMessage.ErrorLevel;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.server.UserError;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -37,6 +40,16 @@ final class GridRenderer {
 		// work around for : https://github.com/vaadin/framework/issues/8638
 		final PropertySetChangeListener columnsChanged0 = _ignore -> cleanupGridHeader(grid);
 		bucketContainer.addPropertySetChangeListener(columnsChanged0);
+		bucketContainer.addPropertySetChangeListener(pcl -> {
+			try {
+				pcl.getContainer().getContainerPropertyIds();
+				grid.setEnabled(true);
+				grid.setComponentError(null);
+			} catch (final IllegalArgumentException e) {
+				grid.setEnabled(false);
+				grid.setComponentError(new UserError(e.getMessage(), ContentMode.TEXT, ErrorLevel.INFORMATION));
+			}
+		});
 		grid.setContainerDataSource(bucketContainer);
 
 		final PropertySetChangeListener columnsChanged = _ignore -> {
@@ -53,48 +66,13 @@ final class GridRenderer {
 			if (columnPropertyId != COLLAPSE_COL_PROPERTY_ID) {
 				final Bucket<?> colBucket = (Bucket<?>) columnPropertyId;
 				modelAggregator.updateRendererAndConverter(column, colBucket.getLevel());
-				// final RendererConverter<?, ?> rc =
-				// modelAggregator.createRendererConverter();
-				// rc.setToColumn(column, colBucket.getLevel());
 				column.setMinimumWidth(75);
 			} else {
-//				column.setRenderer(new org.vaadin.treegrid.HierarchyRenderer( "-"));
+				column.setRenderer(new org.vaadin.treegrid.HierarchyRenderer("-"));
 				column.setMinimumWidth(170);
 			}
 		});
-		// grid.setFrozenColumnCount(1);
 	}
-
-	// private final ModelAggregtorDelegate aggregatorDelegator = new
-	// ModelAggregtorDelegate();
-	//
-	// private void setModelAggregator(final ModelAggregtor<?> modelAggregator)
-	// {
-	// this.aggregatorDelegator.setDelegate(modelAggregator);
-	// fireValueChange();
-	// }
-	//
-	// private ModelAggregtor<?> getModelAggregator() {
-	// return this.aggregatorDelegator.getDelegate();
-	// }
-	//
-	// public void updateRenderer(final Grid g) {
-	//
-	// g.getColumns().forEach(col -> {
-	// col.setResizable(false);
-	// col.setSortable(false);
-	// if (col.getPropertyId() != colProp) {
-	// aggregatorDelegator.createRendererConverter().setToColumn(col);
-	// col.setMinimumWidth(50);
-	// } else
-	// col.setMinimumWidth(170);
-	//
-	// });
-	// /*
-	// * hack for https://vaadin.com/forum#!/thread/9319379
-	// */
-	// // g.setCellStyleGenerator(g.getCellStyleGenerator());
-	// }
 
 	static final Object COLLAPSE_COL_PROPERTY_ID = new Object() {
 		@Override
@@ -170,6 +148,10 @@ final class GridRenderer {
 					} else
 						cell.setComponent(createChildCollapseButton(g,
 								b.stream().filter(b0 -> b0 != b).collect(toList()), SUM_TEXT));
+
+					final HeaderCell cell0 = childRow.getCell(b.getWrappedIfThere());
+					if (cell0 != null)
+						cell0.setText(SUM_TEXT);
 				}
 			}
 		}
@@ -180,6 +162,10 @@ final class GridRenderer {
 				break;
 			}
 			cell.setStyleName("column-depth-" + depth);
+
+			final HeaderCell cell0 = g.getHeaderRow(i).getCell(b.getWrappedIfThere());
+			if (cell0 != null)
+				cell0.setStyleName("column-depth-" + depth);
 		}
 	}
 

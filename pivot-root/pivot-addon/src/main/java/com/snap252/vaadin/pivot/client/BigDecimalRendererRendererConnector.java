@@ -32,6 +32,7 @@ public class BigDecimalRendererRendererConnector extends AbstractRendererConnect
 				final ClientRendererSharedState state = getState();
 				ret.setNumberFormat(new LocalizedNumberFormat(state.numberFormat));
 				ret.setNullRepresentation(state.nullRepresentation);
+				ret.setGradient(state.gradient);
 				ret.setDepth(state.depth);
 			}
 		});
@@ -152,6 +153,7 @@ public class BigDecimalRendererRendererConnector extends AbstractRendererConnect
 		final ClientBigDecimalRendererRenderer ret = (ClientBigDecimalRendererRenderer) super.getRenderer();
 		final ClientRendererSharedState state = getState();
 		ret.setNumberFormat(new LocalizedNumberFormat(state.numberFormat));
+		ret.setGradient(state.gradient);
 		ret.setNullRepresentation(state.nullRepresentation);
 		ret.setDepth(state.depth);
 		return ret;

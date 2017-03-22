@@ -6,18 +6,10 @@ import java.util.ResourceBundle;
 
 import com.vaadin.ui.Component;
 
-public class Enums {
-	private static final String BUNDLE_NAME = "com.snap252.org.pivoting.enums"; //$NON-NLS-1$
+public class Labels {
+	private static final String BUNDLE_NAME = "com.snap252.org.pivoting.labels"; //$NON-NLS-1$
 
-	private Enums() {
-	}
-
-	public static String getString(final Enum<?> key, final Locale l) {
-		return getString(key.getDeclaringClass().getSimpleName() + "." + key.name(), l);
-	}
-
-	public static String getString(final Enum<?> key, final Component c) {
-		return getString(key.getDeclaringClass().getSimpleName() + "." + key.name(), getLocaleFromComponent(c));
+	private Labels() {
 	}
 
 	protected static Locale getLocaleFromComponent(final Component c) {

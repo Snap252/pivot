@@ -14,6 +14,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import com.snap252.vaadin.pivot.UIConfigurable;
 import com.snap252.vaadin.pivot.i18n.LookupComboBox;
+import com.snap252.vaadin.pivot.i18n.LookupTextField;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.AbstractSelect;
@@ -57,20 +58,20 @@ public class DateAttribute extends Attribute<@Nullable Date> {
 
 		public DateConfigurable() {
 			final TabSheet allTabSheet = new TabSheet(
-					getWrapper("Allgemein", false, createForDisplayName(DateAttribute.this)),
-					getWrapper("Format", false, getDateFormatConfig()));
+					getWrapperForTab("common", false, createForDisplayName(DateAttribute.this)),
+					getWrapperForTab("format", false, getDateFormatConfig()));
 			allTabSheet.setWidth("500px");
 			allTabSheet.addStyleName(ValoTheme.TABSHEET_COMPACT_TABBAR);
 			this.comp = allTabSheet;
 		}
 
 		private TabSheet getDateFormatConfig() {
-			final AbstractSelect combobox = new LookupComboBox("Auswahl", DateRounding.values());
+			final AbstractSelect combobox = new LookupComboBox("selection", DateRounding.values());
 			// TODO: "apply from rounding to custom" - button
-			final TextField textfield = new TextField("Eingabe");
+			final TextField textfield = new LookupTextField("input");
 
-			final TabSheet ts = new TabSheet(getWrapper("Vorgegebenes Format", true, combobox),
-					getWrapper("Benutzerdefiniertes Format", true, textfield));
+			final TabSheet ts = new TabSheet(getWrapperForTab("predefined_format", true, combobox),
+					getWrapperForTab("userdefined_format", true, textfield));
 			ts.addStyleName(ValoTheme.TABSHEET_COMPACT_TABBAR);
 			ts.setSizeFull();
 			if (dateFormat instanceof CustomDateFormat) {

@@ -4,6 +4,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.vaadin.hene.popupbutton.PopupButton;
 
+import com.snap252.vaadin.pivot.i18n.MessageButton;
 import com.snap252.vaadin.pivot.xml.bucketextractors.Attribute;
 import com.snap252.vaadin.pivot.xml.data.NotifyingList;
 import com.vaadin.ui.AbstractComponent;
@@ -39,12 +40,12 @@ public class AttributeDnDHandler extends DropHandlerImplementation<Attribute<?>>
 		final AbstractComponent component = uiConfigurable.getComponent();
 
 		final PopupButton popupButton = new PopupButton(createFilter.getDisplayName());
-		final Button deleteButton = new Button("Entfernen", evt -> {
+		final Button deleteButton = new MessageButton("remove", evt -> {
 			removeFromList(createFilter, this);
 			popupButton.setPopupVisible(false);
 		});
 		deleteButton.addStyleName(ValoTheme.BUTTON_SMALL);
-		final Button closeButton = new Button("Schließen", evt -> popupButton.setPopupVisible(false));
+		final Button closeButton = new MessageButton("close", evt -> popupButton.setPopupVisible(false));
 		closeButton.addStyleName(ValoTheme.BUTTON_SMALL);
 
 		final HorizontalLayout footer = new HorizontalLayout(deleteButton, closeButton);

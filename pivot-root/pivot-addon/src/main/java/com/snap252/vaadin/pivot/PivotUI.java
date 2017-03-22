@@ -16,6 +16,7 @@ import com.vaadin.ui.DragAndDropWrapper;
 import com.vaadin.ui.DragAndDropWrapper.DragStartMode;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
@@ -73,7 +74,8 @@ public class PivotUI extends GridLayout {
 			properties = new HorizontalLayout();
 			properties.setCaption("properties");
 			final DragAndDropWrapper rowDndWrapper = new DragAndDropWrapper(properties);
-			addComponents(renderer, rowDndWrapper);
+//			addComponents(renderer, rowDndWrapper);
+			addComponents(new Label(), rowDndWrapper);
 
 			{
 				final Component[] labels = gridRendererParameterx.getProperties().stream().map(propertyId -> {

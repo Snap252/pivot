@@ -53,8 +53,8 @@ public class DecimalValueField extends ValueField<Number> {
 			});
 
 			final TabSheet allTabSheet = new TabSheet(
-					getWrapper("Allgemein", false, createForDisplayName(DecimalValueField.this)),
-					getWrapper("Statistiken", false, statisticsAggConfig), getWrapper("Zählung", false, countingAggConfig));
+					getWrapperForTab("common", false, createForDisplayName(DecimalValueField.this)),
+					getWrapperForTab("statistics", false, statisticsAggConfig), getWrapperForTab("counting", false, countingAggConfig));
 			if (agg instanceof CountingAggregator) {
 				countingAggConfig.setValue((CountingAggregator) agg);
 				allTabSheet.setSelectedTab(2);

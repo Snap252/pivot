@@ -36,7 +36,7 @@ public final class CountingAggregator extends Aggregator<ObjectStatistics, BigDe
 	}
 
 	static class CountingAggConfig extends FormLayoutField<CountingAggregator> {
-		private final AbstractSelect displayCheckbox = new LookupComboBox("Darstellung",
+		private final AbstractSelect displayCheckbox = new LookupComboBox("display",
 				WhatOfObjectStatisticsToShow.values());
 
 		CountingAggConfig() {

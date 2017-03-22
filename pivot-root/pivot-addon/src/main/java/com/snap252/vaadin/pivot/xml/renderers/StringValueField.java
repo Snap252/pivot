@@ -52,8 +52,8 @@ public class StringValueField extends ValueField<String> {
 			});
 
 			final TabSheet allTabSheet = new TabSheet(
-					getWrapper("Allgemein", false, createForDisplayName(StringValueField.this)),
-					getWrapper("Zählung", false, countingAggConfig), getWrapper("Verketten", false, concatAggConfig));
+					getWrapperForTab("common", false, createForDisplayName(StringValueField.this)),
+					getWrapperForTab("counting", false, countingAggConfig), getWrapperForTab("concatenating", false, concatAggConfig));
 			if (agg instanceof CountingAggregator) {
 				countingAggConfig.setValue((CountingAggregator) agg);
 				allTabSheet.setSelectedTab(1);

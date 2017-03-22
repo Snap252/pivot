@@ -21,7 +21,10 @@ import com.snap252.org.aggregators.PivotCollectors;
 import com.snap252.vaadin.pivot.PivotCellReference;
 import com.snap252.vaadin.pivot.client.Color;
 import com.snap252.vaadin.pivot.client.Gradient;
+import com.snap252.vaadin.pivot.i18n.Labels;
 import com.snap252.vaadin.pivot.i18n.LookupComboBox;
+import com.snap252.vaadin.pivot.i18n.LookupTextField;
+import com.snap252.vaadin.pivot.i18n.MessageButton;
 import com.snap252.vaadin.pivot.renderer.BigDecimalRenderer;
 import com.snap252.vaadin.pivot.valuegetter.WhatOfNumberStatisticsToRender;
 import com.vaadin.data.Property;
@@ -149,11 +152,11 @@ public class RelativeStasticsAggregator
 	}
 
 	static class NumberStatisticsConfig extends FormLayoutField<RelativeStasticsAggregator> {
-		private final AbstractSelect whatOfNumberStatisticsToRenderCheckBox = new LookupComboBox("Typ",
+		private final AbstractSelect whatOfNumberStatisticsToRenderCheckBox = new LookupComboBox("type",
 				WhatOfNumberStatisticsToRender.values());
-		private final AbstractSelect ofWhatParentCheckBox = new LookupComboBox("Relativ zu", OfWhatParent.values());
-		private final TextField formatTextField = new TextField("Formatierung");
-		private final TextField nullFormatTextField = new TextField("Leere Werte");
+		private final AbstractSelect ofWhatParentCheckBox = new LookupComboBox("relative_to", OfWhatParent.values());
+		private final TextField formatTextField = new LookupTextField("format");
+		private final TextField nullFormatTextField = new LookupTextField("display_empty_values");
 
 		static class ColorPickerField extends ColorPicker implements DefaultField<@Nullable Color> {
 			private final ColorSelector cs;
@@ -288,15 +291,21 @@ public class RelativeStasticsAggregator
 				value.format = formatString;
 				fireValueChange();
 			});
-			final Button b = new Button("Configure Heat-Map");
+			final Button b = new MessageButton("configure_heat_map");
 
 			b.addClickListener(evt -> {
-				final Window window = new Window(" Heat-Map");
+				final Window window = new Window(" "){
+					@Override
+					public void attach() {
+						super.attach();
+						setCaption(Labels.getString("heat_map", this));
+					}
+				};
 				window.setIcon(FontAwesome.CROSSHAIRS);
 				window.setResizable(false);
 				window.addStyleName("window-in-popup");
 				final VerticalLayout vl = new VerticalLayout(hmi);
-				vl.addComponent(new HorizontalLayout(new Button("Close", btnEvt -> window.close())));
+				vl.addComponent(new HorizontalLayout(new MessageButton("close", btnEvt -> window.close())));
 
 				window.setContent(vl);
 				vl.setMargin(true);

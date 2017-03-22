@@ -46,8 +46,8 @@ public final class ObjectValueField extends ValueField<Object> {
 			});
 
 			final TabSheet allTabSheet = new TabSheet(
-					getWrapper("Allgemein", false, createForDisplayName(ObjectValueField.this)),
-					getWrapper("Zählung", false, countingAggConfig));
+					getWrapperForTab("common", false, createForDisplayName(ObjectValueField.this)),
+					getWrapperForTab("counting", false, countingAggConfig));
 			if (agg instanceof CountingAggregator) {
 				countingAggConfig.setValue((CountingAggregator) agg);
 				allTabSheet.setSelectedTab(1);

@@ -17,6 +17,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.snap252.vaadin.pivot.i18n.LookupComboBox;
+import com.snap252.vaadin.pivot.i18n.LookupTextField;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.renderers.Renderer;
@@ -99,8 +100,8 @@ public class ComparableAggregator<X extends Comparable<X>> extends Aggregator<Op
 
 	static class ComparableAggConfig extends FormLayoutField<ComparableAggregator<?>> {
 
-		private final AbstractSelect displayCheckbox = new LookupComboBox("Darstellung", Sorters.values());
-		private final TextField formatTextfield = new TextField("Formatierung");
+		private final AbstractSelect displayCheckbox = new LookupComboBox("display", Sorters.values());
+		private final TextField formatTextfield = new LookupTextField("format");
 
 		ComparableAggConfig() {
 			super(new ComparableAggregator<>());

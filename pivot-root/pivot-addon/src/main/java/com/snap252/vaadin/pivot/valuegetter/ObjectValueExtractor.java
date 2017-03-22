@@ -22,7 +22,7 @@ public class ObjectValueExtractor<INPUT_TYPE> implements FilteringRenderingCompo
 	// protected final Object propertyId;
 	private final AbstractComponent comp;
 
-	private final AbstractSelect howToRenderComboBox = new LookupComboBox("Anzeige",
+	private final AbstractSelect howToRenderComboBox = new LookupComboBox("display",
 			WhatOfObjectStatisticsToShow.values());
 	private WhatOfObjectStatisticsToShow whatToRender = WhatOfObjectStatisticsToShow.COUNT;
 

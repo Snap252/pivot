@@ -35,8 +35,8 @@ public class StringAttribute extends Attribute<@Nullable String> {
 
 		public StringUIConfigurable() {
 			final TabSheet allTabSheet = new TabSheet(
-					getWrapper("Allgemein", false, createForDisplayName(StringAttribute.this)),
-					getWrapper("Format", false, getRounder()));
+					getWrapperForTab("common", false, createForDisplayName(StringAttribute.this)),
+					getWrapperForTab("format", false, getRounder()));
 			allTabSheet.setWidth("500px");
 			allTabSheet.addStyleName(ValoTheme.TABSHEET_COMPACT_TABBAR);
 			this.comp = allTabSheet;

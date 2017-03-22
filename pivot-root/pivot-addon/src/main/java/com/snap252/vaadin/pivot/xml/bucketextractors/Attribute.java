@@ -79,7 +79,7 @@ public abstract class Attribute<@Nullable DATA_TYPE> extends ForAttributeAndValu
 	protected static AbstractComponent createForDisplayName(final Attribute<?> att) {
 		final TextField namingTextField = createNamingTextField(att);
 
-		final AbstractSelect subtotalCombobox = new LookupComboBox("Zwischensumme", ShowingSubtotal.values());
+		final AbstractSelect subtotalCombobox = new LookupComboBox("sub_total", ShowingSubtotal.values());
 
 		subtotalCombobox.setNullSelectionItemId(ShowingSubtotal.INHERIT);
 		subtotalCombobox.setNullSelectionAllowed(true);

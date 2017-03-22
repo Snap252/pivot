@@ -39,7 +39,7 @@ public class HeatMapInput extends HorizontalLayout {
 	private static final Object COLOR_PROPERTY = "COLOR";
 	private static final Object VALUE_PROPERTY = "VALUE";
 	private final Indexed indexed = new IndexedContainer();
-	private final Grid grid = new Grid(){
+	private final Grid grid = new Grid() {
 		@Override
 		protected void doEditItem() {
 			super.doEditItem();
@@ -162,12 +162,28 @@ public class HeatMapInput extends HorizontalLayout {
 		removeButton.addStyleName(ValoTheme.BUTTON_SMALL);
 		removeButton.addClickListener(btnEvt -> {
 			final Collection<Object> selectedRows = grid.getSelectedRows();
-			if (!selectedRows.isEmpty())
+			if (!selectedRows.isEmpty()) {
+				@NonNull
+				final Object firstSelected = selectedRows.iterator().next();
+				Object nextOrLastItemId = indexed.nextItemId(firstSelected);
+				if (nextOrLastItemId == null)
+					nextOrLastItemId = indexed.lastItemId();
+
 				selectedRows.forEach(indexed::removeItem);
-			else {
+				if (nextOrLastItemId != null)
+					grid.select(nextOrLastItemId);
+			} else {
 				final Object firstItemId = indexed.firstItemId();
-				if (firstItemId != null)
+
+				if (firstItemId != null) {
+					Object nextOrLastItemId = indexed.nextItemId(firstItemId);
+					if (nextOrLastItemId == null)
+						nextOrLastItemId = indexed.lastItemId();
+					if (nextOrLastItemId != null)
+						grid.select(nextOrLastItemId);
 					indexed.removeItem(firstItemId);
+				}
+
 			}
 		});
 

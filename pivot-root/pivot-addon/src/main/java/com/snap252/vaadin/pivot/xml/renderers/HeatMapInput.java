@@ -17,10 +17,13 @@ import com.vaadin.data.Container.Indexed;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.fieldgroup.DefaultFieldGroupFieldFactory;
+import com.vaadin.data.fieldgroup.FieldGroup;
+import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.data.util.converter.Converter;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.AbstractColorPicker.Coordinates2Color;
+import com.vaadin.ui.AbstractTextField;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.Grid;
@@ -36,7 +39,16 @@ public class HeatMapInput extends HorizontalLayout {
 	private static final Object COLOR_PROPERTY = "COLOR";
 	private static final Object VALUE_PROPERTY = "VALUE";
 	private final Indexed indexed = new IndexedContainer();
-	private final Grid grid = new Grid();
+	private final Grid grid = new Grid(){
+		@Override
+		protected void doEditItem() {
+			super.doEditItem();
+			final FieldGroup editorFieldGroup = grid.getEditorFieldGroup();
+			final AbstractTextField valueEditField = (AbstractTextField) editorFieldGroup.getField(VALUE_PROPERTY);
+			valueEditField.focus();
+			valueEditField.selectAll();
+		};
+	};
 
 	@SuppressWarnings({ "null", "unchecked" })
 	public HeatMapInput() {
@@ -48,14 +60,14 @@ public class HeatMapInput extends HorizontalLayout {
 
 			@Override
 			public Color convertToModel(final String value, final Class<? extends Color> targetType,
-					final @Nullable Locale locale) throws com.vaadin.data.util.converter.Converter.ConversionException {
+					final @Nullable Locale locale) {
 				assert false;
 				return new Color();
 			}
 
 			@Override
 			public String convertToPresentation(final Color value, final Class<? extends String> targetType,
-					final @Nullable Locale locale) throws com.vaadin.data.util.converter.Converter.ConversionException {
+					final @Nullable Locale locale) {
 				return "<div style='background-color:" + value.toRGBACssString(255)
 						+ ";width:100%;height: 90%;border-radius:5px;'/>";
 			}
@@ -84,7 +96,6 @@ public class HeatMapInput extends HorizontalLayout {
 
 		final ColorPickerGradient colorPickerGradient = new ColorPickerGradient("rgb-gradient",
 				new Coordinates2Color() {
-
 					@Override
 					public com.vaadin.shared.ui.colorpicker.Color calculate(final int x, final int y) {
 						final float h = (x / 220f);
@@ -133,6 +144,12 @@ public class HeatMapInput extends HorizontalLayout {
 		});
 
 		addButton.addClickListener(evt -> {
+			try {
+				grid.saveEditor();
+			} catch (final CommitException e) {
+				grid.cancelEditor();
+			}
+
 			final Object itemId = indexed.addItem();
 			final com.vaadin.shared.ui.colorpicker.Color color2 = colorPickerGradient.getColor();
 
@@ -206,22 +223,22 @@ public class HeatMapInput extends HorizontalLayout {
 
 		final Color[] colors = new Color[itemIds.size()];
 		final double[] fractions = new double[itemIds.size()];
-		itemIds.stream().map(indexed::getItem)
-				.sorted(Comparator.comparing(
-						item -> ((Number) Objects.requireNonNull(item.getItemProperty(VALUE_PROPERTY)).getValue())
-								.doubleValue()))
+		itemIds.stream().map(indexed::getItem).sorted(Comparator.comparing(HeatMapInput::getValue))
 				.forEach(new Consumer<Item>() {
 					int i = 0;
 
 					@Override
 					public void accept(final Item item) {
+						fractions[i] = getValue(item);
 						colors[i] = (Color) Objects.requireNonNull(item.getItemProperty(COLOR_PROPERTY)).getValue();
-						fractions[i] = ((Number) Objects.requireNonNull(item.getItemProperty(VALUE_PROPERTY))
-								.getValue()).doubleValue();
 						i++;
 
 					}
 				});
 		return new Gradient(fractions, colors);
+	}
+
+	private static double getValue(final Item item) {
+		return ((Number) Objects.requireNonNull(item.getItemProperty(VALUE_PROPERTY)).getValue()).doubleValue();
 	}
 }

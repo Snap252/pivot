@@ -26,7 +26,6 @@ import com.snap252.vaadin.pivot.renderer.BigDecimalRenderer;
 import com.snap252.vaadin.pivot.valuegetter.WhatOfNumberStatisticsToRender;
 import com.vaadin.data.Property;
 import com.vaadin.server.FontAwesome;
-import com.vaadin.ui.AbstractColorPicker;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ColorPicker;
@@ -36,7 +35,6 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.components.colorpicker.ColorChangeEvent;
-import com.vaadin.ui.components.colorpicker.ColorPickerPopup;
 import com.vaadin.ui.components.colorpicker.ColorSelector;
 
 public class RelativeStasticsAggregator
@@ -175,18 +173,6 @@ public class RelativeStasticsAggregator
 
 			@Override
 			protected void showPopup(final boolean open) {
-				// super.showPopup(open);
-				if (open)
-					try {
-						final java.lang.reflect.Field declaredField = AbstractColorPicker.class
-								.getDeclaredField("window");
-						declaredField.setAccessible(true);
-						final ColorPickerPopup window = (ColorPickerPopup) declaredField.get(this);
-						if (window != null)
-							window.addStyleName("window-in-popup");
-					} catch (ReflectiveOperationException | SecurityException | IllegalArgumentException e) {
-						assert false;
-					}
 			}
 
 			@Override

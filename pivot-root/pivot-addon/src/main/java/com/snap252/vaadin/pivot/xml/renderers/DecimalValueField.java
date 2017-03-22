@@ -62,8 +62,7 @@ public class DecimalValueField extends ValueField<Number> {
 				statisticsAggConfig.setValue((RelativeStasticsAggregator) agg);
 				allTabSheet.setSelectedTab(1);
 			}
-			allTabSheet.setWidth("1500px");
-//			allTabSheet.setHeight("900px");
+			allTabSheet.setWidth("500px");
 			allTabSheet.addStyleName(ValoTheme.TABSHEET_COMPACT_TABBAR);
 			this.comp = allTabSheet;
 		}

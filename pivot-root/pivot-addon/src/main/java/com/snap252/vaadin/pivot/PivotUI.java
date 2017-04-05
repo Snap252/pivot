@@ -30,12 +30,17 @@ public class PivotUI extends GridLayout {
 	private final HorizontalLayout properties;
 	// private final GridRendererParameter<?, ?> gridRendererParameter;
 	private final Config config;
+	private Component grid;
+	private DragAndDropWrapper rowDnDWrapper;
+	private DragAndDropWrapper aggregatorDragAndDropWrapper;
+	private DragAndDropWrapper rowDndWrapper2;
+	private DragAndDropWrapper colComponent;
 
 	public PivotUI(final GridRendererParameter<?, ?> gridRendererParameter) {
 		this(PivotGrid::new, gridRendererParameter);
 	}
 
-	public <INPUT_TYPE> PivotUI(final Function<GridRendererParameter<INPUT_TYPE, ?>, Component> f,
+	public <INPUT_TYPE> PivotUI(final Function<GridRendererParameter<INPUT_TYPE, ?>, PivotGridIfc> f,
 			final GridRendererParameter<INPUT_TYPE, ?> gridRendererParameterx) {
 		super(2, 3);
 		// this.gridRendererParameter = gridRendererParameter;
@@ -55,7 +60,7 @@ public class PivotUI extends GridLayout {
 			{
 				renderer.setClosePopupOnOutsideClick(true);
 
-				final VerticalLayout exportWindowContent = new VerticalLayout();
+				final VerticalLayout l = new VerticalLayout();
 				final TextArea textArea = new TextArea();
 				textArea.setRows(20);
 				textArea.setColumns(50);
@@ -66,22 +71,22 @@ public class PivotUI extends GridLayout {
 				final HorizontalLayout horizontalLayout = new HorizontalLayout(fromXmlButton);
 				horizontalLayout.setComponentAlignment(fromXmlButton, Alignment.BOTTOM_RIGHT);
 				horizontalLayout.setSizeFull();
-				exportWindowContent.addComponents(textArea, horizontalLayout);
-				renderer.setContent(exportWindowContent);
+				l.addComponents(textArea, horizontalLayout);
+				renderer.setContent(l);
 			}
 
 			renderer.setSizeFull();
 			properties = new HorizontalLayout();
-			properties.setDescription("properties");
 			properties.setCaption("properties");
-			final DragAndDropWrapper rowDndWrapper = new DragAndDropWrapper(properties);
-//			addComponents(renderer, rowDndWrapper);
-			addComponents(new Label(), rowDndWrapper);
+			rowDndWrapper2 = new DragAndDropWrapper(properties);
+			// addComponents(renderer, rowDndWrapper);
+			addComponents(new Label(), rowDndWrapper2);
 
 			{
 				final Component[] labels = gridRendererParameterx.getProperties().stream().map(propertyId -> {
 					assert propertyId != null;
-					final Component button = new Button(propertyId.toString(), btnEvt -> rowDropHandler.appendProprammatically(propertyId));
+					final Component button = new Button(propertyId.toString(),
+							btnEvt -> rowDropHandler.appendProprammatically(propertyId));
 					button.addStyleName(ValoTheme.BUTTON_QUIET);
 					button.addStyleName(ValoTheme.BUTTON_SMALL);
 					// button.setEnabled(false);
@@ -99,42 +104,50 @@ public class PivotUI extends GridLayout {
 
 			final DDVerticalLayout aggregator = new DDVerticalLayout();
 			aggregator.setSpacing(true);
-			final DragAndDropWrapper aggregatorDragAndDropWrapper = new DragAndDropWrapper(aggregator);
+			aggregatorDragAndDropWrapper = new DragAndDropWrapper(aggregator);
 			final DropHandler aggDopHandler = new ValueFieldDnDHandler(aggregator, true,
 					config.getRendererAsNotifyingList());
 
 			aggregator.setDropHandler(aggDopHandler);
 			aggregatorDragAndDropWrapper.setDropHandler(aggDopHandler);
 
-
 			cols.addStyleName("pivot-ui-cols");
 
 			cols.setDropHandler(colDropHandler);
 			cols.setSpacing(true);
 
-			final DragAndDropWrapper colDnDWrapper = new DragAndDropWrapper(cols);
-			colDnDWrapper.setDropHandler(colDropHandler);
-			addComponents(aggregatorDragAndDropWrapper, colDnDWrapper);
+			colComponent = new DragAndDropWrapper(cols);
+			colComponent.setDropHandler(colDropHandler);
+			addComponents(aggregatorDragAndDropWrapper, colComponent);
 		}
 
 		{
 			rows.addStyleName("pivot-ui-rows");
 
-
 			rows.setDropHandler(rowDropHandler);
 			rows.setSpacing(true);
 
-			final DragAndDropWrapper rowDnDWrapper = new DragAndDropWrapper(rows);
+			rowDnDWrapper = new DragAndDropWrapper(rows);
 			rowDnDWrapper.setDropHandler(rowDropHandler);
 			rowDnDWrapper.setWidth(150, Unit.PIXELS);
 			rowDnDWrapper.setHeight("100%");
 
-			final Component pivotGrid$ = f.apply(gridRendererParameterx);
-			pivotGrid$.setSizeFull();
-			addComponents(rowDnDWrapper, pivotGrid$);
+			grid = f.apply(gridRendererParameterx);
+			grid.setSizeFull();
+			addComponents(rowDnDWrapper, grid);
 		}
 
 		setRowExpandRatio(2, 1);
 		setColumnExpandRatio(1, 1);
+	}
+
+	public void setMaximized(final boolean expanded) {
+		removeAllComponents();
+		if (expanded) {
+			addComponent(grid, 0, 0, 1, 2);
+		} else {
+
+			addComponents(new Label(), rowDndWrapper2, aggregatorDragAndDropWrapper, colComponent, rowDnDWrapper, grid);
+		}
 	}
 }

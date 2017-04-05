@@ -102,6 +102,22 @@ final class GridRenderer {
 		});
 
 		doHeader(grid, colBucket, 0);
+		final HeaderCell cell = grid.getDefaultHeaderRow().getCell(COLLAPSE_COL_PROPERTY_ID);
+		final Button resizeButton = new Button(FontAwesome.EXPAND);
+		resizeButton.addStyleName(ValoTheme.BUTTON_QUIET);
+		resizeButton.addStyleName(ValoTheme.BUTTON_SMALL);
+		resizeButton.addClickListener(new ClickListener() {
+			private boolean collapsed;
+
+			@Override
+			public void buttonClick(final ClickEvent evt) {
+				final PivotUI parent = (PivotUI) grid.getParent();
+				collapsed = !collapsed;
+				parent.setMaximized(collapsed);
+				resizeButton.setIcon(collapsed ? FontAwesome.COMPRESS : FontAwesome.EXPAND);
+			}
+		});
+		cell.setComponent(resizeButton);
 		// TODO: better not to add it
 		if (depth != 0)
 			grid.removeHeaderRow(0);

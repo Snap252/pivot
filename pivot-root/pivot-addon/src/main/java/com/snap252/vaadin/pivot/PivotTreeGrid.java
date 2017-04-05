@@ -6,7 +6,7 @@ import org.vaadin.treegrid.TreeGrid;
 import com.vaadin.shared.ui.grid.ColumnResizeMode;
 
 @NonNullByDefault
-public class PivotTreeGrid extends TreeGrid {
+public class PivotTreeGrid extends TreeGrid implements PivotGridIfc {
 
 	public PivotTreeGrid(final GridRendererParameter<?, ?> bucketParams) {
 		setPrimaryStyleName("v-grid-tiny");

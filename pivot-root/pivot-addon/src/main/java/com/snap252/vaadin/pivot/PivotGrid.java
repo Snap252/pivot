@@ -6,7 +6,7 @@ import com.vaadin.shared.ui.grid.ColumnResizeMode;
 import com.vaadin.ui.Grid;
 
 @NonNullByDefault
-public class PivotGrid extends Grid {
+public class PivotGrid extends Grid implements PivotGridIfc {
 
 	public PivotGrid(final GridRendererParameter<?, ?> bucketParams) {
 		setPrimaryStyleName("v-grid-tiny");

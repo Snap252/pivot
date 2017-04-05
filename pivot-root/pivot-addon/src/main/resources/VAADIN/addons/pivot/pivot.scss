@@ -90,6 +90,12 @@ $tg-expander-width: 5px;
 				}
 			}
 		}
+		.v-button.quiet {
+			line-height: 1.75;
+			height: inherit;
+			text-align: right;
+		}
+
 		.row-header {
 			font-weight: bold;
 		}
@@ -104,11 +110,6 @@ $tg-expander-width: 5px;
 			$v-grid-border-color-source: $v-grid-row-background-color;
 			border: valo-border($color: $v-grid-border-color-source, $strength: 0.8);
 			padding: 4px;
-			.v-button {
-				line-height: 1.75;
-				height: inherit;
-				text-align: right;
-			}
 		}
 
 		.v-grid-tiny-cell {

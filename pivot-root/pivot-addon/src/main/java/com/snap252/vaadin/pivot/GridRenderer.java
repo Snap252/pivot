@@ -104,6 +104,7 @@ final class GridRenderer {
 		doHeader(grid, colBucket, 0);
 		final HeaderCell cell = grid.getDefaultHeaderRow().getCell(COLLAPSE_COL_PROPERTY_ID);
 		final Button resizeButton = new Button(FontAwesome.EXPAND);
+		resizeButton.setDescription("Maximieren");
 		resizeButton.addStyleName(ValoTheme.BUTTON_QUIET);
 		resizeButton.addStyleName(ValoTheme.BUTTON_SMALL);
 		resizeButton.addClickListener(new ClickListener() {
@@ -115,6 +116,7 @@ final class GridRenderer {
 				collapsed = !collapsed;
 				parent.setMaximized(collapsed);
 				resizeButton.setIcon(collapsed ? FontAwesome.COMPRESS : FontAwesome.EXPAND);
+				resizeButton.setDescription(collapsed ? "Minimmieren" : "Maximieren");
 			}
 		});
 		cell.setComponent(resizeButton);

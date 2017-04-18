@@ -5,7 +5,11 @@
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/target/generated-resources/gwt"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/webapp"/>
         <dependent-module archiveName="pivot-1.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/pivot/pivot">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="vaadin-treegrid-0.7.4-x-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/treegrid-addon/treegrid-addon">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <dependent-module archiveName="pivot-core-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/pivot-core/pivot-core">

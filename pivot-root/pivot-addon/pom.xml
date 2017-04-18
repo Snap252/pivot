@@ -29,12 +29,20 @@
 		<Vaadin-Addon>${project.artifactId}-${project.version}.jar</Vaadin-Addon>
 	</properties>
 
-	<!-- <organization> <name>My Name</name> <url>https://github.com/mygithubaccount/PivotGrid/</url>
-		</organization> <scm> <url>git://github.com/mygithubaccount/PivotGrid.git</url>
+	<organization>
+		<name>My Name</name>
+		<url>https://github.com/mygithubaccount/PivotGrid/</url>
+	</organization>
+	<scm>
+		<url>git://github.com/mygithubaccount/PivotGrid.git</url>
 		<connection>scm:git:git://github.com/mygithubaccount/PivotGrid.git</connection>
 		<developerConnection>scm:git:ssh://git@github.com:/mygithubaccount/${componentClassName}.git</developerConnection>
-		<tag>PivotGrid add-on for Vaadin</tag> </scm> <issueManagement> <system>GitHub</system>
-		<url>https://github.com/mygithubaccount/PivotGrid/issues</url> </issueManagement> -->
+		<tag>PivotGrid add-on for Vaadin</tag>
+	</scm>
+	<issueManagement>
+		<system>GitHub</system>
+		<url>https://github.com/mygithubaccount/PivotGrid/issues</url>
+	</issueManagement>
 
 	<licenses>
 		<license>
@@ -127,6 +135,15 @@
 					<configuration>
 						<strict>true</strict>
 						<force>true</force>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-release-plugin</artifactId>
+					<version>2.5.3</version>
+					<configuration>
+						<autoVersionSubmodules>true</autoVersionSubmodules>
+						<tagNameFormat>@{project.version}</tagNameFormat>
 					</configuration>
 				</plugin>
 			</plugins>

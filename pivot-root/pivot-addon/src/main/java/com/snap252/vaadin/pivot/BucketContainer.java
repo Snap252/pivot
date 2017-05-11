@@ -168,7 +168,7 @@ class BucketContainer<INPUT_TYPE>
 			return containerPropertiesCached;
 
 		final List<Object> containerProperties = colBucket.stream().collect(toList());
-		if (containerProperties.size() > 100) {
+		if (containerProperties.size() > 400) {
 			throw new IllegalArgumentException("Zu viele Spalten (" + containerProperties.size() + ")!");
 		}
 		containerProperties.add(0, GridRenderer.COLLAPSE_COL_PROPERTY_ID);

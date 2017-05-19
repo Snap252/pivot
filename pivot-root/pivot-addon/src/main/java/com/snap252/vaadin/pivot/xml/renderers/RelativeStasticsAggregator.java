@@ -148,7 +148,8 @@ public class RelativeStasticsAggregator
 
 		final NumberStatistics<BigDecimal> parent = ofParent$.casted(value);
 		assert parent != null;
-		return getConvertedOwnValue.divide(getConvertedValue(parent), mathContextForDividing);
+		return getConvertedOwnValue == null ? null
+				: getConvertedOwnValue.divide(getConvertedValue(parent), mathContextForDividing);
 	}
 
 	static class NumberStatisticsConfig extends FormLayoutField<RelativeStasticsAggregator> {
@@ -294,7 +295,7 @@ public class RelativeStasticsAggregator
 			final Button b = new MessageButton("configure_heat_map");
 
 			b.addClickListener(evt -> {
-				final Window window = new Window(" "){
+				final Window window = new Window(" ") {
 					@Override
 					public void attach() {
 						super.attach();

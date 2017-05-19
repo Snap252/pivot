@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.snap252.org</groupId>
 	<artifactId>pivot-core</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<properties>
 		<project.build.sourceEncoding>Cp1252</project.build.sourceEncoding>
 	</properties>

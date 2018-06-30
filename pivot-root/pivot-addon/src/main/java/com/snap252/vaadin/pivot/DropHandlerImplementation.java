@@ -1,22 +1,24 @@
 package com.snap252.vaadin.pivot;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 
 import com.snap252.vaadin.pivot.xml.data.NotifyingList;
+import com.vaadin.event.Transferable;
 import com.vaadin.event.dd.DragAndDropEvent;
 import com.vaadin.event.dd.DropHandler;
 import com.vaadin.event.dd.TargetDetails;
-import com.vaadin.event.dd.acceptcriteria.AcceptAll;
 import com.vaadin.event.dd.acceptcriteria.AcceptCriterion;
+import com.vaadin.event.dd.acceptcriteria.ServerSideCriterion;
 import com.vaadin.shared.ui.dd.HorizontalDropLocation;
 import com.vaadin.shared.ui.dd.VerticalDropLocation;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.DragAndDropWrapper;
 import com.vaadin.ui.DragAndDropWrapper.DragStartMode;
 import com.vaadin.ui.DragAndDropWrapper.WrapperTargetDetails;
 import com.vaadin.ui.HasComponents;
@@ -49,15 +51,27 @@ public abstract class DropHandlerImplementation<T> implements DropHandler {
 		updateAllComponentIndices();
 	}
 
+	protected abstract Collection<String> getSupportedFlavors();
+
 	@Override
 	public AcceptCriterion getAcceptCriterion() {
-		return AcceptAll.get();
+
+		final Collection<String> supportedFlavors = getSupportedFlavors();
+		// System.out.println("DropHandlerImplementation.getAcceptCriterion()");
+		return new ServerSideCriterion() {
+
+			@Override
+			public boolean accept(final DragAndDropEvent dragEvent) {
+				final Collection<String> dataFlavors = dragEvent.getTransferable().getDataFlavors();
+				return supportedFlavors.stream().anyMatch(dataFlavors::contains);
+			}
+		};
+		// return AcceptAll.get();
 	}
 
 	@Override
 	public void drop(final DragAndDropEvent event) {
-		final AbstractComponent sourceComponent = (AbstractComponent) event.getTransferable().getSourceComponent();
-		final Object data = sourceComponent.getData();
+
 		final int index;
 
 		final TargetDetails targetDetails = event.getTargetDetails();
@@ -77,30 +91,23 @@ public abstract class DropHandlerImplementation<T> implements DropHandler {
 		} else
 			index = -1;
 
-		if (data instanceof Property) {
-			doWithFilteringComponent(createNew(data), index);
-		} else {
-			doWithFilteringComponent(handlerRemove(event), index);
+		final T data = createNew(event.getTransferable());
+		if (data != null) {
+			final Runnable compToRemove = (Runnable) event.getTransferable().getData("remove");
+			if (compToRemove != null)
+				compToRemove.run();
+			doWithFilteringComponent(data, index);
 		}
 	}
 
-	protected abstract T createNew(final Object data);
-
-	@SuppressWarnings("unchecked")
-	protected T handlerRemove(final DragAndDropEvent event) {
-		final AbstractComponent sourceComponent = (AbstractComponent) event.getTransferable().getSourceComponent();
-		final DragAndDropWrapper dndWrapper = (DragAndDropWrapper) event.getTransferable().getSourceComponent();
-		final AbstractComponent childButton = (AbstractComponent) dndWrapper.iterator().next();
-		final T data2 = (T) childButton.getData();
-		final DropHandlerImplementation<T> pivotCriteriaList2 = (DropHandlerImplementation<T>) sourceComponent
-				.getData();
-		assert pivotCriteriaList2 != null;
-		removeFromList(data2, pivotCriteriaList2);
-		return data2;
+	protected final @Nullable Property<?, ?> getDataFromDrop(final Transferable event) {
+		return event.getDataFlavors().contains("property") ? (Property<?, ?>) event.getData("property") : null;
 	}
 
-	protected static <T> void removeFromList(final T data2, final DropHandlerImplementation<T> pivotCriteriaList) {
-		final boolean changed = pivotCriteriaList.currentElements.remove(data2);
+	protected abstract T createNew(final Transferable data);
+
+	protected void removeFromList(final T data2) {
+		final boolean changed = this.currentElements.remove(data2);
 		assert changed;
 	}
 
@@ -129,12 +136,11 @@ public abstract class DropHandlerImplementation<T> implements DropHandler {
 	private void updateUi(final T createFilter) {
 		final AbstractComponent uiComponent = createUIComponent(createFilter);
 
-		final DragAndDropWrapper moveWrapper = new DragAndDropWrapper(uiComponent);
+		final DragAndDropWrapperExtension moveWrapper = new DragAndDropWrapperExtension(uiComponent, "filter",
+				createFilter);
+		moveWrapper.put("remove", (Runnable) () -> removeFromList(createFilter));
 		orderedLayout.addComponent(moveWrapper);
-
 		moveWrapper.setDragStartMode(DragStartMode.COMPONENT);
-		uiComponent.setData(createFilter);
-		moveWrapper.setData(this);
 		if (vertical) {
 			uiComponent.setWidth("100%");
 		}

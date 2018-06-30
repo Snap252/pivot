@@ -14,5 +14,9 @@
 
     <inherits name="fi.jasoft.dragdroplayouts.DragDropLayoutsWidgetSet" />
 
+    
+
+    
+
     <inherits name="com.vaadin.DefaultWidgetSet" />
 </module>

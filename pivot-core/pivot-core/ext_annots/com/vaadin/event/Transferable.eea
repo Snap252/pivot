@@ -1,0 +1,7 @@
+class com/vaadin/event/Transferable
+getData
+ (Ljava/lang/String;)Ljava/lang/Object;
+ (L1java/lang/String;)L0java/lang/Object;
+getDataFlavors
+ ()Ljava/util/Collection<Ljava/lang/String;>;
+ ()L1java/util/Collection<L1java/lang/String;>;

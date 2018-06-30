@@ -1,12 +1,17 @@
 package com.snap252.vaadin.pivot;
 
+import static java.util.Objects.requireNonNull;
+
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.jdt.annotation.Nullable;
 import org.vaadin.hene.popupbutton.PopupButton;
 
 import com.snap252.vaadin.pivot.i18n.MessageButton;
 import com.snap252.vaadin.pivot.xml.bucketextractors.Attribute;
 import com.snap252.vaadin.pivot.xml.data.NotifyingList;
+import com.vaadin.event.Transferable;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.Alignment;
@@ -26,12 +31,21 @@ public class AttributeDnDHandler extends DropHandlerImplementation<Attribute<?>>
 	}
 
 	@Override
-	protected Attribute<?> createNew(final Object data) {
-		return filterFactory.createAttribute((Property<?, @Nullable ?>) data);
+	protected Collection<String> getSupportedFlavors() {
+		return Arrays.asList("property", "filter");
+	}
+	@Override
+	protected Attribute<?> createNew(final Transferable data) {
+		if (data.getDataFlavors().contains("filter"))
+//			throw new IllegalArgumentException(
+//					"not yet implemented:" + data.getData("filter") + "=>" + data.getData("filter").getClass());
+			return (Attribute<?>) requireNonNull(data.getData("filter"));
+		return filterFactory.createAttribute((Property<?, ?>) requireNonNull(data.getData("property")));
 	}
 
 	public void appendProprammatically(final Property<?, ?> data) {
-		doWithFilteringComponent(createNew(data), -1);
+		final Attribute<?> cn = filterFactory.createAttribute((Property<?, ?>) data);
+		doWithFilteringComponent(cn, -1);
 	}
 
 	@Override
@@ -41,7 +55,7 @@ public class AttributeDnDHandler extends DropHandlerImplementation<Attribute<?>>
 
 		final PopupButton popupButton = new PopupButton(createFilter.getDisplayName());
 		final Button deleteButton = new MessageButton("remove", evt -> {
-			removeFromList(createFilter, this);
+			removeFromList(createFilter);
 			popupButton.setPopupVisible(false);
 		});
 		deleteButton.addStyleName(ValoTheme.BUTTON_SMALL);
@@ -65,4 +79,5 @@ public class AttributeDnDHandler extends DropHandlerImplementation<Attribute<?>>
 	protected UIConfigurable createUIConfigurable(final FilteringComponent<?, ?> filteringComponent) {
 		return (UIConfigurable) filteringComponent;
 	}
+
 }

@@ -1,5 +1,8 @@
 package com.snap252.vaadin.pivot.valuegetter;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.vaadin.hene.popupbutton.PopupButton;
 
 import com.snap252.vaadin.pivot.DropHandlerImplementation;
@@ -7,6 +10,7 @@ import com.snap252.vaadin.pivot.Property;
 import com.snap252.vaadin.pivot.i18n.MessageButton;
 import com.snap252.vaadin.pivot.xml.data.NotifyingList;
 import com.snap252.vaadin.pivot.xml.renderers.ValueField;
+import com.vaadin.event.Transferable;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.Alignment;
@@ -24,10 +28,15 @@ public class ValueFieldDnDHandler extends DropHandlerImplementation<ValueField<?
 		super(cols, vertical, refresher);
 	}
 
+	@Override
+	protected Collection<String> getSupportedFlavors() {
+		return Arrays.asList("property");
+	}
+	
 	@SuppressWarnings("null")
 	@Override
-	protected ValueField<?> createNew(final Object data) {
-		return valueFactory.createFilter((Property<?, ?>) data);
+	protected ValueField<?> createNew(final Transferable data) {
+		return valueFactory.createFilter((Property<?, ?>) data.getData("property"));
 	}
 
 	@Override
@@ -38,7 +47,7 @@ public class ValueFieldDnDHandler extends DropHandlerImplementation<ValueField<?
 		popupButton.setClosePopupOnOutsideClick(false);
 
 		final Button deleteButton = new MessageButton("remove", evt -> {
-			removeFromList(createFilter, this);
+			removeFromList(createFilter);
 			popupButton.setPopupVisible(false);
 		});
 		deleteButton.addStyleName(ValoTheme.BUTTON_SMALL);

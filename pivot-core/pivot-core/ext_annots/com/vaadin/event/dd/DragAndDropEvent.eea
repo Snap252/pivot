@@ -1,0 +1,4 @@
+class com/vaadin/event/dd/DragAndDropEvent
+getTransferable
+ ()Lcom/vaadin/event/Transferable;
+ ()L1com/vaadin/event/Transferable;

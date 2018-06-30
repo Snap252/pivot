@@ -5,7 +5,7 @@
 	<groupId>com.snap252.vaadin</groupId>
 	<artifactId>pivot-demo</artifactId>
 	<packaging>war</packaging>
-	<version>1.0.3-SNAPSHOT</version>
+	<version>1.0.3</version>
 	<name>PivotGrid Add-on Demo</name>
 
 	<prerequisites>

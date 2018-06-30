@@ -90,7 +90,7 @@ public class PivotUI extends GridLayout {
 					button.addStyleName(ValoTheme.BUTTON_QUIET);
 					button.addStyleName(ValoTheme.BUTTON_SMALL);
 					// button.setEnabled(false);
-					final DragAndDropWrapper wrapper = new DragAndDropWrapper(button);
+					final DragAndDropWrapper wrapper = new DragAndDropWrapperExtension(button, propertyId);
 					wrapper.setDragStartMode(DragStartMode.COMPONENT);
 					wrapper.setData(propertyId);
 					return wrapper;

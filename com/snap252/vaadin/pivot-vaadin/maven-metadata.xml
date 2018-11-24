@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>com.snap252.vaadin</groupId>
+  <artifactId>pivot-vaadin</artifactId>
+  <versioning>
+    <versions>
+      <version>1.0.4-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20181124174524</lastUpdated>
+  </versioning>
+</metadata>

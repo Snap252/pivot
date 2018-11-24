@@ -12,9 +12,13 @@ public class PredefinedDateFormat extends ConfigDateFormat {
 	@XmlAttribute(name = "date-rounding")
 	public DateRounding dateRounding;
 
+	public PredefinedDateFormat(final DateRounding rounding) {
+		this.dateRounding = rounding;
+	}
+
 	@Override
 	protected DateFormat getDateformat() {
-		return Optional.ofNullable(dateRounding).orElse(DateRounding.DAY).df;
+		return Optional.ofNullable(dateRounding).orElse(DateRounding.MONTH_SHORT).df;
 	}
 
 	@Override

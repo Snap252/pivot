@@ -132,17 +132,15 @@ public final class GridRendererParameter<INPUT_TYPE, VALUE_TYPE> {
 	}
 
 	public RootBucket<INPUT_TYPE> creatRowBucket(final String SUM_TEXT) {
-
 		final List<PivotCriteria<INPUT_TYPE, ?>> collect = config.rows.attributes.stream()
-				.map(x -> x.createPivotCriteria(provider)).collect(Collectors.toList());
+				.map(x -> (PivotCriteria<INPUT_TYPE, ?>) x.createPivotCriteria(provider)).collect(Collectors.toList());
 		return new RootBucket<INPUT_TYPE>(SUM_TEXT, getValues(), collect, true);
 	}
 
 	public RootBucket<INPUT_TYPE> creatColBucket(final String SUM_TEXT) {
 		final List<PivotCriteria<INPUT_TYPE, ?>> collect = config.columns.attributes.stream()
-				.map(x -> x.createPivotCriteria(provider)).collect(Collectors.toList());
+				.map(x -> (PivotCriteria<INPUT_TYPE, ?>) x.createPivotCriteria(provider)).collect(Collectors.toList());
 		return new RootBucket<INPUT_TYPE>(SUM_TEXT, getValues(), collect, false);
-
 	}
 
 	@Deprecated

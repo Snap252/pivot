@@ -22,12 +22,17 @@ import com.vaadin.ui.themes.ValoTheme;
 
 @NonNullByDefault
 public class AttributeDnDHandler extends DropHandlerImplementation<Attribute<?>> {
-
-	private final AttributeFactory filterFactory = new AttributeFactory();
+	private final AttributeFactory filterFactory;
 
 	public AttributeDnDHandler(final AbstractOrderedLayout cols, final boolean vertical,
-			final NotifyingList<Attribute<?>> currentElements) {
+			final NotifyingList<Attribute<?>> currentElements, final AttributeFactory filterFactory) {
 		super(cols, vertical, currentElements);
+		this.filterFactory = filterFactory;
+	}
+	
+	public AttributeDnDHandler(final AbstractOrderedLayout cols, final boolean vertical,
+			final NotifyingList<Attribute<?>> currentElements) {
+		this(cols, vertical, currentElements, new AttributeFactory());
 	}
 
 	@Override

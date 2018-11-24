@@ -23,9 +23,14 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.themes.ValoTheme;
 
 public class DateAttribute extends Attribute<@Nullable Date> {
+	
+	public DateAttribute(final DateRounding rounding ) {
+		this.dateFormat = new PredefinedDateFormat(rounding);
+	}
+	
 	@XmlElements({ @XmlElement(name = "predefind", type = PredefinedDateFormat.class),
 			@XmlElement(name = "custom", type = CustomDateFormat.class) })
-	public ConfigDateFormat dateFormat = new PredefinedDateFormat();
+	public ConfigDateFormat dateFormat;
 
 	@Override
 	protected Date roundImpl(final Date input) {
@@ -91,9 +96,9 @@ public class DateAttribute extends Attribute<@Nullable Date> {
 
 				combobox.addValueChangeListener(valueChangeEvent -> {
 					final DateRounding rounding = (DateRounding) valueChangeEvent.getProperty().getValue();
-					final PredefinedDateFormat pdf = new PredefinedDateFormat();
-					pdf.dateRounding = Optional.ofNullable(rounding).orElse(DateRounding.DAY);
-					if (dateFormat == pdf)
+					final PredefinedDateFormat pdf = new PredefinedDateFormat(
+							Optional.ofNullable(rounding).orElse(DateRounding.MONTH_SHORT));
+					if (Objects.equals(pdf, dateFormat))
 						return;
 
 					dateFormat = pdf;

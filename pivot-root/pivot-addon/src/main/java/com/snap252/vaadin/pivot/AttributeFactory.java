@@ -6,6 +6,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.snap252.vaadin.pivot.xml.bucketextractors.Attribute;
 import com.snap252.vaadin.pivot.xml.bucketextractors.DateAttribute;
+import com.snap252.vaadin.pivot.xml.bucketextractors.DateRounding;
 import com.snap252.vaadin.pivot.xml.bucketextractors.NumberAttribute;
 import com.snap252.vaadin.pivot.xml.bucketextractors.ObjectAttribute;
 import com.snap252.vaadin.pivot.xml.bucketextractors.StringAttribute;
@@ -18,12 +19,12 @@ public class AttributeFactory {
 		return ret;
 	}
 
-	private <INPUT_TYPE> Attribute<?> createAttributeImpl(final Property<INPUT_TYPE, ?> n) {
+	protected <INPUT_TYPE> Attribute<?> createAttributeImpl(final Property<INPUT_TYPE, ?> n) {
 		if (n.getType() == String.class)
 			return new StringAttribute();
 
 		if (Date.class.isAssignableFrom(n.getType()))
-			return new DateAttribute();
+			return new DateAttribute(DateRounding.MONTH_SHORT);
 		if (Number.class.isAssignableFrom(n.getType()))
 			return new NumberAttribute();
 

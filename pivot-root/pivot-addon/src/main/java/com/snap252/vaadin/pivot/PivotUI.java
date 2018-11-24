@@ -36,12 +36,12 @@ public class PivotUI extends GridLayout {
 	private DragAndDropWrapper rowDndWrapper2;
 	private DragAndDropWrapper colComponent;
 
-	public PivotUI(final GridRendererParameter<?, ?> gridRendererParameter) {
-		this(PivotGrid::new, gridRendererParameter);
+	public PivotUI(final GridRendererParameter<?, ?> gridRendererParameter, final AttributeFactory attributeFactory) {
+		this(PivotGrid::new, gridRendererParameter, attributeFactory);
 	}
 
 	public <INPUT_TYPE> PivotUI(final Function<GridRendererParameter<INPUT_TYPE, ?>, PivotGridIfc> f,
-			final GridRendererParameter<INPUT_TYPE, ?> gridRendererParameterx) {
+			final GridRendererParameter<INPUT_TYPE, ?> gridRendererParameterx, final AttributeFactory attributeFactory) {
 		super(2, 3);
 		// this.gridRendererParameter = gridRendererParameter;
 		this.config = gridRendererParameterx.config;
@@ -50,10 +50,12 @@ public class PivotUI extends GridLayout {
 		setSpacing(true);
 
 		final DDHorizontalLayout cols = new DDHorizontalLayout();
-		final AttributeDnDHandler colDropHandler = new AttributeDnDHandler(cols, false, config.columns.attributes);
+		final AttributeDnDHandler colDropHandler = new AttributeDnDHandler(cols, false, config.columns.attributes,
+				attributeFactory);
 
 		final DDVerticalLayout rows = new DDVerticalLayout();
-		final AttributeDnDHandler rowDropHandler = new AttributeDnDHandler(rows, true, config.rows.attributes);
+		final AttributeDnDHandler rowDropHandler = new AttributeDnDHandler(rows, true, config.rows.attributes,
+				attributeFactory);
 
 		{
 			final PopupButton renderer = new PopupButton("Export/Import");

@@ -1,6 +1,7 @@
 package com.snap252.vaadin.pivot.demo;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -9,12 +10,17 @@ import javax.servlet.annotation.WebServlet;
 
 import com.snap252.org.testing.RandomDataGenerator;
 import com.snap252.org.testing.RandomDataGenerator.Person;
+import com.snap252.vaadin.pivot.AttributeFactory;
 import com.snap252.vaadin.pivot.ContainerPropertyProvider;
 import com.snap252.vaadin.pivot.ExtractOncePropertyProvider;
 import com.snap252.vaadin.pivot.ExtractOncePropertyProvider.PropertyOnceItem;
+import com.snap252.vaadin.pivot.xml.bucketextractors.Attribute;
+import com.snap252.vaadin.pivot.xml.bucketextractors.DateAttribute;
+import com.snap252.vaadin.pivot.xml.bucketextractors.DateRounding;
 import com.snap252.vaadin.pivot.GridRendererParameter;
 import com.snap252.vaadin.pivot.PivotTreeGrid;
 import com.snap252.vaadin.pivot.PivotUI;
+import com.snap252.vaadin.pivot.Property;
 import com.snap252.vaadin.pivot.PropertyProvider;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
@@ -43,7 +49,15 @@ public class DemoUI extends UI {
 	protected void init(VaadinRequest request) {
 
 		// Initialize our new UI component
-		final PivotUI pivotGrid = new PivotUI(PivotTreeGrid::new, gridRendererParameter);
+		final PivotUI pivotGrid = new PivotUI(PivotTreeGrid::new, gridRendererParameter, new AttributeFactory() {
+			@Override
+			protected <INPUT_TYPE> Attribute<?> createAttributeImpl(Property<INPUT_TYPE, ?> n) {
+				if (Date.class.isAssignableFrom(n.getType())) {
+					return new DateAttribute(DateRounding.YEAR);
+				}
+				return super.createAttributeImpl(n);
+			}
+		});
 		pivotGrid.setSizeFull();
 
 		setDS(pivotGrid);

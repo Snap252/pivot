@@ -9,6 +9,6 @@
   
 	<modules>
 		<module>pivot-core/pivot-core</module>
-		<module>pivot-root</module>
+		<module>pivot-vaadin</module>
 	</modules>
 </project>

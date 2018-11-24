@@ -4,11 +4,16 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.snap252.vaadin</groupId>
 	<artifactId>pivot-vaadin-parent</artifactId>
-	<version>1.0.4-SNAPSHOT</version>
-
 	<packaging>pom</packaging>
+	
+	<parent>
+		<groupId>com.snap252.vaadin</groupId>
+		<version>1.0.4-SNAPSHOT</version>
+		<artifactId>pivot-all-parent</artifactId>
+		<relativePath>../parent.pom.xml</relativePath>
+	</parent>
+
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

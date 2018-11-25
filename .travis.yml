@@ -3,4 +3,4 @@ sudo: false
 install:
 - mvn install --settings .travis/settings.xml -DskipTests=true -Dmaven.javadoc.skip=true -B -V
 after_success:
-- mvn deploy
+- mvn deploy --settings .travis/settings.xml

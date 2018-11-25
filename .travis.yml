@@ -1,6 +1,5 @@
 language: java
-script:
-mvn install --settings .travis/settings.xml -DskipTests=true -Dmaven.javadoc.skip=true -B -V
-mvn test --settings .travis/settings.xml -B
+sudo: false
+script: mvn install --settings .travis/settings.xml -DskipTests=true -Dmaven.javadoc.skip=true -B -V
 after_success:
 - mvn deploy

@@ -1,3 +1,6 @@
 language: java
-jdk:
- - oraclejdk8
+script:
+mvn install --settings .travis/settings.xml -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+mvn test --settings .travis/settings.xml -B
+after_success:
+- mvn deploy

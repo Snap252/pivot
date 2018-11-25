@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>pivot</artifactId>
 	<packaging>jar</packaging>
 	<name>PivotGrid Add-on</name>
-	
+
 	<parent>
 		<groupId>com.snap252.vaadin</groupId>
 		<version>1.0.4-SNAPSHOT</version>
@@ -57,9 +59,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.vaadin</groupId>
+			<groupId>snap252</groupId>
 			<artifactId>vaadin-treegrid</artifactId>
-			<version>0.7.6-SIGMA</version>
+			<version>0.7-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
@@ -205,6 +207,19 @@
 			</resource>
 		</resources>
 	</build>
+
+	<repositories>
+		<repository>
+			<id>mvn-repo</id>
+			<url>https://raw.githubusercontent.com/Snap252/tree-grid/mvn-repo/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 
 	<profiles>
 		<profile>
